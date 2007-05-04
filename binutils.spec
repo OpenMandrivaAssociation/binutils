@@ -1,7 +1,7 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
 %define version		2.17.50.0.9
-%define rel		1
+%define rel		2
 %if %{mdkversion} >= 200700
 # XXX core_mkrel
 %define release		%mkrel %{rel}
@@ -141,7 +141,7 @@ ia64)
 i*86 | athlon*)
   ADDITIONAL_TARGETS="x86_64-mandriva-linux"
   ;;
-sparc)
+sparc*)
   ADDITIONAL_TARGETS="sparc64-mandrake-linux"
   ;;
 esac
@@ -152,22 +152,24 @@ else
   ADDITIONAL_TARGETS="spu-unknown-elf"
 fi
 %endif
-[[ -n "$ADDITIONAL_TARGETS" ]] && ADDITIONAL_TARGETS="--enable-targets=$ADDITIONAL_TARGETS"
+if [[ -n "$ADDITIONAL_TARGETS" ]]; then
+  TARGET_CONFIG="$TARGET_CONFIG --enable-targets=$ADDITIONAL_TARGETS"
+fi
 
 case %{target_cpu} in
-ppc | powerpc | i*86 | athlon* | sparc)
-  ADDITIONAL_TARGETS="$ADDITIONAL_TARGETS --enable-64-bit-bfd"
+ppc | powerpc | i*86 | athlon* | sparc*)
+  TARGET_CONFIG="$TARGET_CONFIG --enable-64-bit-bfd"
   ;;
 esac
 
 %if "%{name}" != "binutils"
 %define _program_prefix %{program_prefix}
-ADDITIONAL_TARGETS="$ADDITIONAL_TARGETS --target=%{target_platform}"
+TARGET_CONFIG="$TARGET_CONFIG --target=%{target_platform}"
 %endif
 
 # Don't build shared libraries in cross binutils
 %if "%{name}" == "binutils"
-ENABLE_SHARED="--enable-shared"
+TARGET_CONFIG="$TARGET_CONFIG --enable-shared"
 %endif
 
 # Binutils comes with its own custom libtool
@@ -181,7 +183,7 @@ export CFLAGS="$RPM_OPT_FLAGS -Wno-error"
 rm -rf objs
 mkdir objs
 pushd objs
-CONFIGURE_TOP=.. %configure $ENABLE_SHARED $ADDITIONAL_TARGETS
+CONFIGURE_TOP=.. %configure $TARGET_CONFIG
 %make tooldir=%{_prefix}
 popd
 
