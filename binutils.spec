@@ -142,7 +142,7 @@ i*86 | athlon*)
   ADDITIONAL_TARGETS="x86_64-mandriva-linux"
   ;;
 sparc*)
-  ADDITIONAL_TARGETS="sparc64-mandrake-linux"
+  ADDITIONAL_TARGETS="sparc64-mandriva-linux"
   ;;
 esac
 %ifarch %{spu_arches}
