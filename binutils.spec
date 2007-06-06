@@ -1,7 +1,7 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
-%define version		2.17.50.0.9
-%define rel		2
+%define version		2.17.50.0.12
+%define rel		1
 %if %{mdkversion} >= 200700
 # XXX core_mkrel
 %define release		%mkrel %{rel}
@@ -63,9 +63,16 @@ BuildRequires:	glibc-static-devel
 Patch1:		binutils-2.14.90.0.5-testsuite-Wall-fixes.patch
 Patch2:		binutils-2.16.91.0.7-libtool.patch
 Patch3:		binutils-2.17.50.0.8-linux32.patch
-Patch4:		binutils-2.15.94.0.2-place-orphan.patch
-Patch5:		binutils-2.15.92.0.2-ppc64-pie.patch
+Patch4:		binutils-2.17.50.0.12-place-orphan.patch
+Patch5:		binutils-2.17.50.0.12-ppc64-pie.patch
 Patch6:		binutils-2.16.91.0.1-deps.patch
+Patch7:		binutils-2.17.50.0.12-ltconfig-multilib.patch
+Patch8:		binutils-2.17.50.0.12-ia64-lib64.patch
+Patch9:		binutils-2.17.50.0.12-standards.patch
+Patch10:	binutils-2.17.50.0.12-symbolic-envvar-revert.patch
+Patch11:	binutils-2.17.50.0.12-osabi.patch
+Patch12:	binutils-2.17.50.0.12-rh235747.patch
+
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -84,30 +91,30 @@ Binutils is a collection of binary utilities, including:
 Install binutils if you need to perform any of these types of actions on
 binary files.  Most programmers will want to install binutils.
 
-%package -n spu-binutils
-Summary: GNU Binary Utility Development Utilities for Cell SPU
-Group: Development/Other
-Requires: %{lib_name} = %{version}-%{release}
+%package -n	spu-binutils
+Summary:	GNU Binary Utility Development Utilities for Cell SPU
+Group:		Development/Other
+Requires:	%{lib_name} = %{version}-%{release}
 
-%description -n spu-binutils
+%description -n	spu-binutils
 This package contains the binutils with Cell SPU support.
 
-%package -n %{lib_name}
-Summary: Main library for %{name}
-Group: System/Libraries
-Provides: %{lib_name_orig}
+%package -n	%{lib_name}
+Summary:	Main library for %{name}
+Group:		System/Libraries
+Provides:	%{lib_name_orig}
 
-%description -n %{lib_name}
+%description -n	%{lib_name}
 This package contains the library needed to run programs dynamically
 linked with binutils.
 
-%package -n %{lib_name}-devel
-Summary: Main library for %{name}
-Group: System/Libraries
-Requires: %{lib_name} = %{version}-%{release}
-Provides: %{lib_name_orig}-devel, %{name}-devel
+%package -n	%{lib_name}-devel
+Summary:	Main library for %{name}
+Group:		System/Libraries
+Requires:	%{lib_name} = %{version}-%{release}
+Provides:	%{lib_name_orig}-devel, %{name}-devel
 
-%description -n %{lib_name}-devel
+%description -n	%{lib_name}-devel
 This package contains the library needed to run programs dynamically
 linked with binutils.
 
@@ -121,6 +128,16 @@ This is the development headers for %{lib_name}
 %patch4 -p0 -b .place-orphan
 %patch5 -p0 -b .ppc64-pie
 %patch6 -p1 -b .deps
+%patch7 -p0 -b .ltconfig-multilib
+%ifarch ia64
+%if "%{_lib}" == "lib64"
+%patch8 -p0 -b .ia64-lib64
+%endif
+%endif
+%patch9 -p0 -b .standards
+%patch10 -p0 -b .tekhex
+%patch11 -p0 -b .osabi
+%patch12 -p0 -b .rh235747~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
@@ -217,6 +234,7 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
   done
 fi
 
+%check
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
