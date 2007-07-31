@@ -101,7 +101,7 @@ This package contains the binutils with Cell SPU support.
 
 %package -n	%{lib_name}
 Summary:	Main library for %{name}
-Group:		System/Libraries
+Group:		Development/Other
 Provides:	%{lib_name_orig}
 
 %description -n	%{lib_name}
@@ -110,7 +110,7 @@ linked with binutils.
 
 %package -n	%{lib_name}-devel
 Summary:	Main library for %{name}
-Group:		System/Libraries
+Group:		Development/Other
 Requires:	%{lib_name} = %{version}-%{release}
 Provides:	%{lib_name_orig}-devel, %{name}-devel
 
