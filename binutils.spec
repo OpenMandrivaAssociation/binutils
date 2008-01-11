@@ -4,7 +4,7 @@
 %define rel		2
 %if %{mdkversion} >= 200700
 # XXX core_mkrel
-%define release		%mkrel %{rel}
+1%define release		%mkrel %{rel}
 %else
 %define release		%{rel}mdk
 %endif
