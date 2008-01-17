@@ -1,10 +1,10 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
 %define version		2.17.50.0.12
-%define rel		2
+%define rel		3
 %if %{mdkversion} >= 200700
 # XXX core_mkrel
-1%define release		%mkrel %{rel}
+%define release		%mkrel %{rel}
 %else
 %define release		%{rel}mdk
 %endif
