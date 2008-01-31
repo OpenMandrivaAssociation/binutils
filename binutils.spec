@@ -1,13 +1,8 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
-%define version		2.17.50.0.12
-%define rel		3
-%if %{mdkversion} >= 200700
-# XXX core_mkrel
+%define version		2.18.50.0.3
+%define rel		1
 %define release		%mkrel %{rel}
-%else
-%define release		%{rel}mdk
-%endif
 
 %define lib_major	2
 %define lib_name_orig	%{package_prefix}%mklibname binutils
@@ -60,19 +55,19 @@ BuildRequires:	autoconf automake bison flex gcc gettext texinfo
 BuildRequires:	dejagnu
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel
-Patch1:		binutils-2.14.90.0.5-testsuite-Wall-fixes.patch
-Patch2:		binutils-2.16.91.0.7-libtool.patch
-Patch3:		binutils-2.17.50.0.8-linux32.patch
-Patch4:		binutils-2.17.50.0.12-place-orphan.patch
-Patch5:		binutils-2.17.50.0.12-ppc64-pie.patch
-Patch6:		binutils-2.16.91.0.1-deps.patch
-Patch7:		binutils-2.17.50.0.12-ltconfig-multilib.patch
-Patch8:		binutils-2.17.50.0.12-ia64-lib64.patch
-Patch9:		binutils-2.17.50.0.12-standards.patch
-Patch10:	binutils-2.17.50.0.12-symbolic-envvar-revert.patch
-Patch11:	binutils-2.17.50.0.12-osabi.patch
-Patch12:	binutils-2.17.50.0.12-rh235747.patch
 
+# Fedora patches:
+Patch1:		binutils-2.18.50.0.3-ltconfig-multilib.patch
+Patch2:		binutils-2.18.50.0.3-ppc64-pie.patch
+Patch3:		binutils-2.18.50.0.3-place-orphan.patch
+Patch4:		binutils-2.18.50.0.3-ia64-lib64.patch
+Patch5:		binutils-2.18.50.0.3-build-fixes.patch
+Patch6:		binutils-2.18.50.0.3-symbolic-envvar-revert.patch
+# We don't want this one!
+#Patch7:	binutils-2.18.50.0.3-version.patch
+
+# Mandriva patches
+Patch21:	binutils-2.18.50.0.3-linux32.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -122,22 +117,18 @@ This is the development headers for %{lib_name}
 
 %prep
 %setup -q -n binutils-%{version}
-%patch1 -p1 -b .testsuite-Wall-fixes
-%patch2 -p1 -b .libtool
-%patch3 -p1 -b .linux32
-%patch4 -p0 -b .place-orphan
-%patch5 -p0 -b .ppc64-pie
-%patch6 -p1 -b .deps
-%patch7 -p0 -b .ltconfig-multilib
+%patch1 -p0 -b .ltconfig-multilib~
+%patch2 -p0 -b .ppc64-pie~
+%patch3 -p0 -b .place-orphan~
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%patch8 -p0 -b .ia64-lib64
+%patch4 -p0 -b .ia64-lib64~
 %endif
 %endif
-%patch9 -p0 -b .standards
-%patch10 -p0 -b .tekhex
-%patch11 -p0 -b .osabi
-%patch12 -p0 -b .rh235747~
+%patch5 -p0 -b .build-fixes~
+%patch6 -p0 -b .symbolic-envvar-revert~
+
+%patch21 -p1 -b .linux32
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
@@ -147,19 +138,19 @@ cp %{SOURCE2} ld/emultempl/
 ADDITIONAL_TARGETS=""
 case %{target_cpu} in
 ppc | powerpc)
-  ADDITIONAL_TARGETS="powerpc64-mandriva-linux"
+  ADDITIONAL_TARGETS="powerpc64-%{_target_vendor}-%{_target_os}"
   ;;
 ppc64)
   ADDITIONAL_TARGETS=""
   ;;
 ia64)
-  ADDITIONAL_TARGETS="i586-mandriva-linux"
+  ADDITIONAL_TARGETS="i586-%{_target_vendor}-%{_target_os}"
   ;;
 i*86 | athlon*)
-  ADDITIONAL_TARGETS="x86_64-mandriva-linux"
+  ADDITIONAL_TARGETS="x86_64-%{_target_vendor}-%{_target_os}"
   ;;
 sparc*)
-  ADDITIONAL_TARGETS="sparc64-mandriva-linux"
+  ADDITIONAL_TARGETS="sparc64-%{_target_vendor}-%{_target_os}"
   ;;
 esac
 %ifarch %{spu_arches}
@@ -270,7 +261,20 @@ rm -f  $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.l
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/{dlltool,nlmconv,windres}*
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
+#rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
+
+%find_lang binutils
+%find_lang gas
+%find_lang ld
+%find_lang gprof
+cat gas.lang >> binutils.lang
+cat ld.lang >> binutils.lang
+cat gprof.lang >> binutils.lang
+
+%find_lang opcodes
+%find_lang bfd
+cat opcodes.lang >> libbinutils.lang
+cat bfd.lang >> libbinutils.lang
 
 # Alternate binaries
 [[ -d objs-spu ]] && {
@@ -316,7 +320,7 @@ rm -rf $RPM_BUILD_ROOT
 %post -n %{lib_name} -p /sbin/ldconfig
 %postun -n %{lib_name} -p /sbin/ldconfig
 
-%files
+%files -f binutils.lang
 %defattr(-,root,root)
 %doc README
 %{_bindir}/%{program_prefix}addr2line
@@ -354,11 +358,11 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %if "%{name}" == "binutils"
-%files -n %{lib_name}
+%files -n %{lib_name} -f libbinutils.lang
 %defattr(-,root,root)
 %doc README
-%{_libdir}/libbfd-%{version}.so
-%{_libdir}/libopcodes-%{version}.so
+%{_libdir}/libbfd-%{version}*.so
+%{_libdir}/libopcodes-%{version}*.so
 %endif
 
 %if "%{name}" == "binutils"
@@ -372,5 +376,3 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libopcodes.so
 %{_libdir}/libiberty.a
 %endif
-
-
