@@ -2,7 +2,7 @@
 %define name		%{package_prefix}binutils
 %define version		2.18.50.0.3
 %define rel		1
-%define release		%mkrel %{rel}
+%define release		%manbo_mkrel %{rel}
 
 %define lib_major	2
 %define lib_name_orig	%{package_prefix}%mklibname binutils
