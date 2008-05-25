@@ -1,6 +1,6 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
-%define version		2.18.50.0.3
+%define version		2.18.50.0.6
 %define rel		1
 %define release		%manbo_mkrel %{rel}
 
@@ -37,7 +37,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-License:	GPL
+License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2
@@ -57,14 +57,15 @@ BuildRequires:	dejagnu
 BuildRequires:	glibc-static-devel
 
 # Fedora patches:
-Patch1:		binutils-2.18.50.0.3-ltconfig-multilib.patch
-Patch2:		binutils-2.18.50.0.3-ppc64-pie.patch
-Patch3:		binutils-2.18.50.0.3-place-orphan.patch
-Patch4:		binutils-2.18.50.0.3-ia64-lib64.patch
-Patch5:		binutils-2.18.50.0.3-build-fixes.patch
-Patch6:		binutils-2.18.50.0.3-symbolic-envvar-revert.patch
+Patch1:		binutils-2.18.50.0.6-ltconfig-multilib.patch
+Patch2:		binutils-2.18.50.0.6-ppc64-pie.patch
+Patch3:		binutils-2.18.50.0.6-place-orphan.patch
+Patch4:		binutils-2.18.50.0.6-ia64-lib64.patch
+Patch5:		binutils-2.18.50.0.6-build-fixes.patch
+Patch6:		binutils-2.18.50.0.6-symbolic-envvar-revert.patch
 # We don't want this one!
 #Patch7:	binutils-2.18.50.0.3-version.patch
+Patch8:		binutils-2.18.50.0.6-pclmul.patch
 
 # Mandriva patches
 Patch21:	binutils-2.18.50.0.3-linux32.patch
@@ -127,6 +128,7 @@ This is the development headers for %{lib_name}
 %endif
 %patch5 -p0 -b .build-fixes~
 %patch6 -p0 -b .symbolic-envvar-revert~
+%patch8 -p0 -b .pclmul~
 
 %patch21 -p1 -b .linux32
 
