@@ -87,6 +87,7 @@ Binutils is a collection of binary utilities, including:
 Install binutils if you need to perform any of these types of actions on
 binary files.  Most programmers will want to install binutils.
 
+%ifarch %{spu_arches}
 %package -n	spu-binutils
 Summary:	GNU Binary Utility Development Utilities for Cell SPU
 Group:		Development/Other
@@ -94,6 +95,7 @@ Requires:	%{lib_name} = %{version}-%{release}
 
 %description -n	spu-binutils
 This package contains the binutils with Cell SPU support.
+%endif
 
 %package -n	%{lib_name}
 Summary:	Main library for %{name}
