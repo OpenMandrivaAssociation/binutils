@@ -1,6 +1,6 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
-%define version		2.18.50.0.6
+%define version		2.18.50.0.8
 %define rel		1
 %define release		%manbo_mkrel %{rel}
 
@@ -59,13 +59,17 @@ BuildRequires:	glibc-static-devel
 # Fedora patches:
 Patch1:		binutils-2.18.50.0.6-ltconfig-multilib.patch
 Patch2:		binutils-2.18.50.0.6-ppc64-pie.patch
-Patch3:		binutils-2.18.50.0.6-place-orphan.patch
+Patch3:		binutils-2.18.50.0.8-place-orphan.patch
 Patch4:		binutils-2.18.50.0.6-ia64-lib64.patch
 Patch5:		binutils-2.18.50.0.6-build-fixes.patch
-Patch6:		binutils-2.18.50.0.6-symbolic-envvar-revert.patch
+Patch6:		binutils-2.18.50.0.8-symbolic-envvar-revert.patch
 # We don't want this one!
 #Patch7:	binutils-2.18.50.0.3-version.patch
-Patch8:		binutils-2.18.50.0.6-pclmul.patch
+
+Patch8:		binutils-2.18.50.0.8-spu_ovl-fatal.patch
+Patch9:		binutils-2.18.50.0.8-spu_ovl-dependency.patch
+Patch10:	binutils-2.18.50.0.8-generic-elf-size.patch
+Patch11:	binutils-2.18.50.0.8-largefile.patch
 
 # Mandriva patches
 Patch21:	binutils-2.18.50.0.3-linux32.patch
@@ -130,7 +134,11 @@ This is the development headers for %{lib_name}
 %endif
 %patch5 -p0 -b .build-fixes~
 %patch6 -p0 -b .symbolic-envvar-revert~
-%patch8 -p0 -b .pclmul~
+
+%patch8 -p0 -b .spu_ovl-fatal~
+%patch9 -p0 -b .spu_ovl-dependency~
+%patch10 -p0 -b .generic-elf-size~
+%patch11 -p0 -b .largefile~
 
 %patch21 -p1 -b .linux32
 
