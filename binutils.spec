@@ -1,6 +1,6 @@
 # RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
 %define name		%{package_prefix}binutils
-%define version		2.18.50.0.9
+%define version		2.19.50.0.1
 %define rel		1
 %define release		%manbo_mkrel %{rel}
 
@@ -57,19 +57,18 @@ BuildRequires:	dejagnu
 BuildRequires:	glibc-static-devel
 
 # Fedora patches:
-Patch1:		binutils-2.18.50.0.6-ltconfig-multilib.patch
-Patch2:		binutils-2.18.50.0.6-ppc64-pie.patch
-Patch3:		binutils-2.18.50.0.8-place-orphan.patch
-Patch4:		binutils-2.18.50.0.6-ia64-lib64.patch
-Patch5:		binutils-2.18.50.0.6-build-fixes.patch
-Patch6:		binutils-2.18.50.0.8-symbolic-envvar-revert.patch
+Patch01: binutils-2.19.50.0.1-libtool-lib64.patch
+Patch02: binutils-2.19.50.0.1-ppc64-pie.patch
+Patch03: binutils-2.19.50.0.1-ia64-lib64.patch
+Patch04: binutils-2.19.50.0.1-symbolic-envvar-revert.patch
 # We don't want this one!
-#Patch7:	binutils-2.18.50.0.3-version.patch
-
-Patch11:	binutils-2.18.50.0.9-largefile.patch
+#Patch05: binutils-2.19.50.0.1-version.patch
+Patch06: binutils-2.19.50.0.1-set-long-long.patch
+Patch07: binutils-2.19.50.0.1-linkonce-r-discard.patch
+Patch08: binutils-2.19.50.0.1-build-id.patch
 
 # Mandriva patches
-Patch21:	binutils-2.18.50.0.3-linux32.patch
+Patch21:	binutils-2.19.50.0.1-linux32.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -121,18 +120,17 @@ This is the development headers for %{lib_name}
 
 %prep
 %setup -q -n binutils-%{version}
-%patch1 -p0 -b .ltconfig-multilib~
-%patch2 -p0 -b .ppc64-pie~
-%patch3 -p0 -b .place-orphan~
+%patch01 -p0 -b .libtool-lib64~
+%patch02 -p0 -b .ppc64-pie~
 %ifarch ia64
 %if "%{_lib}" == "lib64"
-%patch4 -p0 -b .ia64-lib64~
+%patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-%patch5 -p0 -b .build-fixes~
-%patch6 -p0 -b .symbolic-envvar-revert~
-
-%patch11 -p0 -b .largefile~
+%patch04 -p0 -b .symbolic-envvar-revert~
+%patch06 -p0 -b .set-long-long~
+%patch07 -p0 -b .linkonce-r-discard~
+%patch08 -p0 -b .build-id~
 
 %patch21 -p1 -b .linux32
 
