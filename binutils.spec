@@ -52,7 +52,7 @@ Requires(preun):info-install
 %endif
 Conflicts:	gcc-c++ < 3.2.3-1mdk
 BuildRequires:	autoconf automake bison flex gcc gettext texinfo
-BuildRequires:	dejagnu
+BuildRequires:	dejagnu zlib-devel
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel
 
