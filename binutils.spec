@@ -267,7 +267,9 @@ rm -f  $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.l
 rm -f $RPM_BUILD_ROOT%{_mandir}/man1/{dlltool,nlmconv,windres}*
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
 rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-#rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
+%if "%{name}" != "binutils"
+rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
+%endif
 
 %find_lang binutils
 %find_lang gas
