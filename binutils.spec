@@ -69,6 +69,7 @@ Patch08: binutils-2.19.50.0.1-build-id.patch
 
 # Mandriva patches
 Patch21:	binutils-2.19.50.0.1-linux32.patch
+Patch22:	binutils-2.19.50.0.1-mips-string_literal-fixes.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -132,7 +133,8 @@ This is the development headers for %{lib_name}
 %patch07 -p0 -b .linkonce-r-discard~
 %patch08 -p0 -b .build-id~
 
-%patch21 -p1 -b .linux32
+%patch21 -p1 -b .linux32~
+%patch22 -p1 -b .string_literal~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
