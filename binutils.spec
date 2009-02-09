@@ -1,8 +1,3 @@
-# RH 2.17.50.0.8-2, SuSE 2.13.90.0.18-6
-%define name		%{package_prefix}binutils
-%define version		2.19.50.0.1
-%define rel		1
-%define release		%manbo_mkrel %{rel}
 
 %define lib_major	2
 %define lib_name_orig	%{package_prefix}%mklibname binutils
@@ -34,9 +29,9 @@
 %define isarch()	%(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
 
 Summary:	GNU Binary Utility Development Utilities
-Name:		%{name}
-Version:	%{version}
-Release:	%{release}
+Name:		%{package_prefix}binutils
+Version:	2.19.50.0.1
+Release:	%manbo_mkrel
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -57,15 +52,15 @@ BuildRequires:	dejagnu zlib-devel
 BuildRequires:	glibc-static-devel
 
 # Fedora patches:
-Patch01: binutils-2.19.50.0.1-libtool-lib64.patch
-Patch02: binutils-2.19.50.0.1-ppc64-pie.patch
-Patch03: binutils-2.19.50.0.1-ia64-lib64.patch
-Patch04: binutils-2.19.50.0.1-symbolic-envvar-revert.patch
+Patch01:	binutils-2.19.50.0.1-libtool-lib64.patch
+Patch02:	binutils-2.19.50.0.1-ppc64-pie.patch
+Patch03:	binutils-2.19.50.0.1-ia64-lib64.patch
+Patch04:	binutils-2.19.50.0.1-symbolic-envvar-revert.patch
 # We don't want this one!
-#Patch05: binutils-2.19.50.0.1-version.patch
-Patch06: binutils-2.19.50.0.1-set-long-long.patch
-Patch07: binutils-2.19.50.0.1-linkonce-r-discard.patch
-Patch08: binutils-2.19.50.0.1-build-id.patch
+#Patch05:	binutils-2.19.50.0.1-version.patch
+Patch06:	binutils-2.19.50.0.1-set-long-long.patch
+Patch07:	binutils-2.19.50.0.1-linkonce-r-discard.patch
+Patch08:	binutils-2.19.50.0.1-build-id.patch
 
 # Mandriva patches
 Patch21:	binutils-2.19.50.0.1-linux32.patch
