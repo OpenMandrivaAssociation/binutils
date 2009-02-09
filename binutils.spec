@@ -30,8 +30,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.19.50.0.1
-Release:	%manbo_mkrel
+Version:	2.19.51.0.2
+Release:	%manbo_mkrel 1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -55,12 +55,11 @@ BuildRequires:	glibc-static-devel
 Patch01:	binutils-2.19.50.0.1-libtool-lib64.patch
 Patch02:	binutils-2.19.50.0.1-ppc64-pie.patch
 Patch03:	binutils-2.19.50.0.1-ia64-lib64.patch
-Patch04:	binutils-2.19.50.0.1-symbolic-envvar-revert.patch
+Patch04:	binutils-2.19.51.0.2-symbolic-envvar-revert.patch
 # We don't want this one!
 #Patch05:	binutils-2.19.50.0.1-version.patch
 Patch06:	binutils-2.19.50.0.1-set-long-long.patch
-Patch07:	binutils-2.19.50.0.1-linkonce-r-discard.patch
-Patch08:	binutils-2.19.50.0.1-build-id.patch
+Patch07:	binutils-2.19.50.0.1-build-id.patch
 
 # Mandriva patches
 Patch21:	binutils-2.19.50.0.1-linux32.patch
@@ -123,10 +122,10 @@ This is the development headers for %{lib_name}
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-%patch04 -p0 -b .symbolic-envvar-revert~
+%patch04 -p1 -b .symbolic-envvar-revert~
+#%patch05 -p0 -b .version~
 %patch06 -p0 -b .set-long-long~
-%patch07 -p0 -b .linkonce-r-discard~
-%patch08 -p0 -b .build-id~
+%patch07 -p0 -b .build-id~
 
 %patch21 -p1 -b .linux32~
 %patch22 -p1 -b .string_literal~
