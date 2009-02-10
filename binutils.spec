@@ -152,6 +152,9 @@ i*86 | athlon*)
 sparc*)
   ADDITIONAL_TARGETS="sparc64-%{_target_vendor}-%{_target_os}"
   ;;
+mipsel*)
+  ADDITIONAL_TARGETS="mips64el-%{_target_vendor}-%{_target_os}"
+  ;;
 esac
 %ifarch %{spu_arches}
 if [[ -n "$ADDITIONAL_TARGETS" ]]; then
@@ -165,7 +168,7 @@ if [[ -n "$ADDITIONAL_TARGETS" ]]; then
 fi
 
 case %{target_cpu} in
-ppc | powerpc | i*86 | athlon* | sparc*)
+ppc | powerpc | i*86 | athlon* | sparc* | mips*)
   TARGET_CONFIG="$TARGET_CONFIG --enable-64-bit-bfd"
   ;;
 esac
