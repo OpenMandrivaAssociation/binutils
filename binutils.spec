@@ -64,6 +64,9 @@ Patch07:	binutils-2.19.50.0.1-build-id.patch
 # Mandriva patches
 Patch21:	binutils-2.19.50.0.1-linux32.patch
 Patch22:	binutils-2.19.50.0.1-mips-string_literal-fixes.patch
+Patch23:	binutils-2.19.51.0.2-mips-gas.patch
+Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
+Patch25:	binutils-2.19.51.0.2-mips-ls2f_fetch_fix.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -129,6 +132,9 @@ This is the development headers for %{lib_name}
 
 %patch21 -p1 -b .linux32~
 %patch22 -p1 -b .string_literal~
+%patch23 -p1 -b .mips_gas~
+%patch24 -p1 -b .mips_ihex~
+%patch25 -p1 -b .mips_l2sf_fetch_fix~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
