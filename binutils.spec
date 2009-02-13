@@ -158,8 +158,11 @@ i*86 | athlon*)
 sparc*)
   ADDITIONAL_TARGETS="sparc64-%{_target_vendor}-%{_target_os}"
   ;;
-mipsel*)
+mipsel)
   ADDITIONAL_TARGETS="mips64el-%{_target_vendor}-%{_target_os}"
+  ;;
+mips)
+  ADDITIONAL_TARGETS="mips64-%{_target_vendor}-%{_target_os}"
   ;;
 esac
 %ifarch %{spu_arches}
@@ -257,8 +260,12 @@ mkdir -p $RPM_BUILD_ROOT%{_prefix}
 %if "%{name}" == "binutils"
 make -C objs prefix=$RPM_BUILD_ROOT%{_prefix} infodir=$RPM_BUILD_ROOT%{_infodir} install-info
 install -m 644 include/libiberty.h $RPM_BUILD_ROOT%{_includedir}/
+%if %isarch mips|mipsel|mips64|mips64el
+install -m 644 objs/libiberty/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
 # Ship with the PIC libiberty
+%else
 install -m 644 objs/libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
+%endif
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/
 %else
 rm -f  $RPM_BUILD_ROOT%{_libdir}/libiberty.a
