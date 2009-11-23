@@ -30,7 +30,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.19.51.0.2
+Version:	2.19.51.0.14
 Release:	%manbo_mkrel 1
 License:	GPLv3+
 Group:		Development/Other
@@ -52,21 +52,24 @@ BuildRequires:	dejagnu zlib-devel
 BuildRequires:	glibc-static-devel
 
 # Fedora patches:
-Patch01:	binutils-2.19.50.0.1-libtool-lib64.patch
-Patch02:	binutils-2.19.50.0.1-ppc64-pie.patch
+Patch01:	binutils-2.19.51.0.10-libtool-lib64.patch
+Patch02:	binutils-2.19.51.0.10-ppc64-pie.patch
 Patch03:	binutils-2.19.50.0.1-ia64-lib64.patch
-Patch04:	binutils-2.19.51.0.2-symbolic-envvar-revert.patch
+Patch04:	binutils-2.19.51.0.10-envvar-revert.patch
 # We don't want this one!
 #Patch05:	binutils-2.19.50.0.1-version.patch
-Patch06:	binutils-2.19.50.0.1-set-long-long.patch
-Patch07:	binutils-2.19.50.0.1-build-id.patch
+Patch06:	binutils-2.19.51.0.10-set-long-long.patch
+Patch07:	binutils-2.19.51.0.10-build-id.patch
+Patch09:	binutils-2.19.51.0.11-moxie.patch
+Patch10:	binutils-2.19.51.0.14-unique-is-global.patch
+Patch11:	binutils-2.19.51.0.14-cxxfilt-java-doc.patch
+Patch12:	binutils-2.19.51.0.14-cfi-sections.patch
 
 # Mandriva patches
-Patch21:	binutils-2.19.50.0.1-linux32.patch
-Patch22:	binutils-2.19.50.0.1-mips-string_literal-fixes.patch
-Patch23:	binutils-2.19.51.0.2-mips-gas.patch
+Patch21:	binutils-2.19.51.0.14-linux32.patch
+Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
-Patch25:	binutils-2.19.51.0.2-mips-ls2f_fetch_fix.patch
+Patch25:	binutils-2.19.51.0.14-mips-ls2f_fetch_fix.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -126,12 +129,11 @@ This is the development headers for %{lib_name}
 %endif
 %endif
 %patch04 -p1 -b .symbolic-envvar-revert~
-#%patch05 -p0 -b .version~
+#%%patch05 -p0 -b .version~
 %patch06 -p0 -b .set-long-long~
 %patch07 -p0 -b .build-id~
 
 %patch21 -p1 -b .linux32~
-%patch22 -p1 -b .string_literal~
 %patch23 -p1 -b .mips_gas~
 %patch24 -p1 -b .mips_ihex~
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
