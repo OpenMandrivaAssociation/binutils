@@ -312,6 +312,8 @@ chmod +x $RPM_BUILD_ROOT%{_bindir}/ppu-as
 install -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}/embedspu
 }
 
+%multiarch_includes $RPM_BUILD_ROOT%{_includedir}/bfd.h
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -394,6 +396,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %doc README
 %{_includedir}/*
+%multiarch %multiarch_includedir/*
 %{_libdir}/libbfd.a
 %{_libdir}/libbfd.so
 %{_libdir}/libopcodes.a
