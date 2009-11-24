@@ -374,8 +374,8 @@ rm -rf $RPM_BUILD_ROOT
 %if "%{name}" == "binutils"
 %files -n %{dev_name}
 %defattr(-,root,root)
-%{_includedir}/*
-%multiarch %multiarch_includedir/*
+%{_includedir}/*.h
+%multiarch %multiarch_includedir/*.h
 %{_libdir}/libbfd.a
 #%{_libdir}/libbfd.so
 %{_libdir}/libopcodes.a
