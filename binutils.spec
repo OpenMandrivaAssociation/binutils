@@ -32,7 +32,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.19.51.0.14
-Release:	%manbo_mkrel 3
+Release:	%manbo_mkrel 4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -185,7 +185,7 @@ TARGET_CONFIG="$TARGET_CONFIG --target=%{target_platform}"
 
 # Don't build shared libraries in cross binutils
 %if "%{name}" == "binutils"
-TARGET_CONFIG="$TARGET_CONFIG --enable-shared"
+TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 %endif
 
 # Binutils comes with its own custom libtool
