@@ -198,9 +198,6 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared"
 # [gb] FIXME: but system libtool also works and has relink fix
 %define __libtoolize /bin/true
 
-# Build with -Wno-error
-export CFLAGS="$RPM_OPT_FLAGS -Wno-error"
-
 # Build main binaries
 rm -rf objs
 mkdir objs
@@ -225,7 +222,10 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
     rm -rf objs-$cpu
     mkdir objs-$cpu
     pushd objs-$cpu
-    CONFIGURE_TOP=.. %configure --enable-shared --target=$target --program-prefix=$cpu-
+    CONFIGURE_TOP=.. %configure	--enable-shared \
+				--target=$target \
+				--program-prefix=$cpu- \
+				--disable-werror
     # make sure we use the fully built libbfd & libopcodes libs
     # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
     # again to configure and rebuild all of those though...
