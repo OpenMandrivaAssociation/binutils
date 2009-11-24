@@ -114,7 +114,7 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%setup -q -n binutils-%{version}
+%setup -q
 %patch01 -p0 -b .libtool-lib64~
 %patch02 -p0 -b .ppc64-pie~
 %ifarch ia64
