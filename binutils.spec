@@ -348,7 +348,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f binutils.lang
 %defattr(-,root,root)
-%doc README
 %{_bindir}/%{program_prefix}addr2line
 %{_bindir}/%{program_prefix}ar
 %{_bindir}/%{program_prefix}as
@@ -376,7 +375,6 @@ rm -rf $RPM_BUILD_ROOT
 %ifarch %{spu_arches}
 %files -n spu-binutils
 %defattr(-,root,root)
-%doc README
 %{_bindir}/spu-*
 %{_bindir}/embedspu
 %dir %{_prefix}/spu/bin
@@ -386,7 +384,6 @@ rm -rf $RPM_BUILD_ROOT
 %if "%{name}" == "binutils"
 %files -n %{lib_name} -f libbinutils.lang
 %defattr(-,root,root)
-%doc README
 %{_libdir}/libbfd-%{version}*.so
 %{_libdir}/libopcodes-%{version}*.so
 %endif
@@ -394,7 +391,6 @@ rm -rf $RPM_BUILD_ROOT
 %if "%{name}" == "binutils"
 %files -n %{lib_name}-devel
 %defattr(-,root,root)
-%doc README
 %{_includedir}/*
 %multiarch %multiarch_includedir/*
 %{_libdir}/libbfd.a
