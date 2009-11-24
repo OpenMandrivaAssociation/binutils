@@ -234,7 +234,6 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 fi
 
 %check
-exit 0
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
