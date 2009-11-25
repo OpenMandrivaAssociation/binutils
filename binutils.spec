@@ -32,7 +32,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.19.51.0.14
-Release:	%manbo_mkrel 4
+Release:	%manbo_mkrel 5
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -106,6 +106,7 @@ Group:		Development/Other
 Provides:	%{name}-devel = %{version}-%{release}
 Provides:	%{lib_name}-devel = %{version}-%{release}
 Obsoletes:	%{lib_name}-devel
+Requires:	zlib-devel
 
 %description -n	%{dev_name}
 This package contains BFD and opcodes static libraries and associated
