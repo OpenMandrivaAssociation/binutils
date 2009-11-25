@@ -197,7 +197,7 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 rm -rf objs
 mkdir objs
 pushd objs
-CONFIGURE_TOP=.. %configure $TARGET_CONFIG
+CONFIGURE_TOP=.. %configure $TARGET_CONFIG --with-bugurl=http://qa.mandriva.com/
 %make tooldir=%{_prefix}
 popd
 
@@ -220,7 +220,8 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
     CONFIGURE_TOP=.. %configure	--enable-shared \
 				--target=$target \
 				--program-prefix=$cpu- \
-				--disable-werror
+				--disable-werror \
+				--with-bugurl=http://qa.mandriva.com/
     # make sure we use the fully built libbfd & libopcodes libs
     # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
     # again to configure and rebuild all of those though...
