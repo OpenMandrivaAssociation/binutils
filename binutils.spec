@@ -72,6 +72,7 @@ Patch21:	binutils-2.20.51-linux32.patch
 Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
 Patch25:	binutils-2.20.51-mips-ls2f_fetch_fix.patch
+Patch26:	binutils-2.20.51-add-missing-bfd_plugin-define.patch
 
 # sourceware patches:
 Patch40:	binutils-2.20.51.0.3-gold-both.patch
@@ -133,6 +134,7 @@ to consider using libelf instead of BFD.
 %patch23 -p1 -b .mips_gas~
 %patch24 -p1 -b .mips_ihex~
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
+%patch26 -p1 -b .missing_define~
 
 %patch40 -p1 -b .gold_both~
 #required by P40
