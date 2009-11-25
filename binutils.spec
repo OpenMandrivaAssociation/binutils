@@ -53,6 +53,8 @@ BuildRequires:	autoconf automake bison flex gcc gettext texinfo
 BuildRequires:	dejagnu zlib-devel
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel
+# gold make check'ing requires libstdc++.a
+BuildRequires:	libstdc++-static-devel
 
 # Fedora patches:
 Patch01:	binutils-2.19.51.0.10-libtool-lib64.patch
