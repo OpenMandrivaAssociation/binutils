@@ -213,7 +213,8 @@ pushd objs
 CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
 						--enable-gold=both \
 						--enable-linker=bfd \
-						--enable-plugins
+						--enable-plugins \
+						--disable-werror
 %make tooldir=%{_prefix}
 popd
 
