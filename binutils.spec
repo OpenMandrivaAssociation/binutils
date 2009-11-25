@@ -32,7 +32,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.20.51
-Release:	%manbo_mkrel 1
+Release:	%manbo_mkrel 2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -247,7 +247,6 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 fi
 
 %check
-exit 0
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
