@@ -31,8 +31,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.19.51.0.14
-Release:	%manbo_mkrel 5
+Version:	2.20.51
+Release:	%manbo_mkrel 1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -58,21 +58,20 @@ BuildRequires:	glibc-static-devel
 Patch01:	binutils-2.19.51.0.10-libtool-lib64.patch
 Patch02:	binutils-2.19.51.0.10-ppc64-pie.patch
 Patch03:	binutils-2.19.50.0.1-ia64-lib64.patch
-Patch04:	binutils-2.19.51.0.10-envvar-revert.patch
 # We don't want this one!
 #Patch05:	binutils-2.19.50.0.1-version.patch
 Patch06:	binutils-2.19.51.0.10-set-long-long.patch
-Patch07:	binutils-2.19.51.0.10-build-id.patch
+Patch07:	binutils-2.20.51-build-id.patch
 Patch09:	binutils-2.19.51.0.11-moxie.patch
 Patch10:	binutils-2.19.51.0.14-unique-is-global.patch
 Patch11:	binutils-2.19.51.0.14-cxxfilt-java-doc.patch
 Patch12:	binutils-2.19.51.0.14-cfi-sections.patch
 
 # Mandriva patches
-Patch21:	binutils-2.19.51.0.14-linux32.patch
+Patch21:	binutils-2.20.51-linux32.patch
 Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
-Patch25:	binutils-2.19.51.0.14-mips-ls2f_fetch_fix.patch
+Patch25:	binutils-2.20.51-mips-ls2f_fetch_fix.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -123,10 +122,9 @@ to consider using libelf instead of BFD.
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-%patch04 -p1 -b .symbolic-envvar-revert~
 #%%patch05 -p0 -b .version~
 %patch06 -p0 -b .set-long-long~
-%patch07 -p0 -b .build-id~
+%patch07 -p1 -b .build-id~
 
 %patch21 -p1 -b .linux32~
 %patch23 -p1 -b .mips_gas~
