@@ -260,11 +260,11 @@ fi
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
-%make -C objs check
+%make -C objs check LDFLAGS=""
 [[ -d objs-spu ]] && \
-%make -C objs-spu check-gas
+%make -C objs-spu check-gas LDFLAGS=""
 %else
-%make -C objs -k check || echo make check failed
+%make -C objs -k check LDFLAGS="" || echo make check failed
 %endif
 echo ====================TESTING END=====================
 
