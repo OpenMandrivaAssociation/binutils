@@ -293,6 +293,23 @@ install -m 644 objs/libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
 %endif
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/
 
+# Sanity check --enable-64-bit-bfd really works.
+grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
+# Fix multilib conflicts of generated values by __WORDSIZE-based expressions.
+%ifarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64
+sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
+    -e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
+    -e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
+    -e 's/^#define BFD_HOST_64_BIT \(long \)\?long *$/#if __WORDSIZE == 32\
+#define BFD_HOST_64_BIT long long\
+#else\
+#define BFD_HOST_64_BIT long\
+#endif/' \
+    -e 's/^#define BFD_HOST_U_64_BIT unsigned \(long \)\?long *$/#define BFD_HOST_U_64_BIT unsigned BFD_HOST_64_BIT/' \
+    %{buildroot}%{_prefix}/include/bfd.h
+%endif
+touch -r bfd/bfd-in2.h %{buildroot}%{_prefix}/include/bfd.h
+
 # Generate .so linker scripts for dependencies; imported from glibc/Makerules:
 
 # This fragment of linker script gives the OUTPUT_FORMAT statement
@@ -358,8 +375,6 @@ EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/ppu-as
 install -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}/embedspu
 }
-
-%multiarch_includes $RPM_BUILD_ROOT%{_includedir}/bfd.h
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -429,7 +444,6 @@ rm -rf $RPM_BUILD_ROOT
 %files -n %{dev_name}
 %defattr(-,root,root)
 %{_includedir}/*.h
-%multiarch %multiarch_includedir/*.h
 %{_libdir}/libbfd.a
 %{_libdir}/libbfd.so
 %{_libdir}/libopcodes.a
