@@ -32,7 +32,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.20.51
-Release:	%manbo_mkrel 2
+Release:	%manbo_mkrel 3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -40,6 +40,7 @@ Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.
 Source1:	build_cross_binutils.sh
 Source2:	spu_ovl.o
 Source3:	embedspu.sh
+Source4:	binutils-2.19.50.0.1-output-format.sed
 Buildroot:	%{_tmppath}/%{name}-%{version}-root
 %if "%{name}" == "binutils"
 Requires:	%{lib_name} = %{version}-%{release}
@@ -276,6 +277,11 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
 %makeinstall_std -C objs
 
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/{dlltool,nlmconv,windres}*
+rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.so
+
 %if "%{name}" == "binutils"
 make -C objs prefix=$RPM_BUILD_ROOT%{_prefix} infodir=$RPM_BUILD_ROOT%{_infodir} install-info
 install -m 644 include/libiberty.h $RPM_BUILD_ROOT%{_includedir}/
@@ -286,19 +292,40 @@ install -m 644 objs/libiberty/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
 install -m 644 objs/libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
 %endif
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/
+
+# Generate .so linker scripts for dependencies; imported from glibc/Makerules:
+
+# This fragment of linker script gives the OUTPUT_FORMAT statement
+# for the configuration we are building.
+OUTPUT_FORMAT="\
+/* Ensure this .so library will not be used by a link for a different format
+   on a multi-architecture system.  */
+$(gcc $CFLAGS $LDFLAGS -shared -x c /dev/null -o /dev/null -Wl,--verbose -v 2>&1 | sed -n -f "%{SOURCE4}")"
+
+tee %{buildroot}%{_libdir}/libbfd.so <<EOH
+/* GNU ld script */
+
+$OUTPUT_FORMAT
+
+/* The libz dependency is unexpected by legacy build scripts.  */
+INPUT ( %{_libdir}/libbfd.a -lz -lc )
+EOH
+
+tee %{buildroot}%{_libdir}/libopcodes.so <<EOH
+/* GNU ld script */
+
+$OUTPUT_FORMAT
+
+INPUT ( %{_libdir}/libopcodes.a -lbfd -lz -lc )
+EOH
+
 %else
 rm -f  $RPM_BUILD_ROOT%{_libdir}/libiberty.a
 rm -rf $RPM_BUILD_ROOT%{_infodir}
+rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
+
 rm -rf $RPM_BUILD_ROOT%{_prefix}/%{target_platform}/lib/ldscripts/
 rm -f  $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.la
-%endif
-
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/{dlltool,nlmconv,windres}*
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.so
-%if "%{name}" != "binutils"
-rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
 %endif
 
 %find_lang binutils
@@ -404,8 +431,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/*.h
 %multiarch %multiarch_includedir/*.h
 %{_libdir}/libbfd.a
-#%{_libdir}/libbfd.so
+%{_libdir}/libbfd.so
 %{_libdir}/libopcodes.a
-#%{_libdir}/libopcodes.so
+%{_libdir}/libopcodes.so
 %{_libdir}/libiberty.a
 %endif
