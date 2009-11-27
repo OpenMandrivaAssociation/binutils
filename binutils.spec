@@ -220,7 +220,10 @@ CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/
 						--enable-linker=bfd \
 						--enable-plugins \
 						--disable-werror
-%make tooldir=%{_prefix}
+# There seems to be some problems with builds of gold randomly failing whenever
+# going through the build system, so let's try workaround this by trying to do
+# make once again when it happens...
+%make tooldir=%{_prefix} || make tooldir=%{_prefix}
 popd
 
 # Build alternate binaries (spu-gas in particular)
@@ -261,7 +264,8 @@ fi
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
-%make -C objs check LDFLAGS=""
+# random build failures with gold seems to happen during check as well...
+%make -C objs check LDFLAGS="" || make -C objs check LDFLAGS=""
 [[ -d objs-spu ]] && \
 %make -C objs-spu check-gas LDFLAGS=""
 %else
