@@ -325,7 +325,7 @@ tee %{buildroot}%{_libdir}/libbfd.so <<EOH
 $OUTPUT_FORMAT
 
 /* The libz dependency is unexpected by legacy build scripts.  */
-INPUT ( %{_libdir}/libbfd.a -lz -lc )
+INPUT ( %{_libdir}/libbfd.a -lz )
 EOH
 
 tee %{buildroot}%{_libdir}/libopcodes.so <<EOH
@@ -333,7 +333,7 @@ tee %{buildroot}%{_libdir}/libopcodes.so <<EOH
 
 $OUTPUT_FORMAT
 
-INPUT ( %{_libdir}/libopcodes.a -lbfd -lz -lc )
+INPUT ( %{_libdir}/libopcodes.a -lbfd -lz )
 EOH
 
 %else
