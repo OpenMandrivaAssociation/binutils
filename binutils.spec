@@ -31,8 +31,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.20.51
-Release:	%manbo_mkrel 3
+Version:	2.20.51.0.4
+Release:	%manbo_mkrel 1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -58,29 +58,21 @@ BuildRequires:	glibc-static-devel
 BuildRequires:	libstdc++-static-devel
 
 # Fedora patches:
-Patch01:	binutils-2.19.51.0.10-libtool-lib64.patch
-Patch02:	binutils-2.19.51.0.10-ppc64-pie.patch
-Patch03:	binutils-2.19.50.0.1-ia64-lib64.patch
+Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
+Patch02:	binutils-2.20.51.0.2-ppc64-pie.patch
+Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
-#Patch05:	binutils-2.19.50.0.1-version.patch
-Patch06:	binutils-2.19.51.0.10-set-long-long.patch
-Patch07:	binutils-2.20.51-build-id.patch
-Patch09:	binutils-2.19.51.0.11-moxie.patch
-Patch10:	binutils-2.19.51.0.14-unique-is-global.patch
-Patch11:	binutils-2.19.51.0.14-cxxfilt-java-doc.patch
-Patch12:	binutils-2.19.51.0.14-cfi-sections.patch
+#Patch05: binutils-2.20.51.0.2-version.patch
+Patch06:	binutils-2.20.51.0.2-set-long-long.patch
+Patch07:	binutils-2.20.51.0.2-build-id.patch
+Patch10:	binutils-2.20.51.0.2-lwp.patch
+Patch13:	binutils-2.20.51.0.4-ppc-hidden-plt-relocs.patch
 
 # Mandriva patches
 Patch21:	binutils-2.20.51-linux32.patch
 Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
 Patch25:	binutils-2.20.51-mips-ls2f_fetch_fix.patch
-Patch26:	binutils-2.20.51-add-missing-bfd_plugin-define.patch
-Patch27:	binutils-2.20.51-add-missing-library-dependency.patch
-Patch28:	binutils-2.20.51-skip-failing-tls_shared_gnu2_test.patch
-
-# sourceware patches:
-Patch40:	binutils-2.20.51.0.3-gold-both.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -133,23 +125,13 @@ to consider using libelf instead of BFD.
 %endif
 #%%patch05 -p0 -b .version~
 %patch06 -p0 -b .set-long-long~
-%patch07 -p1 -b .build-id~
+%patch07 -p0 -b .build-id~
+%patch13 -p1 -b .hidden-plt~
 
 %patch21 -p1 -b .linux32~
 %patch23 -p1 -b .mips_gas~
 %patch24 -p1 -b .mips_ihex~
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
-%patch26 -p1 -b .missing_define~
-%patch27 -p1 -b .missing_lib_dep~
-%patch28 -p1 -b .skip_test~
-
-%patch40 -p1 -b .gold_both~
-#required by P40
-for d in . gold ld; do
-  cd $d
-  autoreconf -f
-  cd -
-done
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
@@ -215,7 +197,7 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 rm -rf objs
 mkdir objs
 pushd objs
-CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
+CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
 						--enable-gold=both \
 						--enable-linker=bfd \
 						--enable-plugins \
