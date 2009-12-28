@@ -29,10 +29,13 @@
 %define arch		%(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
 %define isarch()	%(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
 
+# List of targets where gold can be enabled
+%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
+
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.20.51.0.4
-Release:	%manbo_mkrel 1
+Release:	%manbo_mkrel 2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -115,7 +118,7 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%setup -q
+%setup -q -n binutils-%{version}
 %patch01 -p0 -b .libtool-lib64~
 %patch02 -p0 -b .ppc64-pie~
 %ifarch ia64
@@ -326,8 +329,6 @@ EOH
 rm -f  $RPM_BUILD_ROOT%{_libdir}/libiberty.a
 rm -rf $RPM_BUILD_ROOT%{_infodir}
 rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
-
-rm -rf $RPM_BUILD_ROOT%{_prefix}/%{target_platform}/lib/ldscripts/
 rm -f  $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.la
 %endif
 
@@ -396,7 +397,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/%{program_prefix}gprof
 %{_bindir}/%{program_prefix}ld
 %{_bindir}/%{program_prefix}ld.bfd
+%if %isarch %{gold_arches}
 %{_bindir}/%{program_prefix}ld.gold
+%endif
 %{_bindir}/%{program_prefix}nm
 %{_bindir}/%{program_prefix}objcopy
 %{_bindir}/%{program_prefix}objdump
@@ -415,6 +418,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libopcodes-%{version}*.so
 %else
 %{_prefix}/%{target_platform}/bin/*
+%{_prefix}/%{target_platform}/lib/ldscripts
 %endif
 
 %ifarch %{spu_arches}
