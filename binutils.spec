@@ -34,8 +34,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.20.51.0.4
-Release:	%manbo_mkrel 2
+Version:	2.20.51.0.7
+Release:	%manbo_mkrel 1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -68,8 +68,9 @@ Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 #Patch05: binutils-2.20.51.0.2-version.patch
 Patch06:	binutils-2.20.51.0.2-set-long-long.patch
 Patch07:	binutils-2.20.51.0.2-build-id.patch
-Patch10:	binutils-2.20.51.0.2-lwp.patch
-Patch13:	binutils-2.20.51.0.4-ppc-hidden-plt-relocs.patch
+Patch08:	binutils-2.20.51.0.2-copy-osabi.patch
+Patch09:	binutils-2.20.51.0.7-do-not-bind-unique-symbols-locally.patch
+Patch10:	binutils-2.20.51.0.7-dwarf4.patch
 
 # Mandriva patches
 Patch21:	binutils-2.20.51-linux32.patch
@@ -129,7 +130,9 @@ to consider using libelf instead of BFD.
 #%%patch05 -p0 -b .version~
 %patch06 -p0 -b .set-long-long~
 %patch07 -p0 -b .build-id~
-%patch13 -p1 -b .hidden-plt~
+%patch08 -p0 -b .copy-osabi~
+%patch09 -p0 -b .do-not-bind-unique~
+%patch10 -p0 -b .dwarf4~
 
 %patch21 -p1 -b .linux32~
 %patch23 -p1 -b .mips_gas~
@@ -394,6 +397,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/%{program_prefix}ar
 %{_bindir}/%{program_prefix}as
 %{_bindir}/%{program_prefix}c++filt
+%{_bindir}/%{program_prefix}elfedit
 %{_bindir}/%{program_prefix}gprof
 %{_bindir}/%{program_prefix}ld
 %{_bindir}/%{program_prefix}ld.bfd
