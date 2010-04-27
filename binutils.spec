@@ -253,7 +253,7 @@ fi
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
 # random build failures with gold seems to happen during check as well...
-%make -C objs check LDFLAGS="" || make -C objs check LDFLAGS=""
+%make -C objs check LDFLAGS="" || make -k -C objs check LDFLAGS=""
 [[ -d objs-spu ]] && \
 %make -C objs-spu check-gas LDFLAGS=""
 %else
