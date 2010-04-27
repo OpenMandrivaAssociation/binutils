@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.20.51.0.7
-Release:	%manbo_mkrel 1
+Release:	%manbo_mkrel 2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -204,8 +204,7 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
-						--enable-gold=both \
-						--enable-linker=bfd \
+						--enable-gold=both/bfd \
 						--enable-plugins \
 						--disable-werror
 # There seems to be some problems with builds of gold randomly failing whenever
