@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.20.51.0.7
-Release:	%manbo_mkrel 2
+Release:	%manbo_mkrel 3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -198,6 +198,11 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 # Binutils comes with its own custom libtool
 # [gb] FIXME: but system libtool also works and has relink fix
 %define __libtoolize /bin/true
+
+# Workaround to build when gold is default
+mkdir BIN
+cp -a /usr/bin/ld.bfd BIN/ld
+export PATH=`pwd`/BIN:$PATH
 
 # Build main binaries
 rm -rf objs
