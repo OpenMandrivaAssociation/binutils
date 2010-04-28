@@ -199,11 +199,6 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 # [gb] FIXME: but system libtool also works and has relink fix
 %define __libtoolize /bin/true
 
-# Workaround to build when gold is default
-mkdir BIN
-cp -a /usr/bin/ld.bfd BIN/ld
-export PATH=`pwd`/BIN:$PATH
-
 # Build main binaries
 rm -rf objs
 mkdir objs
