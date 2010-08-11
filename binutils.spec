@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.20.51.0.7
-Release:	%manbo_mkrel 3
+Release:	%manbo_mkrel 4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -316,7 +316,7 @@ tee %{buildroot}%{_libdir}/libbfd.so <<EOH
 $OUTPUT_FORMAT
 
 /* The libz dependency is unexpected by legacy build scripts.  */
-INPUT ( %{_libdir}/libbfd.a -lz )
+INPUT ( %{_libdir}/libbfd.a -liberty -lz )
 EOH
 
 tee %{buildroot}%{_libdir}/libopcodes.so <<EOH
