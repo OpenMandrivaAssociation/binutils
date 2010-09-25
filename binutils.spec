@@ -34,8 +34,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.20.51.0.7
-Release:	%manbo_mkrel 4
+Version:	2.20.51.0.11
+Release:	%manbo_mkrel 1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -62,18 +62,20 @@ BuildRequires:	libstdc++-static-devel
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
-Patch02:	binutils-2.20.51.0.2-ppc64-pie.patch
+Patch02:	binutils-2.20.51.0.10-ppc64-pie.patch
 Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch05: binutils-2.20.51.0.2-version.patch
 Patch06:	binutils-2.20.51.0.2-set-long-long.patch
 Patch07:	binutils-2.20.51.0.2-build-id.patch
-Patch08:	binutils-2.20.51.0.2-copy-osabi.patch
-Patch09:	binutils-2.20.51.0.7-do-not-bind-unique-symbols-locally.patch
-Patch10:	binutils-2.20.51.0.7-dwarf4.patch
+Patch08:	binutils-2.20.51.0.10-copy-osabi.patch
+Patch09:	binutils-2.20.51.0.10-sec-merge-emit.patch
+Patch10:	binutils-2.20.51.0.10-ldlex-add-caret-pling.patch
+Patch11:	binutils-2.20.51.0.11-compress-compile.patch
 
 # Mandriva patches
-Patch21:	binutils-2.20.51-linux32.patch
+#TODO: should really clean up this patch again now...
+Patch21:	binutils-2.20.51.0.11-linux32.patch
 Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
 Patch25:	binutils-2.20.51-mips-ls2f_fetch_fix.patch
@@ -131,8 +133,9 @@ to consider using libelf instead of BFD.
 %patch06 -p0 -b .set-long-long~
 %patch07 -p0 -b .build-id~
 %patch08 -p0 -b .copy-osabi~
-%patch09 -p0 -b .do-not-bind-unique~
-%patch10 -p0 -b .dwarf4~
+%patch09 -p0 -b .sec-merge-emit~
+%patch10 -p0 -b .ldlex~
+%patch11 -p0 -b .compress~
 
 %patch21 -p1 -b .linux32~
 %patch23 -p1 -b .mips_gas~
@@ -204,7 +207,7 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
-						--enable-gold=both/bfd \
+						--enable-gold=both \
 						--enable-plugins \
 						--disable-werror
 # There seems to be some problems with builds of gold randomly failing whenever
