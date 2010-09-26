@@ -79,6 +79,7 @@ Patch21:	binutils-2.20.51.0.11-linux32.patch
 Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
 Patch25:	binutils-2.20.51-mips-ls2f_fetch_fix.patch
+Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -141,6 +142,7 @@ to consider using libelf instead of BFD.
 %patch23 -p1 -b .mips_gas~
 %patch24 -p1 -b .mips_ihex~
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
+%patch26 -p1 -b .x86_64~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
