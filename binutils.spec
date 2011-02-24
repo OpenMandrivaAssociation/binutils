@@ -34,8 +34,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.20.51.0.11
-Release:	%manbo_mkrel 1
+Version:	2.21.51.0.6
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -65,21 +65,20 @@ Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
 Patch02:	binutils-2.20.51.0.10-ppc64-pie.patch
 Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
-#Patch05: binutils-2.20.51.0.2-version.patch
-Patch06:	binutils-2.20.51.0.2-set-long-long.patch
-Patch07:	binutils-2.20.51.0.2-build-id.patch
-Patch08:	binutils-2.20.51.0.10-copy-osabi.patch
-Patch09:	binutils-2.20.51.0.10-sec-merge-emit.patch
-Patch10:	binutils-2.20.51.0.10-ldlex-add-caret-pling.patch
-Patch11:	binutils-2.20.51.0.11-compress-compile.patch
+#Patch04:	binutils-2.20.51.0.2-version.patch
+Patch05:	binutils-2.20.51.0.2-set-long-long.patch
+Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
+Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
+Patch08:	binutils-2.20.51.0.2-build-id.patch
 
 # Mandriva patches
-#TODO: should really clean up this patch again now...
-Patch21:	binutils-2.20.51.0.11-linux32.patch
+# (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
+Patch21:	binutils-2.21.51.0.6-linux32.patch
 Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
-Patch25:	binutils-2.20.51-mips-ls2f_fetch_fix.patch
+Patch25:	binutils-2.21.51.0.6-mips-ls2f_fetch_fix.patch
 Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
+# (proyvind): skip gold tests that fails
 Patch27:	binutils-2.20.51.0.11-skip-gold-check.patch
 
 %description
@@ -131,13 +130,11 @@ to consider using libelf instead of BFD.
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-#%%patch05 -p0 -b .version~
-%patch06 -p0 -b .set-long-long~
-%patch07 -p0 -b .build-id~
-%patch08 -p0 -b .copy-osabi~
-%patch09 -p0 -b .sec-merge-emit~
-%patch10 -p0 -b .ldlex~
-%patch11 -p0 -b .compress~
+#%%patch04 -p0 -b .version~
+%patch05 -p0 -b .set-long-long~
+%patch06 -p0 -b .copy-osabi~
+%patch07 -p0 -b .sec-merge-emit~
+%patch08 -p0 -b .build-id~
 
 %patch21 -p1 -b .linux32~
 %patch23 -p1 -b .mips_gas~
@@ -211,7 +208,8 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
-						--enable-gold=both \
+						--enable-ld=yes \
+						--enable-gold=default \
 						--enable-plugins \
 						--disable-werror
 # There seems to be some problems with builds of gold randomly failing whenever
