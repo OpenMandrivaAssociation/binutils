@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.21.51.0.6
-Release:	%mkrel 1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -208,8 +208,8 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
-						--enable-ld=yes \
-						--enable-gold=default \
+						--enable-ld=default \
+						--enable-gold=yes \
 						--enable-plugins \
 						--disable-werror
 # There seems to be some problems with builds of gold randomly failing whenever
