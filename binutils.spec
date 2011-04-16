@@ -216,6 +216,9 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.
 # going through the build system, so let's try workaround this by trying to do
 # make once again when it happens...
 %make tooldir=%{_prefix} || make tooldir=%{_prefix}
+make -C bfd/doc html
+mkdir -p ../html
+cp -f bfd/doc/bfd.html/* ../html
 popd
 
 # Build alternate binaries (spu-gas in particular)
@@ -442,6 +445,7 @@ rm -rf $RPM_BUILD_ROOT
 %if "%{name}" == "binutils"
 %files -n %{dev_name}
 %defattr(-,root,root)
+%doc html
 %{_includedir}/*.h
 %{_libdir}/libbfd.a
 %{_libdir}/libbfd.so
