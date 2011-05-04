@@ -34,8 +34,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.21.51.0.6
-Release:	4
+Version:	2.21.51.0.8
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -79,7 +79,7 @@ Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
 Patch25:	binutils-2.21.51.0.6-mips-ls2f_fetch_fix.patch
 Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
 # (proyvind): skip gold tests that fails
-Patch27:	binutils-2.20.51.0.11-skip-gold-check.patch
+Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -141,7 +141,7 @@ to consider using libelf instead of BFD.
 %patch24 -p1 -b .mips_ihex~
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
 %patch26 -p1 -b .x86_64~
-%patch27 -p1 -b .skip_gold_check~
+#%%patch27 -p1 -b .skip_gold_check~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
@@ -259,7 +259,7 @@ fi
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
-%make -C objs check LDFLAGS=""
+%make -k -C objs check LDFLAGS=""
 # random build failures with gold seems to happen during check as well...
 make -k -C objs gold-check LDFLAGS="" || :
 [[ -d objs-spu ]] && \
