@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.21.51.0.8
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -143,7 +143,8 @@ to consider using libelf instead of BFD.
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
 %patch26 -p1 -b .x86_64~
 #%%patch27 -p1 -b .skip_gold_check~
-%patch28 -p1 -b .defaults~
+# disable ld-default-setting changement just before an rc
+#%patch28 -p1 -b .defaults~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
