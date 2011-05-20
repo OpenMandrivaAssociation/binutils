@@ -216,6 +216,7 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.
 						--enable-ld=default \
 						--enable-gold=yes \
 						--enable-plugins \
+						--enable-threads \
 						--disable-werror
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
