@@ -189,7 +189,7 @@ if [[ -n "$ADDITIONAL_TARGETS" ]]; then
 fi
 
 case %{target_cpu} in
-ppc | powerpc | i*86 | athlon* | sparc* | mips*)
+ppc | powerpc | i*86 | athlon* | sparc* | mips* | s390* | sh* | arm*)
   TARGET_CONFIG="$TARGET_CONFIG --enable-64-bit-bfd"
   ;;
 esac
@@ -302,7 +302,7 @@ rm -rf $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/
 # Sanity check --enable-64-bit-bfd really works.
 grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
 # Fix multilib conflicts of generated values by __WORDSIZE-based expressions.
-%ifarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64
+%ifarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64 arm
 sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
     -e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
     -e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
