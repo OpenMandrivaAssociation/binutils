@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.21.51.0.9
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -82,6 +82,9 @@ Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 Patch29:	binutils-2.21.51.0.8-ld.gold-default-settings.patch
+
+# Upstream patches
+Patch100:	binutils-2.21.51.0.9-relocation-warn-in-readonly-section.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -148,6 +151,7 @@ to consider using libelf instead of BFD.
 #%%patch28 -p1 -b .defaults~
 #%%patch29 -p1 -b .gold_defaults~
 
+%patch100 -p1 -b .relocation~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE2} ld/emultempl/
 
