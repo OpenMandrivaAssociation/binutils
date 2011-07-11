@@ -40,10 +40,11 @@ License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2
-Source1:	build_cross_binutils.sh
-Source2:	spu_ovl.o
-Source3:	embedspu.sh
-Source4:	binutils-2.19.50.0.1-output-format.sed
+Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
+Source2:	build_cross_binutils.sh
+Source3:	spu_ovl.o
+Source4:	embedspu.sh
+Source5:	binutils-2.19.50.0.1-output-format.sed
 Buildroot:	%{_tmppath}/%{name}-%{version}-root
 %if "%{name}" == "binutils"
 Requires:	%{lib_name} = %{version}-%{release}
@@ -156,7 +157,7 @@ to consider using libelf instead of BFD.
 #%%patch29 -p1 -b .gold_defaults~
 
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
-cp %{SOURCE2} ld/emultempl/
+cp %{SOURCE3} ld/emultempl/
 
 %build
 # Additional targets
@@ -330,7 +331,7 @@ touch -r bfd/bfd-in2.h %{buildroot}%{_prefix}/include/bfd.h
 OUTPUT_FORMAT="\
 /* Ensure this .so library will not be used by a link for a different format
    on a multi-architecture system.  */
-$(gcc $CFLAGS $LDFLAGS -shared -x c /dev/null -o /dev/null -Wl,--verbose -v 2>&1 | sed -n -f "%{SOURCE4}")"
+$(gcc $CFLAGS $LDFLAGS -shared -x c /dev/null -o /dev/null -Wl,--verbose -v 2>&1 | sed -n -f "%{SOURCE5}")"
 
 tee %{buildroot}%{_libdir}/libbfd.so <<EOH
 /* GNU ld script */
@@ -384,7 +385,7 @@ cat > $RPM_BUILD_ROOT%{_bindir}/ppu-as << EOF
 exec %{_bindir}/as -mcell -maltivec \${1+"\$@"}
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/ppu-as
-install -m 755 %{SOURCE3} $RPM_BUILD_ROOT%{_bindir}/embedspu
+install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}/embedspu
 }
 
 %clean
