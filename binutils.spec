@@ -290,14 +290,18 @@ fi
 %check
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
+# workaround for not using colorgcc when building due to colorgcc
+# messes up output redirection..
+export CC=`gcc --version|cut -d\   -f3|head -n1`
+export CXX=g++-`g++ --version|cut -d\   -f3|head -n1`
 %if %isarch i386|x86_64|ppc|ppc64|spu
 %make -k -C objs check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 # random build failures with gold seems to happen during check as well...
-make -k -C objs gold-check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
+make -k -C objs gold-check CC=$CC CXX=$CXX CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 [[ -d objs-spu ]] && \
-%make -C objs-spu check-gas CFLAGS="" CXXFLAGS="" LDFLAGS=""
+%make -C objs-spu check-gas CC=$CC CXX=$CXX CFLAGS="" CXXFLAGS="" LDFLAGS=""
 %else
-%make -C objs -k check CFLAGS="" CXXFLAGS="" LDFLAGS="" || echo make check failed
+%make -C objs -k check CC=$CC CXX=$CXX CFLAGS="" CXXFLAGS="" LDFLAGS="" || echo make check failed
 %endif
 echo ====================TESTING END=====================
 
