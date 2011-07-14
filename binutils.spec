@@ -279,13 +279,13 @@ fi
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 %if %isarch i386|x86_64|ppc|ppc64|spu
-%make -k -C objs check LDFLAGS="" || :
+%make -k -C objs check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 # random build failures with gold seems to happen during check as well...
-make -k -C objs gold-check LDFLAGS="" || :
+make -k -C objs gold-check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 [[ -d objs-spu ]] && \
-%make -C objs-spu check-gas LDFLAGS=""
+%make -C objs-spu check-gas CFLAGS="" CXXFLAGS="" LDFLAGS=""
 %else
-%make -C objs -k check LDFLAGS="" || echo make check failed
+%make -C objs -k check CFLAGS="" CXXFLAGS="" LDFLAGS="" || echo make check failed
 %endif
 echo ====================TESTING END=====================
 
