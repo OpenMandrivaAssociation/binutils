@@ -86,7 +86,20 @@ Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
-Patch29:	binutils-2.21.51.0.8-ld.gold-default-settings.patch
+# enables the following by default:
+# --as-needed
+# --hash-style=gnu
+# --enable-new-dtags
+# --no-undefined
+# -O1
+# --threads
+# --warn-common
+# --warn-execstack
+# --warn-shared-textrel
+# --warn-unresolved-symbols
+# -z relro
+# --build-id=sha1
+Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 Patch30:	binutils-2.21.52.0.2-gold-lib64-search-path.patch
 
 %description
@@ -153,9 +166,13 @@ to consider using libelf instead of BFD.
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
 %patch26 -p1 -b .x86_64~
 #%%patch27 -p1 -b .skip_gold_check~
-# disable ld-default-setting changement just before an rc
+# we don't bother modifying the defaults for the bfd linker, we'll switch
+# to gold as the default now, so let's just leave the older linker with
+# the same behaviour as previous for anyone who needs to use it..
 #%%patch28 -p1 -b .defaults~
-#%%patch29 -p1 -b .gold_defaults~
+%if "%{distepoch}" >= "2012"
+%patch29 -p1 -b .gold_defaults~
+%endif
 %patch30 -p1 -b .gold_lib64~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
