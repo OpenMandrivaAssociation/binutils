@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.21.52.0.2
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -226,6 +226,11 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.
 						--enable-gold=yes \
 						--enable-plugins \
 						--enable-threads \
+%if "%{_lib}" == "lib64"
+						--with-lib-path=/%{_lib}:%{_libdir}:%{_prefix}/local/%{_lib}:/lib:%{_prefix}/lib:%{_prefix}/local/lib \
+%else
+						--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib \
+%endif
 						--disable-werror
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
