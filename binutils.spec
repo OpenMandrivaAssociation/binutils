@@ -101,6 +101,7 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # --build-id=sha1
 Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 Patch30:	binutils-2.21.52.0.2-gold-lib64-search-path.patch
+Patch31:	binutils-2.21.52.0.2-fix-overrides-for-gold-testsuite.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -174,6 +175,7 @@ to consider using libelf instead of BFD.
 %patch29 -p1 -b .gold_defaults~
 %endif
 %patch30 -p1 -b .gold_lib64~
+%patch31 -p1 -b .gold_testsuite~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
@@ -309,12 +311,10 @@ fi
 echo ====================TESTING=========================
 # workaround for not using colorgcc when building due to colorgcc
 # messes up output redirection..
-export CC=`gcc --version|cut -d\   -f3|head -n1`
-export CXX=g++-`g++ --version|cut -d\   -f3|head -n1`
+export CC="gcc-`gcc --version|cut -d\   -f3|head -n1`"
+export CXX="g++-`g++ --version|cut -d\   -f3|head -n1`"
 %if %isarch i386|x86_64|ppc|ppc64|spu
-%make -k -C objs check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
-# random build failures with gold seems to happen during check as well...
-make -k -C objs gold-check CC=$CC CXX=$CXX CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
+%make -k -C objs CC=$CC CXX=$CXX check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 [[ -d objs-spu ]] && \
 %make -C objs-spu check-gas CC=$CC CXX=$CXX CFLAGS="" CXXFLAGS="" LDFLAGS=""
 %else
