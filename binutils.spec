@@ -222,8 +222,13 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
+%if "%{distepoch}" < "2012"
 						--enable-ld=default \
 						--enable-gold=yes \
+%else
+						--enable-ld=yes \
+						--enable-gold=default \
+%endif
 						--enable-plugins \
 						--enable-threads \
 %if "%{_lib}" == "lib64"
@@ -260,6 +265,13 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
     CONFIGURE_TOP=.. %configure	--enable-shared \
 				--target=$target \
 				--program-prefix=$cpu- \
+%if "%{distepoch}" < "2012"
+				--enable-ld=default \
+				--enable-gold=yes \
+%else
+				--enable-ld=yes \
+				--enable-gold=default \
+%endif
 				--disable-werror \
 				--with-bugurl=http://qa.mandriva.com/
     # make sure we use the fully built libbfd & libopcodes libs
