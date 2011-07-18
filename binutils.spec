@@ -100,7 +100,8 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # -z relro
 # --build-id=sha1
 Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
-Patch30:	binutils-2.21.52.0.2-gold-lib64-search-path.patch
+#from Леонид Юрьев leo@yuriev.ru, posted to binutils list
+Patch30:	binutils-2.21.53-with-lib-path-support-for-gold.patch
 Patch31:	binutils-2.21.53-fix-overrides-for-gold-testsuite.patch
 
 %description
@@ -174,7 +175,7 @@ to consider using libelf instead of BFD.
 %if "%{distepoch}" >= "2012"
 %patch29 -p1 -b .gold_defaults~
 %endif
-%patch30 -p1 -b .gold_lib64~
+%patch30 -p1 -b .gold_lib_path~
 %patch31 -p1 -b .gold_testsuite~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
