@@ -34,13 +34,13 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.21.52.0.2
-Release:	4
+Version:	2.21.53
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2
-Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
+#Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
 Source4:	embedspu.sh
@@ -73,13 +73,13 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch08:	binutils-2.20.51.0.2-build-id.patch
 # merged already
 #Patch09:	binutils-2.21.52.0.1-keeping-notes.patch
-Patch10:	binutils-2.21.52.0.1-finding-without-symbols.patch
-Patch11:	binutils-2.21.52.0.1-sh_offset-for-SHT_NOBITS.patch
+#Patch10:	binutils-2.21.52.0.1-finding-without-symbols.patch
+#Patch11:	binutils-2.21.52.0.1-sh_offset-for-SHT_NOBITS.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
-Patch21:	binutils-2.21.52.0.2-linux32.patch
-Patch23:	binutils-2.19.51.0.14-mips-gas.patch
+Patch21:	binutils-2.21.53-linux32.patch
+#Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
 Patch25:	binutils-2.21.51.0.6-mips-ls2f_fetch_fix.patch
 Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
@@ -101,7 +101,7 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # --build-id=sha1
 Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 Patch30:	binutils-2.21.52.0.2-gold-lib64-search-path.patch
-Patch31:	binutils-2.21.52.0.2-fix-overrides-for-gold-testsuite.patch
+Patch31:	binutils-2.21.53-fix-overrides-for-gold-testsuite.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -158,11 +158,11 @@ to consider using libelf instead of BFD.
 %patch07 -p0 -b .sec-merge-emit~
 %patch08 -p0 -b .build-id~
 #%%patch09 -p0 -b .keeping-notes~
-%patch10 -p0 -b .finding~
-%patch11 -p0 -b .sh_offset~
+#%%patch10 -p0 -b .finding~
+#%%patch11 -p0 -b .sh_offset~
 
 %patch21 -p1 -b .linux32~
-%patch23 -p1 -b .mips_gas~
+#%%patch23 -p1 -b .mips_gas~
 %patch24 -p1 -b .mips_ihex~
 %patch25 -p1 -b .mips_l2sf_fetch_fix~
 %patch26 -p1 -b .x86_64~
