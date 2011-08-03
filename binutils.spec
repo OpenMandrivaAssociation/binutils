@@ -35,7 +35,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.21.53.0.1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -101,6 +101,8 @@ Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch30:	binutils-2.21.53-with-lib-path-support-for-gold.patch
 Patch31:	binutils-2.21.53-fix-overrides-for-gold-testsuite.patch
+Patch32:	binutils-2.21.53.0.1-gold-fix-Ttext.patch
+Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -156,7 +158,7 @@ to consider using libelf instead of BFD.
 %patch06 -p0 -b .copy-osabi~
 %patch07 -p0 -b .sec-merge-emit~
 %patch08 -p0 -b .build-id~
-%patch09 -p1 -b .debug_macro~
+%patch09 -p0 -b .debug_macro~
 %patch10 -p1 -b .demangle
  
 %patch21 -p1 -b .linux32~
@@ -174,6 +176,9 @@ to consider using libelf instead of BFD.
 %endif
 %patch30 -p1 -b .gold_lib_path~
 %patch31 -p1 -b .gold_testsuite~
+%patch32 -p0 -b .gold_Ttext~
+# later
+#%%patch33 -p1 -b .ld_13048~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
