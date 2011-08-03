@@ -72,6 +72,7 @@ Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
 Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch08:	binutils-2.20.51.0.2-build-id.patch
 Patch09:	binutils-2.21.53.0.1-debug_macro.patch
+Patch10:	binutils-2.21.53.0.1-demangle.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -156,6 +157,7 @@ to consider using libelf instead of BFD.
 %patch07 -p0 -b .sec-merge-emit~
 %patch08 -p0 -b .build-id~
 %patch09 -p1 -b .debug_macro~
+%patch10 -p1 -b .demangle
  
 %patch21 -p1 -b .linux32~
 #%%patch23 -p1 -b .mips_gas~
