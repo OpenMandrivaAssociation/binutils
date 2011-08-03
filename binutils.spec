@@ -71,10 +71,7 @@ Patch05:	binutils-2.20.51.0.2-set-long-long.patch
 Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
 Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch08:	binutils-2.20.51.0.2-build-id.patch
-# merged already
-#Patch09:	binutils-2.21.52.0.1-keeping-notes.patch
-#Patch10:	binutils-2.21.52.0.1-finding-without-symbols.patch
-#Patch11:	binutils-2.21.52.0.1-sh_offset-for-SHT_NOBITS.patch
+Patch09:	binutils-2.21.53.0.1-debug_macro.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -158,10 +155,8 @@ to consider using libelf instead of BFD.
 %patch06 -p0 -b .copy-osabi~
 %patch07 -p0 -b .sec-merge-emit~
 %patch08 -p0 -b .build-id~
-#%%patch09 -p0 -b .keeping-notes~
-#%%patch10 -p0 -b .finding~
-#%%patch11 -p0 -b .sh_offset~
-
+%patch09 -p1 -b .debug_macro~
+ 
 %patch21 -p1 -b .linux32~
 #%%patch23 -p1 -b .mips_gas~
 %patch24 -p1 -b .mips_ihex~
