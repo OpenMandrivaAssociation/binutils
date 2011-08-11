@@ -32,10 +32,12 @@
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
+%define gold_default	0
+
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.21.53.0.1
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -244,12 +246,12 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
-%if "%{distepoch}" < "2012"
-						--enable-ld=default \
-						--enable-gold=yes \
-%else
+%if %{gold_default}
 						--enable-ld=yes \
 						--enable-gold=default \
+%else
+						--enable-ld=default \
+						--enable-gold=yes \
 %endif
 						--enable-plugins \
 						--enable-threads \
