@@ -36,8 +36,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.21.53.0.1
-Release:	3
+Version:	2.21.53.0.2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -73,15 +73,13 @@ Patch05:	binutils-2.20.51.0.2-set-long-long.patch
 Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
 Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch08:	binutils-2.20.51.0.2-build-id.patch
-Patch09:	binutils-2.21.53.0.1-debug_macro.patch
-Patch10:	binutils-2.21.53.0.1-demangle.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 Patch21:	binutils-2.21.53-linux32.patch
 #Patch23:	binutils-2.19.51.0.14-mips-gas.patch
 Patch24:	binutils-2.19.51.0.2-mips-ihex.patch
-Patch25:	binutils-2.21.51.0.6-mips-ls2f_fetch_fix.patch
+Patch25:	binutils-2.21.53.0.2-mips-ls2f_fetch_fix.patch
 Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
@@ -103,7 +101,6 @@ Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch30:	binutils-2.21.53-with-lib-path-support-for-gold.patch
 Patch31:	binutils-2.21.53-fix-overrides-for-gold-testsuite.patch
-Patch32:	binutils-2.21.53.0.1-gold-fix-Ttext.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 
 %description
@@ -160,8 +157,6 @@ to consider using libelf instead of BFD.
 %patch06 -p0 -b .copy-osabi~
 %patch07 -p0 -b .sec-merge-emit~
 %patch08 -p0 -b .build-id~
-%patch09 -p0 -b .debug_macro~
-%patch10 -p1 -b .demangle
  
 %patch21 -p1 -b .linux32~
 #%%patch23 -p1 -b .mips_gas~
@@ -178,7 +173,6 @@ to consider using libelf instead of BFD.
 %endif
 %patch30 -p1 -b .gold_lib_path~
 %patch31 -p1 -b .gold_testsuite~
-%patch32 -p0 -b .gold_Ttext~
 # later
 #%%patch33 -p1 -b .ld_13048~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
