@@ -257,6 +257,15 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.
 %else
 						--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib \
 %endif
+%ifarch armv7l
+						--with-cpu=cortex-a8 \
+						--with-tune=cortex-a8 \
+						--with-arch=armv7-a \
+						--with-mode=thumb \
+						--with-float=softfp \
+						--with-fpu=vfpv3-d16 \
+						--with-abi=aapcs-linux \
+%endif
 						--disable-werror \
 						--with-separate-debug-dir=%{_prefix}/lib/debug
 # There seems to be some problems with builds of gold randomly failing whenever
