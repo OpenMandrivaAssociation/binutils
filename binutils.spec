@@ -47,7 +47,6 @@ Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
 Source4:	embedspu.sh
 Source5:	binutils-2.19.50.0.1-output-format.sed
-Buildroot:	%{_tmppath}/%{name}-%{version}-root
 %if "%{name}" == "binutils"
 Requires:	%{lib_name} = %{version}-%{release}
 Requires(post):	info-install
@@ -338,7 +337,6 @@ logfile="%{name}-%{version}-%{release}.log"
 rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
 
 %install
-rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_prefix}
 %makeinstall_std -C objs
 
@@ -439,9 +437,6 @@ chmod +x $RPM_BUILD_ROOT%{_bindir}/ppu-as
 install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}/embedspu
 }
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %if "%{name}" == "binutils"
 %post
 %_install_info as.info
@@ -465,7 +460,6 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 
 %files -f binutils.lang
-%defattr(-,root,root)
 %{_bindir}/%{program_prefix}addr2line
 %{_bindir}/%{program_prefix}ar
 %{_bindir}/%{program_prefix}as
@@ -500,7 +494,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %ifarch %{spu_arches}
 %files -n spu-binutils
-%defattr(-,root,root)
 %{_bindir}/spu-*
 %{_bindir}/embedspu
 %dir %{_prefix}/spu/bin
@@ -509,7 +502,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %if "%{name}" == "binutils"
 %files -n %{dev_name}
-%defattr(-,root,root)
 %doc html
 %{_includedir}/*.h
 %{_libdir}/libbfd.a
