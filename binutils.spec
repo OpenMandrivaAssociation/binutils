@@ -263,12 +263,16 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.
 %else
 						--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib \
 %endif
-%ifarch armv7l
+%ifarch armv7l armv7hl
 						--with-cpu=cortex-a8 \
 						--with-tune=cortex-a8 \
 						--with-arch=armv7-a \
 						--with-mode=thumb \
+  %ifarch armv7l
 						--with-float=softfp \
+  %else
+						--with-float=hard \
+  %endif
 						--with-fpu=vfpv3-d16 \
 						--with-abi=aapcs-linux \
 %endif
@@ -366,7 +370,7 @@ rm -rf $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/
 # Sanity check --enable-64-bit-bfd really works.
 grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
 # Fix multilib conflicts of generated values by __WORDSIZE-based expressions.
-%ifarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64 arm
+%ifarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64 %arm
 sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
     -e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
     -e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
