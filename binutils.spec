@@ -37,10 +37,11 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.22.51
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
+# snapshot from 2011.11.25
 Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
 Source2:	build_cross_binutils.sh
@@ -98,16 +99,10 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # --build-id=sha1
 Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
-Patch30:	binutils-2.22.51-with-lib-path-support-for-gold.patch
 Patch31:	binutils-2.21.53-fix-overrides-for-gold-testsuite.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch34:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
-
-# Required to build chromium-browser-unstable
-# http://sourceware.org/ml/binutils/2011-09/msg00103.html
-# http://sourceware.org/cgi-bin/cvsweb.cgi/src/bfd/elflink.c.diff?r1=1.420&r2=1.421&cvsroot=src
-Patch35:	binutils-2.22.51-ld-pr13195.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -177,15 +172,12 @@ to consider using libelf instead of BFD.
 %if "%{distepoch}" >= "2012"
 %patch29 -p1 -b .gold_defaults~
 %endif
-%patch30 -p1 -b .gold_lib_path~
 #%%patch31 -p1 -b .gold_testsuite~
 # later
 #%%patch33 -p1 -b .ld_13048~
 %patch34 -p1 -b .nls~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
-
-%patch35 -p1
 
 %build
 # Additional targets
