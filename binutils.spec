@@ -59,7 +59,7 @@ Conflicts:	gcc-c++ < 3.2.3-1mdk
 BuildRequires:	autoconf automake bison flex gcc gettext texinfo
 BuildRequires:	dejagnu zlib-devel
 # make check'ing requires libdl.a
-BuildRequires:	glibc-static-devel
+BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel bc
 
