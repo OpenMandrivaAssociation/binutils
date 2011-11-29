@@ -260,11 +260,11 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.
 						--with-tune=cortex-a8 \
 						--with-arch=armv7-a \
 						--with-mode=thumb \
-  %ifarch armv7l
+%ifarch armv7l
 						--with-float=softfp \
-  %else
+%else
 						--with-float=hard \
-  %endif
+%endif
 						--with-fpu=vfpv3-d16 \
 						--with-abi=aapcs-linux \
 %endif
