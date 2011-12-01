@@ -340,24 +340,24 @@ logfile="%{name}-%{version}-%{release}.log"
 rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
 
 %install
-mkdir -p $RPM_BUILD_ROOT%{_prefix}
+mkdir -p %{buildroot}%{_prefix}
 %makeinstall_std -C objs
 
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/{dlltool,nlmconv,windres}*
-rm -f $RPM_BUILD_ROOT%{_infodir}/dir
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
-rm -f $RPM_BUILD_ROOT%{_libdir}/lib{bfd,opcodes}.so
+rm -f %{buildroot}%{_mandir}/man1/{dlltool,nlmconv,windres}*
+rm -f %{buildroot}%{_infodir}/dir
+rm -f %{buildroot}%{_libdir}/*.la
+rm -f %{buildroot}%{_libdir}/lib{bfd,opcodes}.so
 
 %if "%{name}" == "binutils"
-make -C objs prefix=$RPM_BUILD_ROOT%{_prefix} infodir=$RPM_BUILD_ROOT%{_infodir} install-info
-install -m 644 include/libiberty.h $RPM_BUILD_ROOT%{_includedir}/
+make -C objs prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
+install -m 644 include/libiberty.h %{buildroot}%{_includedir}/
 %if %isarch mips|mipsel|mips64|mips64el
-install -m 644 objs/libiberty/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
+install -m 644 objs/libiberty/libiberty.a %{buildroot}%{_libdir}/
 # Ship with the PIC libiberty
 %else
-install -m 644 objs/libiberty/pic/libiberty.a $RPM_BUILD_ROOT%{_libdir}/
+install -m 644 objs/libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
 %endif
-rm -rf $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/
+rm -rf %{buildroot}%{_prefix}/%{_target_platform}/
 
 # Sanity check --enable-64-bit-bfd really works.
 grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
@@ -403,10 +403,10 @@ INPUT ( %{_libdir}/libopcodes.a -lbfd -lz )
 EOH
 
 %else
-rm -f  $RPM_BUILD_ROOT%{_libdir}/libiberty.a
-rm -rf $RPM_BUILD_ROOT%{_infodir}
-rm -rf $RPM_BUILD_ROOT%{_datadir}/locale/
-rm -f  $RPM_BUILD_ROOT%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.la
+rm -f  %{buildroot}%{_libdir}/libiberty.a
+rm -rf %{buildroot}%{_infodir}
+rm -rf %{buildroot}%{_datadir}/locale/
+rm -f  %{buildroot}%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.la
 %endif
 
 %find_lang binutils
@@ -428,16 +428,16 @@ cat bfd.lang >> binutils.lang
 [[ -d objs-spu ]] && {
 destdir=`mktemp -d`
 make -C objs-spu DESTDIR=$destdir install-binutils install-gas install-ld
-mv $destdir%{_bindir}/spu-* $RPM_BUILD_ROOT%{_bindir}/
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/spu/bin
-mv $destdir%{_prefix}/spu-unknown-elf/bin/* $RPM_BUILD_ROOT%{_prefix}/spu/bin/
+mv $destdir%{_bindir}/spu-* %{buildroot}%{_bindir}/
+mkdir -p %{buildroot}%{_prefix}/spu/bin
+mv $destdir%{_prefix}/spu-unknown-elf/bin/* %{buildroot}%{_prefix}/spu/bin/
 rm -rf $destdir
-cat > $RPM_BUILD_ROOT%{_bindir}/ppu-as << EOF
+cat > %{buildroot}%{_bindir}/ppu-as << EOF
 #!/bin/sh
 exec %{_bindir}/as -mcell -maltivec \${1+"\$@"}
 EOF
-chmod +x $RPM_BUILD_ROOT%{_bindir}/ppu-as
-install -m 755 %{SOURCE4} $RPM_BUILD_ROOT%{_bindir}/embedspu
+chmod +x %{buildroot}%{_bindir}/ppu-as
+install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 }
 
 %if "%{name}" == "binutils"
