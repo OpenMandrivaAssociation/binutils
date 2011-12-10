@@ -77,7 +77,6 @@ Patch08:	binutils-2.20.51.0.2-build-id.patch
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 Patch21:	binutils-2.21.53-linux32.patch
-Patch26:	binutils-2.20.51.0.11-ld-selective45-x86_64-xfail.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
@@ -157,7 +156,6 @@ to consider using libelf instead of BFD.
 %patch08 -p0 -b .build-id~
  
 %patch21 -p1 -b .linux32~
-%patch26 -p1 -b .x86_64~
 #%%patch27 -p1 -b .skip_gold_check~
 # we don't bother modifying the defaults for the bfd linker, we'll switch
 # to gold as the default now, so let's just leave the older linker with
