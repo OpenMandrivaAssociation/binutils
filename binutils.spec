@@ -49,11 +49,9 @@ Source3:	spu_ovl.o
 Source4:	embedspu.sh
 Source5:	binutils-2.19.50.0.1-output-format.sed
 %if "%{name}" == "binutils"
-Requires:	%{lib_name} = %{version}-%{release}
 Requires(post):	info-install
 Requires(preun):info-install
-Provides:	%{lib_name} = %{version}-%{release}
-Obsoletes:	%{lib_name}
+%rename		%{lib_name}
 %endif
 Conflicts:	gcc-c++ < 3.2.3-1mdk
 BuildRequires:	autoconf automake bison flex gcc gettext texinfo
