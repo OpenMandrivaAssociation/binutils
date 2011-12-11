@@ -95,7 +95,7 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # --build-id=sha1
 Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
-Patch31:	binutils-2.21.53-fix-overrides-for-gold-testsuite.patch
+Patch31:	binutils-2.22.51.0.1-fix-overrides-for-gold-testsuite.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch34:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
@@ -164,7 +164,7 @@ to consider using libelf instead of BFD.
 %if "%{distepoch}" >= "2012"
 %patch29 -p1 -b .gold_defaults~
 %endif
-#%%patch31 -p1 -b .gold_testsuite~
+%patch31 -p1 -b .gold_testsuite~
 # later
 #%%patch33 -p1 -b .ld_13048~
 %patch34 -p1 -b .nls~
