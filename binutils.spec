@@ -398,7 +398,9 @@ rm -rf %{buildroot}%{_datadir}/locale/
 rm -f  %{buildroot}%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.la
 %endif
 
+%if "%{name}" == "binutils"
 %find_lang binutils --all-name
+%endif
 
 # Alternate binaries
 [[ -d objs-spu ]] && {
@@ -425,9 +427,7 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %_install_info gprof.info
 %_install_info ld.info
 %_install_info standards.info
-%endif
 
-%if "%{name}" == "binutils"
 %preun
 %_remove_install_info as.info
 %_remove_install_info bfd.info
@@ -436,9 +436,11 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %_remove_install_info gprof.info
 %_remove_install_info ld.info
 %_remove_install_info standards.info
-%endif
 
 %files -f binutils.lang
+%else
+%files
+%endif
 %{_bindir}/%{program_prefix}addr2line
 %{_bindir}/%{program_prefix}ar
 %{_bindir}/%{program_prefix}as
