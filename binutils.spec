@@ -48,6 +48,7 @@ Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
 Source4:	embedspu.sh
 Source5:	binutils-2.19.50.0.1-output-format.sed
+Source10:	binutils.rpmlintrc
 %if "%{name}" == "binutils"
 Requires(post):	info-install
 Requires(preun):info-install
@@ -340,12 +341,12 @@ rm -f %{buildroot}%{_libdir}/lib{bfd,opcodes}.so
 %if "%{name}" == "binutils"
 make -C objs prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
 install -m 644 include/libiberty.h %{buildroot}%{_includedir}/
-%if %isarch mips|mipsel|mips64|mips64el
-install -m 644 objs/libiberty/libiberty.a %{buildroot}%{_libdir}/
-# Ship with the PIC libiberty
-%else
-install -m 644 objs/libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
-%endif
+if [ -e objs/libiberty/pic/libiberty.a ]; then
+	# Ship with the PIC libiberty
+	install -m 644 objs/libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
+else
+	install -m 644 objs/libiberty/libiberty.a %{buildroot}%{_libdir}/
+fi
 rm -rf %{buildroot}%{_prefix}/%{_target_platform}/
 
 # Sanity check --enable-64-bit-bfd really works.
