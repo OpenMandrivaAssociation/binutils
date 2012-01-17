@@ -72,6 +72,7 @@ Patch05:	binutils-2.20.51.0.2-set-long-long.patch
 Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
 Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch08:	binutils-2.20.51.0.2-build-id.patch
+Patch09:	binutils-2.22-gold-casts.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -153,6 +154,7 @@ to consider using libelf instead of BFD.
 %patch06 -p0 -b .copy-osabi~
 %patch07 -p0 -b .sec-merge-emit~
 %patch08 -p0 -b .build-id~
+%patch09 -p0 -b .gold-cast~
  
 %patch21 -p1 -b .linux32~
 #%%patch27 -p1 -b .skip_gold_check~
