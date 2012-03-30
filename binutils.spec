@@ -37,7 +37,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.22.52.0.1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -50,8 +50,6 @@ Source4:	embedspu.sh
 Source5:	binutils-2.19.50.0.1-output-format.sed
 Source10:	binutils.rpmlintrc
 %if "%{name}" == "binutils"
-Requires(post):	info-install
-Requires(preun):info-install
 %rename		%{lib_name}
 %endif
 Conflicts:	gcc-c++ < 3.2.3-1mdk
@@ -420,24 +418,6 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 }
 
 %if "%{name}" == "binutils"
-%post
-%_install_info as.info
-%_install_info bfd.info
-%_install_info binutils.info
-%_install_info gasp.info
-%_install_info gprof.info
-%_install_info ld.info
-%_install_info standards.info
-
-%preun
-%_remove_install_info as.info
-%_remove_install_info bfd.info
-%_remove_install_info binutils.info
-%_remove_install_info gasp.info
-%_remove_install_info gprof.info
-%_remove_install_info ld.info
-%_remove_install_info standards.info
-
 %files -f binutils.lang
 %else
 %files
