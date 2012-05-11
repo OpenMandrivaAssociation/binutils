@@ -37,7 +37,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.22.52.0.3
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -90,6 +90,7 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # --warn-unresolved-symbols
 # -z relro
 # --build-id=sha1
+# --icf=safe
 Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch31:	binutils-2.22.51.0.1-fix-overrides-for-gold-testsuite.patch
