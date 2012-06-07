@@ -36,8 +36,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.22.52.0.3
-Release:	2
+Version:	2.22.52.0.4
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -73,7 +73,7 @@ Patch08:	binutils-2.20.51.0.2-build-id.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
-Patch21:	binutils-2.21.53-linux32.patch
+Patch21:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
