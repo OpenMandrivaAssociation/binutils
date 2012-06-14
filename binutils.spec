@@ -32,12 +32,12 @@
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
-%define gold_default	0
+%define gold_default	1
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.22.52.0.4
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -155,13 +155,10 @@ to consider using libelf instead of BFD.
  
 %patch21 -p1 -b .linux32~
 #%%patch27 -p1 -b .skip_gold_check~
-# we don't bother modifying the defaults for the bfd linker, we'll switch
-# to gold as the default now, so let's just leave the older linker with
-# the same behaviour as previous for anyone who needs to use it..
-#%%patch28 -p1 -b .defaults~
-%if "%{distepoch}" >= "2012"
+# Modify the defaults of the BFD linker as well, since many
+# things fall back to it...
+%patch28 -p1 -b .defaults~
 %patch29 -p1 -b .gold_defaults~
-%endif
 %patch31 -p1 -b .gold_testsuite~
 # later
 #%%patch33 -p1 -b .ld_13048~
