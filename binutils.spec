@@ -36,13 +36,13 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.22.52.0.4
-Release:	3
+Version:	2.23.51.0.1
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 # official beta snapshot from http://git.kernel.org/?p=linux/kernel/git/hjl/binutils.git;a=summary
-Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz
+Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
@@ -69,7 +69,15 @@ Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 Patch05:	binutils-2.20.51.0.2-set-long-long.patch
 Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
 Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
-Patch08:	binutils-2.20.51.0.2-build-id.patch
+# we already set our own set of defaults...
+# Enable -zrelro by default: BZ #621983
+#Patch08:	binutils-2.22.52.0.1-relro-on-by-default.patch
+# Local patch - export demangle.h with the binutils-devel rpm.
+Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
+# Disable checks that config.h has been included before system headers.  BZ #845084
+Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
+# Make GOLD honour the KEEP directive in linker scripts.
+Patch11:	binutils-2.23.51.0.1-gold-keep.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -147,14 +155,17 @@ to consider using libelf instead of BFD.
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-#%%patch04 -p0 -b .version~
+#patch04 -p0 -b .version~
 %patch05 -p0 -b .set-long-long~
 %patch06 -p0 -b .copy-osabi~
 %patch07 -p0 -b .sec-merge-emit~
-%patch08 -p0 -b .build-id~
+#patch08 -p0 -b .relro~
+%patch09 -p0 -b .export-demangle-h~
+%patch10 -p0 -b .no-config-h-check~
+%patch11 -p0 -b .gold-keep~
  
 %patch21 -p1 -b .linux32~
-#%%patch27 -p1 -b .skip_gold_check~
+#patch27 -p1 -b .skip_gold_check~
 # Modify the defaults of the BFD linker as well, since many
 # things fall back to it...
 %patch28 -p1 -b .defaults~
