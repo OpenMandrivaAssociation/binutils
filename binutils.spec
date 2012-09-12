@@ -36,7 +36,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.23.51.0.1
+Version:	2.23.51.0.2
 Release:	1
 License:	GPLv3+
 Group:		Development/Other
@@ -62,7 +62,7 @@ BuildRequires:	libstdc++-static-devel bc
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
-Patch02:	binutils-2.20.51.0.10-ppc64-pie.patch
+Patch02:	binutils-2.23.51.0.2-ppc64-pie.patch
 Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch04:	binutils-2.20.51.0.2-version.patch
@@ -76,8 +76,6 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-# Make GOLD honour the KEEP directive in linker scripts.
-Patch11:	binutils-2.23.51.0.1-gold-keep.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -149,7 +147,7 @@ to consider using libelf instead of BFD.
 %prep
 %setup -q -n binutils-%{version}
 %patch01 -p0 -b .libtool-lib64~
-%patch02 -p0 -b .ppc64-pie~
+%patch02 -p1 -b .ppc64-pie~
 %ifarch ia64
 %if "%{_lib}" == "lib64"
 %patch03 -p0 -b .ia64-lib64~
@@ -162,7 +160,6 @@ to consider using libelf instead of BFD.
 #patch08 -p0 -b .relro~
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
-%patch11 -p0 -b .gold-keep~
  
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
