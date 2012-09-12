@@ -396,6 +396,13 @@ $OUTPUT_FORMAT
 INPUT ( %{_libdir}/libopcodes.a -lbfd -lz )
 EOH
 
+# Symlinks for compatibility with crosscompilers
+cd %buildroot%_bindir
+for i in *; do
+	ln -s $i %_target_platform-$i
+done
+cd -
+
 %else
 rm -f  %{buildroot}%{_libdir}/libiberty.a
 rm -rf %{buildroot}%{_infodir}
@@ -428,25 +435,22 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %else
 %files
 %endif
-%{_bindir}/%{program_prefix}addr2line
-%{_bindir}/%{program_prefix}ar
-%{_bindir}/%{program_prefix}as
-%{_bindir}/%{program_prefix}c++filt
-%{_bindir}/%{program_prefix}elfedit
-%{_bindir}/%{program_prefix}gprof
-%{_bindir}/%{program_prefix}ld
-%{_bindir}/%{program_prefix}ld.bfd
-%if %isarch %{gold_arches}
-%{_bindir}/%{program_prefix}ld.gold
-%endif
-%{_bindir}/%{program_prefix}nm
-%{_bindir}/%{program_prefix}objcopy
-%{_bindir}/%{program_prefix}objdump
-%{_bindir}/%{program_prefix}ranlib
-%{_bindir}/%{program_prefix}readelf
-%{_bindir}/%{program_prefix}size
-%{_bindir}/%{program_prefix}strings
-%{_bindir}/%{program_prefix}strip
+%{_bindir}/*addr2line
+%{_bindir}/*ar
+%{_bindir}/*as
+%{_bindir}/*c++filt
+%{_bindir}/*elfedit
+%{_bindir}/*gprof
+%{_bindir}/*ld
+%{_bindir}/*ld.bfd
+%{_bindir}/*nm
+%{_bindir}/*objcopy
+%{_bindir}/*objdump
+%{_bindir}/*ranlib
+%{_bindir}/*readelf
+%{_bindir}/*size
+%{_bindir}/*strings
+%{_bindir}/*strip
 %ifarch %{spu_arches}
 %{_bindir}/ppu-as
 %endif
