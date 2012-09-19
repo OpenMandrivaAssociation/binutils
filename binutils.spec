@@ -36,13 +36,13 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.23.51.0.2
+Version:	2.23.51.0.3
 Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 # official beta snapshot from http://git.kernel.org/?p=linux/kernel/git/hjl/binutils.git;a=summary
-Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2
+Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
@@ -147,7 +147,8 @@ to consider using libelf instead of BFD.
 %prep
 %setup -q -n binutils-%{version}
 %patch01 -p0 -b .libtool-lib64~
-%patch02 -p1 -b .ppc64-pie~
+# Needs porting, and we don't care about the target for now
+#patch02 -p1 -b .ppc64-pie~
 %ifarch ia64
 %if "%{_lib}" == "lib64"
 %patch03 -p0 -b .ia64-lib64~
