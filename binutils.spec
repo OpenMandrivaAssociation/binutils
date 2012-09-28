@@ -30,14 +30,18 @@
 %define isarch()	%(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
 
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
+%define gold_arches %ix86 x86_64
 
-%define gold_default	1
+%ifarch %{gold_arches}
+%define build_gold	both
+%else
+%define build_gold	no
+%endif
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.23.51.0.3
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -103,6 +107,15 @@ Patch31:	binutils-2.22.51.0.1-fix-overrides-for-gold-testsuite.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch34:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
+
+# The higher of these two numbers determines the default ld.
+%define ld_bfd_priority		50
+%define ld_gold_priority	30
+
+%if "%{build_gold}" == "both"
+Requires(post): update-alternatives
+Requires(preun): update-alternatives
+%endif
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -237,12 +250,10 @@ rm -rf objs
 mkdir objs
 pushd objs
 CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=http://qa.mandriva.com/ \
-%if %{gold_default}
-						--enable-ld=yes \
-						--enable-gold=default \
+%if "%{build_gold}" == "both"
+						--enable-gold=default --enable-ld \
 %else
-						--enable-ld=default \
-						--enable-gold=yes \
+						--enable-gold \
 %endif
 						--enable-plugins \
 						--enable-threads \
@@ -298,8 +309,11 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 				--enable-ld=default \
 				--enable-gold=yes \
 %else
-				--enable-ld=yes \
-				--enable-gold=default \
+  %if "%{build_gold}" == "both"
+				--enable-gold=default --enable-ld \
+  %else
+				--enable-gold \
+  %endif
 %endif
 				--disable-werror \
 				--with-bugurl=http://qa.mandriva.com/
@@ -431,6 +445,33 @@ chmod +x %{buildroot}%{_bindir}/ppu-as
 install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 }
 
+%if "%{build_gold}" == "both"
+    # make it consistent with default alternatives in case one
+    # installs with --noscripts
+    rm -f %{buildroot}%{_bindir}/ld
+    ln -s ld.bfd %{buildroot}%{_bindir}/ld
+%endif
+
+%post
+%if "%{build_gold}" == "both"
+    %__rm -f %{_bindir}/ld
+    update-alternatives --install %{_bindir}/ld ld \
+	%{_bindir}/ld.bfd %{ld_bfd_priority}
+    update-alternatives --install %{_bindir}/ld ld \
+	%{_bindir}/ld.gold %{ld_gold_priority}
+    update-alternatives --auto ld 
+%endif
+exit 0
+
+%preun
+%if "%{build_gold}" == "both"
+    if [ $1 = 0 ]; then
+	update-alternatives --remove ld %{_bindir}/ld.bfd
+	update-alternatives --remove ld %{_bindir}/ld.gold
+    fi
+%endif
+exit 0
+
 %if "%{name}" == "binutils"
 %files -f binutils.lang
 %else
@@ -442,8 +483,7 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %{_bindir}/*c++filt
 %{_bindir}/*elfedit
 %{_bindir}/*gprof
-%{_bindir}/*ld
-%{_bindir}/*ld.bfd
+%{_bindir}/*ld*
 %{_bindir}/*nm
 %{_bindir}/*objcopy
 %{_bindir}/*objdump
