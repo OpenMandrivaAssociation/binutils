@@ -1,0 +1,19 @@
+diff --git a/opcodes/i386-gen.c b/opcodes/i386-gen.c
+index a0d0627..4974cd0 100644
+--- a/opcodes/i386-gen.c
++++ b/opcodes/i386-gen.c
+@@ -28,8 +28,12 @@
+ 
+ #include "i386-opc.h"
+ 
+-#include <libintl.h>
+-#define _(String) gettext (String)
++#ifdef ENABLE_NLS
++# include <libintl.h>
++# define _(String) gettext (String)
++#else
++# define _(String) (String)
++#endif
+ 
+ static const char *program_name = NULL;
+ static int debug = 0;

@@ -1,0 +1,18 @@
+--- binutils-2.23.51.0.2/ld/ldmain.c.defaults~	2012-09-10 18:28:03.000000000 +0200
++++ binutils-2.23.51.0.2/ld/ldmain.c	2012-09-12 13:33:28.305315250 +0200
+@@ -278,9 +278,14 @@ main (int argc, char **argv)
+ 
+   link_info.allow_undefined_version = TRUE;
+   link_info.keep_memory = TRUE;
++  link_info.optimize = TRUE;
++  link_info.new_dtags = TRUE;
+   link_info.combreloc = TRUE;
++  link_info.relro = TRUE;
+   link_info.strip_discarded = TRUE;
+-  link_info.emit_hash = TRUE;
++  link_info.emit_hash = FALSE;
++  link_info.emit_gnu_hash = TRUE;
++  link_info.emit_note_gnu_build_id = xstrdup("sha1");
+   link_info.emit_secondary = TRUE;
+   link_info.callbacks = &link_callbacks;
+   link_info.input_bfds_tail = &link_info.input_bfds;
