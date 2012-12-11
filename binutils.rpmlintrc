@@ -1,0 +1,4 @@
+from Config import *
+from os import environ
+
+addFilter('binutils\..*: non-versioned-file-in-library-package')

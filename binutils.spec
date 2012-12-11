@@ -36,8 +36,8 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.23.51.0.3
-Release:	3
+Version:	2.23.51.0.6
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -440,6 +440,7 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %{_bindir}/*ar
 %{_bindir}/*as
 %{_bindir}/*c++filt
+%{_bindir}/*dwp
 %{_bindir}/*elfedit
 %{_bindir}/*gprof
 %{_bindir}/*ld
