@@ -36,7 +36,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.23.51.0.8
+Version:	2.23.51.0.9
 Release:	1
 License:	GPLv3+
 Group:		Development/Other
@@ -97,7 +97,7 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # -z relro
 # --build-id=sha1
 # --icf=safe
-Patch29:	binutils-2.21.52.0.2-ld.gold-default-settings.patch
+Patch29:	binutils-2.23.51.0.9-ld.gold-default-settings.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch31:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch

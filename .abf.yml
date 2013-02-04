@@ -1,6 +1,3 @@
-removed_sources:
-  binutils-2.23.51.0.3.tar.xz: ae8f2bb5957a073a6cec5ee42fc0a0345d6af054
-  binutils-2.23.51.0.6.tar.xz: 18a1d79bd811bc9ad6e5f9af3e3e62bc4feec438
 sources:
-  binutils-2.23.51.0.8.tar.xz: d288e5cf3dcaa3c37ca4308806ae1a270e7b4c39
   spu_ovl.o: d5ebd9a79e64af4efd9d4f012bcfe9c2d055335f
+  binutils-2.23.51.0.9.tar.xz: 7d10b69a7df2926ed2f10d5bd8e9530da7162ed2
