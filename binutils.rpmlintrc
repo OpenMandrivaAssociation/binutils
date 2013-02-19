@@ -3,3 +3,4 @@ from os import environ
 
 addFilter('binutils\..*: non-versioned-file-in-library-package')
 addFilter('binutils\..*: executable-in-library-package')
+addFilter('binutils\..*: incoherent-version-in-name')
