@@ -36,7 +36,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.23.51.0.9
+Version:	2.23.52.0.1
 Release:	1
 License:	GPLv3+
 Group:		Development/Other
@@ -103,6 +103,7 @@ Patch31:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch34:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
+Patch35:	binutils-2.23.52.0.1-texinfo-5.0.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -172,6 +173,7 @@ to consider using libelf instead of BFD.
 # later
 #%%patch33 -p1 -b .ld_13048~
 %patch34 -p1 -b .nls~
+%patch35 -p1 -b .texi5~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 

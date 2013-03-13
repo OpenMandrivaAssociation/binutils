@@ -1,6 +1,6 @@
 --- binutils-2.23.51.0.2/ld/ldmain.c.defaults~	2012-09-10 18:28:03.000000000 +0200
 +++ binutils-2.23.51.0.2/ld/ldmain.c	2012-09-12 13:33:28.305315250 +0200
-@@ -278,9 +278,14 @@ main (int argc, char **argv)
+@@ -278,9 +278,13 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = TRUE;
    link_info.keep_memory = TRUE;
@@ -12,7 +12,27 @@
 -  link_info.emit_hash = TRUE;
 +  link_info.emit_hash = FALSE;
 +  link_info.emit_gnu_hash = TRUE;
-+  link_info.emit_note_gnu_build_id = xstrdup("sha1");
    link_info.emit_secondary = TRUE;
    link_info.callbacks = &link_callbacks;
    link_info.input_bfds_tail = &link_info.input_bfds;
+--- binutils-2.23.52.0.1/ld/emultempl/elf32.em.bero	2013-03-13 17:24:10.063556174 +0100
++++ binutils-2.23.52.0.1/ld/emultempl/elf32.em	2013-03-13 17:26:51.405539121 +0100
+@@ -168,7 +168,7 @@ static char *audit; /* colon (typically)
+ static char *depaudit; /* colon (typically) separated list of libs */
+ 
+ /* Style of .note.gnu.build-id section.  */
+-static const char *emit_note_gnu_build_id;
++static const char *emit_note_gnu_build_id = NULL;
+ 
+ /* On Linux, it's possible to have different versions of the same
+    shared library linked against different versions of libc.  The
+@@ -586,6 +586,9 @@ gld${EMULATION_NAME}_check_ld_elf_hints
+       FILE *f;
+       char *tmppath;
+ 
++      if (!emit_note_gnu_build_id)
++        emit_note_gnu_build_id = xstrdup("sha1");
++
+       tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
+       f = fopen (tmppath, FOPEN_RB);
+       free (tmppath);

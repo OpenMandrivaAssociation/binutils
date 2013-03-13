@@ -1,0 +1,96 @@
+--- binutils-2.23.52.0.1/gas/doc/c-arc.texi.bero	2013-03-13 16:32:40.558180306 +0100
++++ binutils-2.23.52.0.1/gas/doc/c-arc.texi	2013-03-13 16:42:31.204796207 +0100
+@@ -199,10 +199,10 @@ and 60, with the following as valid valu
+ The other parameter gives a description of the register having a
+ @var{shortcut} in the pipeline.  The valid values are:
+ 
+-@table @code
++@itemize @bullet
+ @item can_shortcut
+ @item cannot_shortcut
+-@end table
++@end itemize
+ 
+ For example:
+ 
+@@ -220,7 +220,7 @@ The extension instructions are not macro
+ encodings for use of these instructions according to the specification
+ by the user.  The parameters are:
+ 
+-@table @bullet
++@table @samp
+ @item @var{name}
+ Name of the extension instruction
+ 
+--- binutils-2.23.52.0.1/gas/doc/c-arm.texi.bero	2013-03-13 16:32:58.541955478 +0100
++++ binutils-2.23.52.0.1/gas/doc/c-arm.texi	2013-03-13 16:55:40.164932848 +0100
+@@ -390,7 +390,7 @@ ARM and THUMB instructions had their own
+ @code{unified} syntax, which can be selected via the @code{.syntax}
+ directive, and has the following main features:
+ 
+-@table @bullet
++@itemize @bullet
+ @item
+ Immediate operands do not require a @code{#} prefix.
+ 
+@@ -415,7 +415,7 @@ The @code{.N} and @code{.W} suffixes are
+ @item
+ All instructions set the flags if and only if they have an @code{s}
+ affix.
+-@end table
++@end itemize
+ 
+ @node ARM-Chars
+ @subsection Special Characters
+@@ -467,6 +467,14 @@ so @samp{: @var{align}} is used instead.
+ @end smallexample
+ 
+ @node ARM Floating Point
++@menu
++* ARM-Instruction-Set::      Instruction Set
++* ARM-Chars::                Special Characters
++* ARM-Regs::                 Register Names
++* ARM-Relocations::	     Relocations
++* ARM-Neon-Alignment::	     NEON Alignment Specifiers
++@end menu
++
+ @section Floating Point
+ 
+ @cindex floating point, ARM (@sc{ieee})
+--- binutils-2.23.52.0.1/gas/doc/c-tic54x.texi.bero	2013-03-13 16:33:33.396519736 +0100
++++ binutils-2.23.52.0.1/gas/doc/c-tic54x.texi	2013-03-13 16:34:40.172684919 +0100
+@@ -109,7 +109,7 @@ In this example, x is replaced with SYM2
+ is replaced with x.  At this point, x has already been encountered
+ and the substitution stops.
+ 
+-@smallexample @code
++@smallexample
+  .asg   "x",SYM1
+  .asg   "SYM1",SYM2
+  .asg   "SYM2",x
+@@ -126,14 +126,14 @@ Substitution may be forced in situations
+ ambiguous by placing colons on either side of the subsym.  The following
+ code:
+ 
+-@smallexample @code
++@smallexample
+  .eval  "10",x
+ LAB:X:  add     #x, a
+ @end smallexample
+ 
+ When assembled becomes:
+ 
+-@smallexample @code
++@smallexample
+ LAB10  add     #10, a
+ @end smallexample
+ 
+@@ -309,7 +309,7 @@ The @code{LDX} pseudo-op is provided for
+ of a label or address.  For example, if an address @code{_label} resides
+ in extended program memory, the value of @code{_label} may be loaded as
+ follows:
+-@smallexample @code
++@smallexample
+  ldx     #_label,16,a    ; loads extended bits of _label
+  or      #_label,a       ; loads lower 16 bits of _label
+  bacc    a               ; full address is in accumulator A
