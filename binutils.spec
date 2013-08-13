@@ -1,43 +1,43 @@
 
-%define lib_major	2
-%define lib_name_orig	%{package_prefix}%mklibname binutils
-%define lib_name	%{lib_name_orig}%{lib_major}
-%define	dev_name	%mklibname binutils -d
+%define lib_major 2
+%define lib_name_orig %{package_prefix}%mklibname binutils
+%define lib_name %{lib_name_orig}%{lib_major}
+%define dev_name %mklibname binutils -d
 
 # Allow SPU support for native PowerPC arches, not cross env packages
-%define spu_arches	ppc ppc64
+%define spu_arches ppc ppc64
 
 # Define if building a cross-binutils
-%define build_cross	0
+%define build_cross 0
 %{expand: %{?cross:	%%global build_cross 1}}
 
 %if %{build_cross}
-%define target_cpu	%{cross}
-%define target_platform	%{target_cpu}-linux
+%define target_cpu %{cross}
+%define target_platform %{target_cpu}-linux
 %if "%{target_cpu}" == "spu"
-%define target_platform	%{target_cpu}-unknown-elf
+%define target_platform %{target_cpu}-unknown-elf
 %endif
-%define program_prefix	%{target_platform}-
-%define package_prefix	cross-%{target_cpu}-
+%define program_prefix %{target_platform}-
+%define package_prefix cross-%{target_cpu}-
 %else
-%define target_cpu	%{_target_cpu}
-%define target_platform	%{_target_platform}
-%define program_prefix	%{nil}
-%define package_prefix	%{nil}
+%define target_cpu %{_target_cpu}
+%define target_platform %{_target_platform}
+%define program_prefix %{nil}
+%define package_prefix %{nil}
 %endif
 
-%define arch		%(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
-%define isarch()	%(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
+%define arch %(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
+%define isarch() %(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
 
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
-%define gold_default	1
+%define gold_default 1
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.23.52.0.2
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -53,12 +53,20 @@ Source10:	binutils.rpmlintrc
 %rename		%{lib_name}
 %endif
 Conflicts:	gcc-c++ < 3.2.3-1mdk
-BuildRequires:	autoconf automake bison flex gcc gettext texinfo
-BuildRequires:	dejagnu zlib-devel
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	bison
+BuildRequires:	flex
+BuildRequires:	gcc
+BuildRequires:	gettext
+BuildRequires:	texinfo
+BuildRequires:	dejagnu
+BuildRequires:	zlib-devel
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
-BuildRequires:	libstdc++-static-devel bc
+BuildRequires:	libstdc++-static-devel
+BuildRequires:	bc
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
@@ -135,7 +143,7 @@ Summary:	Main library for %{name}
 Group:		Development/Other
 Provides:	%{name}-devel = %{version}-%{release}
 Provides:	%{lib_name}-devel = %{version}-%{release}
-Obsoletes:	%{lib_name}-devel
+Obsoletes:	%{lib_name}-devel <= %{version}-%{release}
 Requires:	zlib-devel
 
 %description -n	%{dev_name}
