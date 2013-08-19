@@ -273,7 +273,7 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 						--with-abi=aapcs-linux \
 %endif
 						--disable-werror \
-                        --enable-static \ 
+						--enable-static \
 						--with-separate-debug-dir=%{_prefix}/lib/debug
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
