@@ -37,7 +37,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.23.52.0.2
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -273,6 +273,7 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 						--with-abi=aapcs-linux \
 %endif
 						--disable-werror \
+                        --enable-static \ 
 						--with-separate-debug-dir=%{_prefix}/lib/debug
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
