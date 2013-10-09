@@ -1,0 +1,38 @@
+--- binutils-2.24-2013-10-04/ld/emultempl/elf32.em.defaults~	2013-10-09 04:18:47.616798711 +0200
++++ binutils-2.24-2013-10-04/ld/emultempl/elf32.em	2013-10-09 04:18:47.643465678 +0200
+@@ -167,7 +167,7 @@ static char *audit; /* colon (typically)
+ static char *depaudit; /* colon (typically) separated list of libs */
+ 
+ /* Style of .note.gnu.build-id section.  */
+-static const char *emit_note_gnu_build_id;
++static const char *emit_note_gnu_build_id = NULL;
+ 
+ /* On Linux, it's possible to have different versions of the same
+    shared library linked against different versions of libc.  The
+@@ -585,6 +585,9 @@ gld${EMULATION_NAME}_check_ld_elf_hints
+       FILE *f;
+       char *tmppath;
+ 
++      if (!emit_note_gnu_build_id)
++        emit_note_gnu_build_id = xstrdup("sha1");
++
+       tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
+       f = fopen (tmppath, FOPEN_RB);
+       free (tmppath);
+--- binutils-2.24-2013-10-04/ld/ldmain.c.defaults~	2013-10-09 04:18:47.640132308 +0200
++++ binutils-2.24-2013-10-04/ld/ldmain.c	2013-10-09 04:18:59.106928324 +0200
+@@ -279,9 +279,13 @@ main (int argc, char **argv)
+ 
+   link_info.allow_undefined_version = TRUE;
+   link_info.keep_memory = TRUE;
++  link_info.optimize = TRUE;
++  link_info.new_dtags = TRUE;
+   link_info.combreloc = TRUE;
++  link_info.relro = TRUE;
+   link_info.strip_discarded = TRUE;
+-  link_info.emit_hash = TRUE;
++  link_info.emit_hash = FALSE;
++  link_info.emit_gnu_hash = TRUE;
+   link_info.callbacks = &link_callbacks;
+   link_info.input_bfds_tail = &link_info.input_bfds;
+   /* SVR4 linkers seem to set DT_INIT and DT_FINI based on magic _init

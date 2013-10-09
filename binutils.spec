@@ -34,15 +34,17 @@
 
 %define gold_default 1
 
+%global DATE 2013-10-04
+
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.23.52.0.2
-Release:	3
+Version:	2.24
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 # official beta snapshot from http://git.kernel.org/?p=linux/kernel/git/hjl/binutils.git;a=summary
-Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz
+Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.bz2.sign
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
@@ -84,13 +86,18 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
+Patch11:	binutils-2.23.52.0.1-addr2line-dynsymtab.patch
+Patch12:	binutils-2.23.2-kernel-ld-r.patch
+# Correct bug introduced by patch 12
+Patch13:	binutils-2.23.2-aarch64-em.patch
+
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 Patch21:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
+Patch28:	binutils-2.24-2013-10-04.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
@@ -105,7 +112,8 @@ Patch28:	binutils-2.21.51.0.8-ld-default-settings.patch
 # -z relro
 # --build-id=sha1
 # --icf=safe
-Patch29:	binutils-2.23.51.0.9-ld.gold-default-settings.patch
+Patch29:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
+
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch31:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
 Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
@@ -153,7 +161,7 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%setup -q -n binutils-%{version}
+%setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
 %patch01 -p0 -b .libtool-lib64~
 # Needs porting, and we don't care about the target for now
 #patch02 -p1 -b .ppc64-pie~
@@ -169,7 +177,10 @@ to consider using libelf instead of BFD.
 #patch08 -p0 -b .relro~
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
- 
+%patch11 -p0 -b .addr2line~
+%patch12 -p0 -b .kernel-ld-r~
+%patch13 -p0 -b .aarch64~
+
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
 # Modify the defaults of the BFD linker as well, since many
@@ -182,6 +193,8 @@ to consider using libelf instead of BFD.
 %patch34 -p1 -b .nls~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
+
+find -name \*.h -o -name.c -o -name \*.cc | xargs chmod 644
 
 %build
 # Additional targets
@@ -468,8 +481,8 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %{_mandir}/man1/*
 %if "%{name}" == "binutils"
 %{_infodir}/*info*
-%{_libdir}/libbfd-%{version}*.so
-%{_libdir}/libopcodes-%{version}*.so
+%{_libdir}/libbfd-*.so
+%{_libdir}/libopcodes-*.so
 %else
 %{_prefix}/%{target_platform}/bin/*
 %{_prefix}/%{target_platform}/lib/ldscripts
