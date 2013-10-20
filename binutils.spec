@@ -194,7 +194,7 @@ to consider using libelf instead of BFD.
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
-find -name \*.h -o -name.c -o -name \*.cc | xargs chmod 644
+find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
 %build
 # Additional targets
