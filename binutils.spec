@@ -34,12 +34,12 @@
 
 %define gold_default 1
 
-%global DATE 2013-10-04
+%global DATE 2013-11-21
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
