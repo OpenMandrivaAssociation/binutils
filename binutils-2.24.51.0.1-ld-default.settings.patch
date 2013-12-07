@@ -1,6 +1,6 @@
---- binutils-2.24-2013-10-04/ld/emultempl/elf32.em.defaults~	2013-10-09 04:18:47.616798711 +0200
-+++ binutils-2.24-2013-10-04/ld/emultempl/elf32.em	2013-10-09 04:18:47.643465678 +0200
-@@ -167,7 +167,7 @@ static char *audit; /* colon (typically)
+--- binutils-2.24.51.0.1/ld/emultempl/elf32.em.defaults~	2013-11-09 19:15:16.000000000 +0100
++++ binutils-2.24.51.0.1/ld/emultempl/elf32.em	2013-12-07 20:28:22.224827371 +0100
+@@ -168,7 +168,7 @@ static char *audit; /* colon (typically)
  static char *depaudit; /* colon (typically) separated list of libs */
  
  /* Style of .note.gnu.build-id section.  */
@@ -9,7 +9,7 @@
  
  /* On Linux, it's possible to have different versions of the same
     shared library linked against different versions of libc.  The
-@@ -585,6 +585,9 @@ gld${EMULATION_NAME}_check_ld_elf_hints
+@@ -586,6 +586,9 @@ gld${EMULATION_NAME}_check_ld_elf_hints
        FILE *f;
        char *tmppath;
  
@@ -19,8 +19,8 @@
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
---- binutils-2.24-2013-10-04/ld/ldmain.c.defaults~	2013-10-09 04:18:47.640132308 +0200
-+++ binutils-2.24-2013-10-04/ld/ldmain.c	2013-10-09 04:18:59.106928324 +0200
+--- binutils-2.24.51.0.1/ld/ldmain.c.defaults~	2013-12-07 20:28:22.225827371 +0100
++++ binutils-2.24.51.0.1/ld/ldmain.c	2013-12-07 20:32:54.274829175 +0100
 @@ -279,9 +279,13 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = TRUE;
@@ -33,6 +33,6 @@
 -  link_info.emit_hash = TRUE;
 +  link_info.emit_hash = FALSE;
 +  link_info.emit_gnu_hash = TRUE;
+   link_info.emit_secondary = TRUE;
    link_info.callbacks = &link_callbacks;
    link_info.input_bfds_tail = &link_info.input_bfds;
-   /* SVR4 linkers seem to set DT_INIT and DT_FINI based on magic _init

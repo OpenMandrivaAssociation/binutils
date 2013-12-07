@@ -84,18 +84,14 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-Patch11:	binutils-2.23.52.0.1-addr2line-dynsymtab.patch
-Patch12:	binutils-2.23.2-kernel-ld-r.patch
-# Correct bug introduced by patch 12
-Patch13:	binutils-2.23.2-aarch64-em.patch
-
+Patch11:	binutils-2.24.51.0.1-addr2line-dynsymtab.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 Patch21:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch28:	binutils-2.24-2013-10-04.ld-default.settings.patch
+Patch28:	binutils-2.24.51.0.1-ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
@@ -175,9 +171,7 @@ to consider using libelf instead of BFD.
 #patch08 -p0 -b .relro~
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
-%patch11 -p0 -b .addr2line~
-%patch12 -p0 -b .kernel-ld-r~
-%patch13 -p0 -b .aarch64~
+%patch11 -p1 -b .addr2line~
 
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
