@@ -37,7 +37,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
