@@ -30,7 +30,7 @@
 %define isarch() %(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
 
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
+%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 aarch64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
 %define gold_default 1
 
