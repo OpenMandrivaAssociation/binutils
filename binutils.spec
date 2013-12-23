@@ -32,12 +32,17 @@
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 aarch64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
+%ifarch aarch64
+# gold on aarch64 doesn't exist
+%define gold_default 0
+%else
 %define gold_default 1
+%endif
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.24.51.0.1
-Release:	5
+Version:	2.24.51.0.2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -449,7 +454,7 @@ install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 %{_bindir}/*ar
 %{_bindir}/*as
 %{_bindir}/*c++filt
-%{_bindir}/*dwp
+%optional %{_bindir}/*dwp
 %{_bindir}/*elfedit
 %{_bindir}/*gprof
 %{_bindir}/*ld
