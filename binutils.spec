@@ -65,7 +65,7 @@ BuildRequires:	flex
 BuildRequires:	gcc
 BuildRequires:	gettext
 BuildRequires:	texinfo
-BuildRequires:	dejagnu
+?BuildRequires:	dejagnu
 BuildRequires:	zlib-devel
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel >= 6:2.14.90-8
@@ -89,10 +89,9 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-Patch11:	binutils-2.23.52.0.1-addr2line-dynsymtab.patch
-Patch12:	binutils-2.23.2-kernel-ld-r.patch
+Patch11:	binutils-2.24.51.0.2-addr2line-dynsymtab.patch
 # Correct bug introduced by patch 12
-Patch13:	binutils-2.23.2-aarch64-em.patch
+Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
 # Fix building opcodes library with -Werror=format-security
 Patch14:	binutils-2.24-s390-mkopc.patch
 # Import fixes for IFUNC and PLT handling for AArch64.
@@ -183,10 +182,7 @@ to consider using libelf instead of BFD.
 #patch08 -p0 -b .relro~
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
-%patch11 -p0 -b .addr2line~
-%patch12 -p0 -b .kernel-ld-r~
-%patch13 -p0 -b .aarch64~
-%patch14 -p0 -b .mkopc~
+%patch13 -p1 -b .aarch64~
 %patch15 -p0 -b .elf-aarch64~
 
 %patch21 -p1 -b .linux32~
@@ -242,7 +238,7 @@ if [[ -n "$ADDITIONAL_TARGETS" ]]; then
 fi
 
 case %{target_cpu} in
-ppc | powerpc | i*86 | athlon* | sparc* | mips* | s390* | sh* | arm* | aarch64)
+ppc | powerpc | i*86 | athlon* | sparc* | mips* | s390* | sh* | arm* )
   TARGET_CONFIG="$TARGET_CONFIG --enable-64-bit-bfd"
   ;;
 esac
