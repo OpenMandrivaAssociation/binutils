@@ -23,9 +23,16 @@
    // Check for options that are not compatible with incremental linking.
    // Where an option can be disabled without seriously changing the semantics
    // of the link, we turn the option off; otherwise, we issue a fatal error.
---- binutils-2.24.51.0.1/gold/options.h.gold_defaults~	2013-11-09 19:15:16.000000000 +0100
-+++ binutils-2.24.51.0.1/gold/options.h	2013-12-02 14:11:51.972368265 +0100
-@@ -645,7 +645,7 @@ class General_options
+--- binutils-2.24-2013-10-04/gold/options.h.gold_defaults~	2013-07-20 01:07:08.000000000 +0200
++++ binutils-2.24-2013-10-04/gold/options.h	2013-10-20 21:14:31.751162119 +0200
+@@ -639,13 +639,13 @@ class General_options
+ 
+   DEFINE_bool_alias(allow_multiple_definition, muldefs, options::TWO_DASHES,
+ 		    '\0', N_("Allow multiple definitions of symbols"),
+-		    N_("Do not allow multiple definitions"), false);
++		    N_("Do not allow multiple definitions"), false); // not yet
+ 
+   DEFINE_bool(allow_shlib_undefined, options::TWO_DASHES, '\0', false,
  	      N_("Allow unresolved references in shared libraries"),
  	      N_("Do not allow unresolved references in shared libraries"));
  
