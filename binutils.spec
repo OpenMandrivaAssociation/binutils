@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.2
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -93,7 +93,10 @@ Patch11:	binutils-2.23.52.0.1-addr2line-dynsymtab.patch
 Patch12:	binutils-2.23.2-kernel-ld-r.patch
 # Correct bug introduced by patch 12
 Patch13:	binutils-2.23.2-aarch64-em.patch
-
+# Fix building opcodes library with -Werror=format-security
+Patch14:	binutils-2.24-s390-mkopc.patch
+# Import fixes for IFUNC and PLT handling for AArch64.
+Patch15:	binutils-2.24-elfnn-aarch64.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -183,6 +186,8 @@ to consider using libelf instead of BFD.
 %patch11 -p0 -b .addr2line~
 %patch12 -p0 -b .kernel-ld-r~
 %patch13 -p0 -b .aarch64~
+%patch14 -p0 -b .mkopc~
+%patch15 -p0 -b .elf-aarch64~
 
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
