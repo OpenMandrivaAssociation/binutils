@@ -92,17 +92,13 @@ Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 Patch11:	binutils-2.24.51.0.2-addr2line-dynsymtab.patch
 # Correct bug introduced by patch 12
 Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
-# Fix building opcodes library with -Werror=format-security
-Patch14:	binutils-2.24-s390-mkopc.patch
-# Import fixes for IFUNC and PLT handling for AArch64.
-Patch15:	binutils-2.24-elfnn-aarch64.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 Patch21:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch28:	binutils-2.24-2013-10-04.ld-default.settings.patch
+Patch28:	binutils-2.24.51.0.2.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
@@ -183,7 +179,6 @@ to consider using libelf instead of BFD.
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
 %patch13 -p1 -b .aarch64~
-%patch15 -p0 -b .elf-aarch64~
 
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
