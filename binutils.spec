@@ -242,7 +242,7 @@ if [[ -n "$ADDITIONAL_TARGETS" ]]; then
 fi
 
 case %{target_cpu} in
-ppc | powerpc | i*86 | athlon* | sparc* | mips* | s390* | sh* | arm*)
+ppc | powerpc | i*86 | athlon* | sparc* | mips* | s390* | sh* | arm* | aarch64)
   TARGET_CONFIG="$TARGET_CONFIG --enable-64-bit-bfd"
   ;;
 esac
