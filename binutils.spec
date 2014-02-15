@@ -91,6 +91,8 @@ Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 Patch11:	binutils-2.24.51.0.2-addr2line-dynsymtab.patch
 # Correct bug introduced by patch 12
 Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
+# Fix decoding of abstract instance names using DW_FORM_ref_addr.
+Patch16:	binutils-2.24-DW_FORM_ref_addr.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -179,6 +181,7 @@ to consider using libelf instead of BFD.
 %patch10 -p0 -b .no-config-h-check~
 %patch11 -p1 -b .addr2line~
 %patch13 -p1 -b .aarch64~
+%patch16 -p0 -b .ref-addr~
 
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
