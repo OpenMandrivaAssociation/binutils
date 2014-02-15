@@ -42,12 +42,12 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
-Source0:	https://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-#Source1:	https://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz.sign
+Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
+#Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz.sign
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
 Source4:	embedspu.sh
@@ -88,14 +88,16 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-Patch11:	binutils-2.24.51.0.1-addr2line-dynsymtab.patch
+Patch11:	binutils-2.24.51.0.2-addr2line-dynsymtab.patch
+# Correct bug introduced by patch 12
+Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 Patch21:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch28:	binutils-2.24.51.0.1-ld-default.settings.patch
+Patch28:	binutils-2.24.51.0.2.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
@@ -176,6 +178,7 @@ to consider using libelf instead of BFD.
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
 %patch11 -p1 -b .addr2line~
+%patch13 -p1 -b .aarch64~
 
 %patch21 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
