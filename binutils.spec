@@ -323,7 +323,7 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 				--enable-gold=default \
 %endif
 				--disable-werror \
-				--with-bugurl=http://qa.mandriva.com/
+				--with-bugurl=%{bugurl}
     # make sure we use the fully built libbfd & libopcodes libs
     # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
     # again to configure and rebuild all of those though...
