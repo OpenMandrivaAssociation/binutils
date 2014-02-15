@@ -1,5 +1,5 @@
---- binutils-2.24.51.0.1/ld/emultempl/elf32.em.defaults~	2013-11-09 19:15:16.000000000 +0100
-+++ binutils-2.24.51.0.1/ld/emultempl/elf32.em	2013-12-07 20:28:22.224827371 +0100
+--- binutils-2.24.51.0.2/ld/emultempl/elf32.em.defaults~	2013-12-13 17:42:48.000000000 +0100
++++ binutils-2.24.51.0.2/ld/emultempl/elf32.em	2013-12-26 00:03:07.684989320 +0100
 @@ -168,7 +168,7 @@ static char *audit; /* colon (typically)
  static char *depaudit; /* colon (typically) separated list of libs */
  
@@ -19,8 +19,8 @@
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
---- binutils-2.24.51.0.1/ld/ldmain.c.defaults~	2013-12-07 20:28:22.225827371 +0100
-+++ binutils-2.24.51.0.1/ld/ldmain.c	2013-12-07 20:32:54.274829175 +0100
+--- binutils-2.24.51.0.2/ld/ldmain.c.defaults~	2013-12-26 00:03:07.684989320 +0100
++++ binutils-2.24.51.0.2/ld/ldmain.c	2013-12-26 00:08:49.862997892 +0100
 @@ -279,9 +279,13 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = TRUE;
