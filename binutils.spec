@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -377,7 +377,6 @@ mkdir -p %{buildroot}%{_prefix}
 
 rm -f %{buildroot}%{_mandir}/man1/{dlltool,nlmconv,windres}*
 rm -f %{buildroot}%{_infodir}/dir
-rm -f %{buildroot}%{_libdir}/*.la
 rm -f %{buildroot}%{_libdir}/lib{bfd,opcodes}.so
 
 %if "%{name}" == "binutils"
