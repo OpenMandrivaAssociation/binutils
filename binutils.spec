@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -71,6 +71,7 @@ BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
+BuildRequires:	pkgconfig(isl) pkgconfig(cloog-isl)
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
@@ -289,7 +290,8 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %endif
 						--disable-werror \
 						--enable-static \
-						--with-separate-debug-dir=%{_prefix}/lib/debug
+						--with-separate-debug-dir=%{_prefix}/lib/debug \
+						--enable-initfini-array
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
 # make once again when it happens...
@@ -326,7 +328,8 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 				--enable-gold=default \
 %endif
 				--disable-werror \
-				--with-bugurl=%{bugurl}
+				--with-bugurl=%{bugurl} \
+				--enable-initfini-array
     # make sure we use the fully built libbfd & libopcodes libs
     # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
     # again to configure and rebuild all of those though...
