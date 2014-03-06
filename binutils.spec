@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	3
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -71,7 +71,6 @@ BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
-BuildRequires:	pkgconfig(isl) pkgconfig(cloog-isl)
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
@@ -199,6 +198,16 @@ cp %{SOURCE3} ld/emultempl/
 
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
+# (proyvind): for weird reasons, gold testsuite failes building on arm with
+# 'execvp: /bin/sh: Argument list too long' when invoking make...
+%ifarch %{arm} aarch64
+sed -e 's#2\.64#2.69#g' -i config/override.m4 gold/configure.ac configure.ac
+sed -e 's#testsuite##g' -i gold/Makefile.am
+find gold -name Makefile.in|xargs rm -f
+cd gold
+autoreconf -fsv
+%endif
+
 %build
 # Additional targets
 ADDITIONAL_TARGETS=""
@@ -295,7 +304,7 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
 # make once again when it happens...
-%make tooldir=%{_prefix} || make tooldir=%{_prefix}
+%make tooldir=%{_prefix}
 make -C bfd/doc html
 mkdir -p ../html
 cp -f bfd/doc/bfd.html/* ../html
