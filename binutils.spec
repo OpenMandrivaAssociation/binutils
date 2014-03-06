@@ -205,7 +205,7 @@ sed -e 's#2\.64#2.69#g' -i config/override.m4 gold/configure.ac configure.ac
 sed -e 's#testsuite##g' -i gold/Makefile.am
 find gold -name Makefile.in|xargs rm -f
 cd gold
-autoreconf -fsv
+autoreconf -fiv
 %endif
 
 %build
