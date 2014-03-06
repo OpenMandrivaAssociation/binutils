@@ -71,6 +71,7 @@ BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
+BuildRequires:	pkgconfig(isl) pkgconfig(cloog-isl)
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
