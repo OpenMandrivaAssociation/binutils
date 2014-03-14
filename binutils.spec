@@ -30,7 +30,7 @@
 %define isarch() %(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
 
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 aarch64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
+%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
 %ifarch aarch64
 # gold on aarch64 doesn't exist
@@ -201,7 +201,7 @@ find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
 # (proyvind): for weird reasons, gold testsuite failes building on arm with
 # 'execvp: /bin/sh: Argument list too long' when invoking make...
-%ifarch %{arm} aarch64
+%ifarch %{arm}
 sed -e 's#2\.64#2.69#g' -i config/override.m4 gold/configure.ac configure.ac
 sed -e 's#testsuite##g' -i gold/Makefile.am
 find gold -name Makefile.in|xargs rm -f
