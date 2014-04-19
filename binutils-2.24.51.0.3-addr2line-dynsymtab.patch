@@ -1,5 +1,5 @@
---- binutils-2.24.51.0.1/bfd/dwarf2.c.addr2line~	2013-11-09 19:15:16.000000000 +0100
-+++ binutils-2.24.51.0.1/bfd/dwarf2.c	2013-12-07 20:03:45.348817580 +0100
+--- binutils-2.24.51.0.3/bfd/dwarf2.c.addr2line~	2014-01-27 18:46:18.000000000 +0100
++++ binutils-2.24.51.0.3/bfd/dwarf2.c	2014-04-19 01:50:08.860248146 +0200
 @@ -3470,8 +3470,11 @@ find_line (bfd *abfd,
    struct dwarf2_debug *stash;
    /* What address are we looking for?  */
@@ -25,11 +25,10 @@
    if (section->output_section)
      addr += section->output_section->vma + section->output_offset;
    else
-@@ -3612,6 +3621,16 @@ find_line (bfd *abfd,
- 	  found = TRUE;
- 	  goto done;
- 	}
-+
+@@ -3557,6 +3566,15 @@ find_line (bfd *abfd,
+ 		if (found)
+ 		  goto done;
+ 	      }
 +	  if (! possible_find)
 +	    possible_find = ((each->arange.high == 0
 +			      || comp_unit_contains_address (each, unrelocated_addr))
@@ -39,10 +38,10 @@
 +							     linenumber_ptr,
 +							     discriminator_ptr,
 +							     stash));
+ 	}
      }
- 
-   /* The DWARF2 spec says that the initial length field, and the
-@@ -3704,6 +3723,16 @@ find_line (bfd *abfd,
+   else
+@@ -3704,6 +3722,16 @@ find_line (bfd *abfd,
  						     discriminator_ptr,
  						     stash)) > 0;
  
@@ -59,15 +58,7 @@
  	  if ((bfd_vma) (stash->info_ptr - stash->sec_info_ptr)
  	      == stash->sec->size)
  	    {
-@@ -3714,6 +3743,7 @@ find_line (bfd *abfd,
- 
- 	  if (found)
- 	    goto done;
-+
- 	}
-     }
- 
-@@ -3721,6 +3751,8 @@ find_line (bfd *abfd,
+@@ -3721,6 +3750,8 @@ find_line (bfd *abfd,
    if ((abfd->flags & (EXEC_P | DYNAMIC)) == 0)
      unset_sections (stash);
  
@@ -76,9 +67,9 @@
    return found;
  }
  
---- binutils-2.24.51.0.1/bfd/opncls.c.addr2line~	2013-11-09 19:15:16.000000000 +0100
-+++ binutils-2.24.51.0.1/bfd/opncls.c	2013-12-07 19:25:35.726802401 +0100
-@@ -1378,6 +1378,8 @@ find_separate_debug_file (bfd *
+--- binutils-2.24.51.0.3/bfd/opncls.c.addr2line~	2014-01-27 18:46:18.000000000 +0100
++++ binutils-2.24.51.0.3/bfd/opncls.c	2014-04-19 01:49:03.217210775 +0200
+@@ -1411,6 +1411,8 @@ find_separate_debug_file (bfd *
        bfd_malloc (strlen (debug_file_directory) + 1
                    + (canon_dirlen > dirlen ? canon_dirlen : dirlen)
                    + strlen (".debug/")
@@ -87,7 +78,7 @@
                    + strlen (base)
                    + 1);
    if (debugfile == NULL)
-@@ -1398,6 +1400,26 @@ find_separate_debug_file (bfd *
+@@ -1431,6 +1433,26 @@ find_separate_debug_file (bfd *
    if (check_func (debugfile, crc32))
      goto found;
  

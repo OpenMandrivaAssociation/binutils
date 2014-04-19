@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	5
+Release:	6
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -89,7 +89,7 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-Patch11:	binutils-2.24.51.0.2-addr2line-dynsymtab.patch
+Patch11:	binutils-2.24.51.0.3-addr2line-dynsymtab.patch
 # Correct bug introduced by patch 12
 Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
 # Fix decoding of abstract instance names using DW_FORM_ref_addr.
