@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	6
+Release:	7
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -94,6 +94,12 @@ Patch11:	binutils-2.24.51.0.3-addr2line-dynsymtab.patch
 Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
 # Fix decoding of abstract instance names using DW_FORM_ref_addr.
 Patch16:	binutils-2.24-DW_FORM_ref_addr.patch
+# Fix compiling using gcc 4.9
+Patch17:	binutils-2.24-set-section-macros.patch
+# Fix detections of uncompressed .debug_str sections that look like they have been compressed.
+Patch18:	binutils-2.24-fake-zlib-sections.patch
+# Fix detections little endian PPC shared libraries
+Patch19:	binutils-2.24-ldforcele.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
