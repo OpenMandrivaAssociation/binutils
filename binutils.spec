@@ -364,6 +364,7 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
   done
 fi
 
+%if !%{build_cross}
 %check
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
@@ -381,6 +382,7 @@ echo ====================TESTING END=====================
 
 logfile="%{name}-%{version}-%{release}.log"
 rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
+%endif
 
 %install
 mkdir -p %{buildroot}%{_prefix}
