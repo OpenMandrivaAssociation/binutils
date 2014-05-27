@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	7
+Release:	8
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -53,6 +53,11 @@ Source3:	spu_ovl.o
 Source4:	embedspu.sh
 Source5:	binutils-2.19.50.0.1-output-format.sed
 Source10:	binutils.rpmlintrc
+# Wrapper scripts for ar, ranlib and nm that know how to deal with
+# LTO bytecode, regardless of whether it's gcc or clang
+Source100:	ar
+Source101:	ranlib
+Source102:	nm
 %if "%{name}" == "binutils"
 %rename		%{lib_name}
 %endif
@@ -472,6 +477,18 @@ EOF
 chmod +x %{buildroot}%{_bindir}/ppu-as
 install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
 }
+
+%if "%{name}" == "binutils"
+# Replace ar, ranlib and nm with LTO friendly wrappers
+cd %{buildroot}%{_bindir}
+mv ar binutils-ar
+mv ranlib binutils-ranlib
+mv nm binutils-nm
+install -c -m 755 %{SOURCE100} ar
+install -c -m 755 %{SOURCE101} ranlib
+install -c -m 755 %{SOURCE102} nm
+cd -
+%endif
 
 %if "%{name}" == "binutils"
 %files -f binutils.lang

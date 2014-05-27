@@ -1,0 +1,18 @@
+#!/bin/sh
+REAL_NM=binutils-nm
+# If we're being called by gcc-nm or llvm-nm, we're
+# already wrapped...
+if ! readlink /proc/$PPID/exe |grep -qE -- '-nm$'; then
+	for i in "$@"; do
+		if echo $i |grep -qE '\.a$' && [ -e $i ]; then
+			if LANG=C gcc-nm $i 2>&1 |grep -q "File format not recognized"; then
+				which llvm-nm &>/dev/null && REAL_NM=llvm-nm
+				break
+			fi
+		fi
+	done
+	if [ "$REAL_NM" = "binutils-nm" ] && which gcc-nm &>/dev/null; then
+		REAL_NM=gcc-nm
+	fi
+fi
+exec $REAL_NM "$@"

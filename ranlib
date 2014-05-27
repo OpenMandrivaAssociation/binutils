@@ -1,0 +1,20 @@
+#!/bin/sh
+REAL_RANLIB=binutils-ranlib
+# If we're being called by gcc-ranlib or llvm-ranlib, we're
+# already wrapped
+if ! readlink /proc/$PPID/exe |grep -qE -- '-ranlib$'; then
+	for i in "$@"; do
+		if echo $i |grep -qE '\.a$' && [ -e $i ]; then
+			if LANG=C gcc-nm $i 2>&1 |grep -q "File format not recognized"; then
+				if which llvm-ranlib &>/dev/null; then
+					REAL_RANLIB=llvm-ranlib
+					break
+				fi
+			fi
+		fi
+	done
+	if [ "$REAL_RANLIB" = "binutils-ranlib" ] && which gcc-ranlib &>/dev/null; then
+		REAL_RANLIB=gcc-ranlib
+	fi
+fi
+exec $REAL_RANLIB "$@"

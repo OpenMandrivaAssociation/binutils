@@ -1,0 +1,18 @@
+#!/bin/sh
+REAL_AR=binutils-ar
+# If we're being called by gcc-ar or llvm-ar, we're already
+# wrapped...
+if ! readlink /proc/$PPID/exe |grep -qE -- '-ar$'; then
+	for i in "$@"; do
+		if echo $i |grep -qE '\.o$' && [ -e $i ]; then
+			if LANG=C file $i |grep -q "LLVM IR bitcode"; then
+				which llvm-ar &>/dev/null && REAL_AR=llvm-ar
+				break
+			fi
+		fi
+	done
+	if [ "$REAL_AR" = "binutils-ar" ] && which gcc-ar &>/dev/null; then
+		REAL_AR=gcc-ar
+	fi
+fi
+exec $REAL_AR "$@"
