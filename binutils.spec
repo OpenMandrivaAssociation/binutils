@@ -454,6 +454,9 @@ done
 cd -
 
 %else
+if [ -f "%{buildroot}%{_bindir}/%{target_platform}-ld.bfd" -a ! -e "%{buildroot}%{_bindir}%{target_platform}-ld" ]; then
+	ln -s %{target_platform}-ld.bfd "%{buildroot}%{_bindir}/%{target_platform}-ld"
+fi
 rm -f  %{buildroot}%{_libdir}/libiberty.a
 rm -rf %{buildroot}%{_infodir}
 rm -rf %{buildroot}%{_datadir}/locale/
