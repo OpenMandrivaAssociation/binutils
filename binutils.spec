@@ -13,7 +13,7 @@
 
 %if %{build_cross}
 %define target_cpu %{cross}
-%define target_platform %{target_cpu}-linux
+%define target_platform %{target_cpu}-%{_target_vendor}-%{_target_os}%{?_gnu}
 %if "%{target_cpu}" == "spu"
 %define target_platform %{target_cpu}-unknown-elf
 %endif
