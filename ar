@@ -1,8 +1,23 @@
 #!/bin/sh
 REAL_AR=binutils-ar
-# If we're being called by gcc-ar or llvm-ar, we're already
-# wrapped...
-if ! readlink /proc/$PPID/exe |grep -qE -- '-ar$'; then
+PARENT="`readlink /proc/$PPID/exe`"
+WRAPPED=false
+# If /proc isn't mounted, let's do the least evil thing we can
+if [ -z "$PARENT" ]; then
+	WRAPPED=true
+elif echo $PARENT |grep -qE -- '-ar$'; then
+	# If we're being called by gcc-ar or llvm-ar, we're already
+	# wrapped (and need to make sure we don't call ourselves recursively)
+	WRAPPED=true
+elif echo $PARENT |grep -qE -- 'qemu'; then
+	# Fun... We're running inside qemu binfmt_misc emulation,
+	# so we have to determine our parent the evil and less
+	# reliable way...
+	if grep -qE -- '-ar$' /proc/$PPID/cmdline; then
+		WRAPPED=true
+	fi
+fi
+if ! $WRAPPED; then
 	for i in "$@"; do
 		if echo $i |grep -qE '\.o$' && [ -e $i ]; then
 			if LANG=C file $i |grep -q "LLVM IR bitcode"; then

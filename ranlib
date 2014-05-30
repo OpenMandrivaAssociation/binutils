@@ -1,8 +1,26 @@
 #!/bin/sh
 REAL_RANLIB=binutils-ranlib
+PARENT="`readlink /proc/$PPID/exe`"
+WRAPPED=false
+# If /proc isn't mounted, let's do the least evil thing we can
+if [ -z "$PARENT" ]; then
+	WRAPPED=true
+elif echo $PARENT |grep -qE -- '-ranlib$'; then
+	# If we're being called by gcc-ranlib or llvm-ranlib,
+	# we're already wrapped (and need to make sure we don't
+	# call ourselves recursively)
+	WRAPPED=true
+elif echo $PARENT |grep -qE -- 'qemu'; then
+	# Fun... We're running inside qemu binfmt_misc emulation,
+	# so we have to determine our parent the evil and less
+	# reliable way...
+	if grep -qE -- '-ranlib$' /proc/$PPID/cmdline; then
+		WRAPPED=true
+	fi
+fi
 # If we're being called by gcc-ranlib or llvm-ranlib, we're
 # already wrapped
-if ! readlink /proc/$PPID/exe |grep -qE -- '-ranlib$'; then
+if ! $WRAPPED; then
 	for i in "$@"; do
 		if echo $i |grep -qE '\.a$' && [ -e $i ]; then
 			if LANG=C gcc-nm $i 2>&1 |grep -q "File format not recognized"; then
