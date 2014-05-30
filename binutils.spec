@@ -317,10 +317,13 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 # going through the build system, so let's try workaround this by trying to do
 # make once again when it happens...
 %make tooldir=%{_prefix}
+
+%if "%{name}" == "binutils"
 make -C bfd/doc html
 mkdir -p ../html
 cp -f bfd/doc/bfd.html/* ../html
 popd
+%endif
 
 # Build alternate binaries (spu-gas in particular)
 case "$ADDITIONAL_TARGETS," in
