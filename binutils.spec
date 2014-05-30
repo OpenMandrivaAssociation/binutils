@@ -281,7 +281,7 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 rm -rf objs
 mkdir objs
 pushd objs
-CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
+CONFIGURE_TOP=.. CC=gcc CXX=g++ %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %if %{gold_default}
 						--enable-ld=yes \
 						--enable-gold=default \
