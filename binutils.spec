@@ -111,7 +111,7 @@ Patch19:	binutils-2.24-ldforcele.patch
 Patch21:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch28:	binutils-2.24.51.0.2.ld-default.settings.patch
+Patch28:	binutils-2.24.51.0.3.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
