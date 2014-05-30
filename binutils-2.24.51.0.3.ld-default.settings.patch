@@ -1,5 +1,5 @@
---- binutils-2.24.51.0.2/ld/emultempl/elf32.em.defaults~	2013-12-13 17:42:48.000000000 +0100
-+++ binutils-2.24.51.0.2/ld/emultempl/elf32.em	2013-12-26 00:03:07.684989320 +0100
+--- binutils-2.24.51.0.3/ld/emultempl/elf32.em.defaults~	2014-01-27 18:46:18.000000000 +0100
++++ binutils-2.24.51.0.3/ld/emultempl/elf32.em	2014-05-30 12:22:54.803707746 +0200
 @@ -168,7 +168,7 @@ static char *audit; /* colon (typically)
  static char *depaudit; /* colon (typically) separated list of libs */
  
@@ -19,9 +19,9 @@
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
---- binutils-2.24.51.0.2/ld/ldmain.c.defaults~	2013-12-26 00:03:07.684989320 +0100
-+++ binutils-2.24.51.0.2/ld/ldmain.c	2013-12-26 00:08:49.862997892 +0100
-@@ -279,9 +279,13 @@ main (int argc, char **argv)
+--- binutils-2.24.51.0.3/ld/ldmain.c.defaults~	2014-01-27 18:46:18.000000000 +0100
++++ binutils-2.24.51.0.3/ld/ldmain.c	2014-05-30 12:23:09.081836742 +0200
+@@ -279,9 +279,15 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = TRUE;
    link_info.keep_memory = TRUE;
@@ -32,7 +32,9 @@
    link_info.strip_discarded = TRUE;
 -  link_info.emit_hash = TRUE;
 +  link_info.emit_hash = FALSE;
++#ifdef ARCH_mips
 +  link_info.emit_gnu_hash = TRUE;
++#endif
    link_info.emit_secondary = TRUE;
    link_info.callbacks = &link_callbacks;
    link_info.input_bfds_tail = &link_info.input_bfds;
