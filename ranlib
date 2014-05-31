@@ -14,7 +14,7 @@ elif echo $PARENT |grep -qE -- 'qemu'; then
 	# Fun... We're running inside qemu binfmt_misc emulation,
 	# so we have to determine our parent the evil and less
 	# reliable way...
-	if grep -qE -- '-ranlib$' /proc/$PPID/cmdline; then
+	if grep -qP -- '-ranlib\x00' /proc/$PPID/cmdline; then
 		WRAPPED=true
 	fi
 fi
