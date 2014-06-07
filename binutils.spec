@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	10
+Release:	11
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -281,7 +281,9 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 rm -rf objs
 mkdir objs
 pushd objs
-CONFIGURE_TOP=.. CC=gcc CXX=g++ %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
+export CC="%__cc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
+export CXX="%__cxx -D_GNU_SOURCE=1"
+CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %if %{gold_default}
 						--enable-ld=yes \
 						--enable-gold=default \
