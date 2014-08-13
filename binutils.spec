@@ -42,7 +42,7 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 Version:	2.24.51.0.3
-Release:	14
+Release:	15
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -105,13 +105,18 @@ Patch17:	binutils-2.24-set-section-macros.patch
 Patch18:	binutils-2.24-fake-zlib-sections.patch
 # Fix detections little endian PPC shared libraries
 Patch19:	binutils-2.24-ldforcele.patch
+Patch20:	binutils-2.24-arm-static-tls.patch
+# already in our more recent version
+#Patch21:	binutils-2.24-fat-lto-objects.patch
+Patch22:	binutils-2.24.51.0.3-symbol-warning.patch
+Patch23:	binutils-2.24-aarch64-ld-shared-non-PIC-xfail.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
-Patch21:	binutils-2.22.52.0.4-linux32.patch
+Patch121:	binutils-2.22.52.0.4-linux32.patch
 # (proyvind): skip gold tests that fails
-Patch27:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch28:	binutils-2.24.51.0.3.ld-default.settings.patch
+Patch127:	binutils-2.21.51.0.8-skip-gold-check.patch
+Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
@@ -126,13 +131,13 @@ Patch28:	binutils-2.24.51.0.3.ld-default.settings.patch
 # -z relro
 # --build-id=sha1
 # --icf=safe
-Patch29:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
+Patch129:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
-Patch31:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
-Patch33:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
+Patch131:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
+Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
-Patch34:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
+Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -194,17 +199,26 @@ to consider using libelf instead of BFD.
 %patch11 -p1 -b .addr2line~
 %patch13 -p1 -b .aarch64~
 %patch16 -p0 -b .ref-addr~
+%patch17 -p0 -b .sec-macros~
+%patch18 -p0 -b .fake-zlib~
+%ifarch ppc64le
+%patch19 -p0 -b .ldforcele~
+%endif
+%patch20 -p1 -b .armstatictls~
+#patch21 -p1 -b .fatlto~
+%patch22 -p1 -b .symwarn~
+%patch23 -p1 -b .ld-aarch64-xfails~
 
-%patch21 -p1 -b .linux32~
+%patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
 # Modify the defaults of the BFD linker as well, since many
 # things fall back to it...
-%patch28 -p1 -b .defaults~
-%patch29 -p1 -b .gold_defaults~
-%patch31 -p1 -b .gold_testsuite~
+%patch128 -p1 -b .defaults~
+%patch129 -p1 -b .gold_defaults~
+%patch131 -p1 -b .gold_testsuite~
 # later
 #%%patch33 -p1 -b .ld_13048~
-%patch34 -p1 -b .nls~
+%patch134 -p1 -b .nls~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
