@@ -1,5 +1,5 @@
---- binutils-2.22.52.0.4/gas/config/tc-i386.c.linux32~	2012-06-05 18:44:10.000000000 +0200
-+++ binutils-2.22.52.0.4/gas/config/tc-i386.c	2012-06-07 16:17:52.040447605 +0200
+--- binutils-linaro-2.24.0-2014.09/gas/config/tc-i386.c.linux32~	2014-08-29 17:48:57.000000000 +0200
++++ binutils-linaro-2.24.0-2014.09/gas/config/tc-i386.c	2014-09-12 22:55:22.246069154 +0200
 @@ -36,6 +36,15 @@
  #include "elf/x86-64.h"
  #include "opcodes/i386-init.h"
@@ -16,7 +16,7 @@
  #ifndef REGISTER_WARNINGS
  #define REGISTER_WARNINGS 1
  #endif
-@@ -2013,7 +2022,7 @@ update_code_flag (int value, int check)
+@@ -2194,7 +2203,7 @@ update_code_flag (int value, int check)
        else
  	as_error = as_bad;
        (*as_error) (_("64bit mode not supported on `%s'."),
@@ -25,7 +25,7 @@
      }
    if (value == CODE_32BIT && !cpu_arch_flags.bitfield.cpui386)
      {
-@@ -2022,7 +2031,7 @@ update_code_flag (int value, int check)
+@@ -2203,7 +2212,7 @@ update_code_flag (int value, int check)
        else
  	as_error = as_bad;
        (*as_error) (_("32bit mode not supported on `%s'."),
@@ -34,7 +34,7 @@
      }
    stackop_size = '\0';
  }
-@@ -2136,7 +2145,7 @@ check_cpu_arch_compatible (const char *n
+@@ -2331,7 +2340,7 @@ check_cpu_arch_compatible (const char *n
  	 use default_arch.  */
        arch = cpu_arch_name;
        if (!arch)
@@ -43,7 +43,7 @@
      }
  
    /* If we are targeting Intel L1OM, we must enable it.  */
-@@ -3516,7 +3525,7 @@ check_suffix:
+@@ -3912,7 +3921,7 @@ check_suffix:
      {
        as_bad (_("`%s' is not supported on `%s%s'"),
  	      current_templates->start->name,
@@ -52,7 +52,7 @@
  	      cpu_sub_arch_name ? cpu_sub_arch_name : "");
        return NULL;
      }
-@@ -8806,7 +8815,7 @@ md_show_usage (FILE *stream)
+@@ -9975,7 +9984,7 @@ md_show_usage (FILE *stream)
  const char *
  i386_target_format (void)
  {
@@ -61,7 +61,7 @@
      {
        update_code_flag (CODE_64BIT, 1);
        if (default_arch[6] == '\0')
-@@ -8814,7 +8823,7 @@ i386_target_format (void)
+@@ -9983,7 +9992,7 @@ i386_target_format (void)
        else
  	x86_elf_abi = X86_64_X32_ABI;
      }
@@ -70,9 +70,9 @@
      update_code_flag (CODE_32BIT, 1);
    else
      as_fatal (_("unknown architecture"));
---- binutils-2.22.52.0.4/gas/config/tc-ppc.c.linux32~	2012-06-05 18:44:10.000000000 +0200
-+++ binutils-2.22.52.0.4/gas/config/tc-ppc.c	2012-06-07 16:23:14.868449175 +0200
-@@ -41,6 +41,10 @@
+--- binutils-linaro-2.24.0-2014.09/gas/config/tc-ppc.c.linux32~	2014-08-29 17:48:57.000000000 +0200
++++ binutils-linaro-2.24.0-2014.09/gas/config/tc-ppc.c	2014-09-12 22:56:17.696375929 +0200
+@@ -42,6 +42,10 @@
  #include "libxcoff.h"
  #endif
  
@@ -83,7 +83,7 @@
  /* This is the assembler for the PowerPC or POWER (RS/6000) chips.  */
  
  /* Tell the main code what the endianness is.  */
-@@ -119,6 +123,8 @@ static bfd_boolean reg_names_p = TARGET_
+@@ -98,6 +102,8 @@ static bfd_boolean reg_names_p = TARGET_
  static void ppc_macro (char *, const struct powerpc_macro *);
  static void ppc_byte (int);
  
@@ -92,7 +92,7 @@
  #if defined (OBJ_XCOFF) || defined (OBJ_ELF)
  static void ppc_tc (int);
  static void ppc_machine (int);
-@@ -946,7 +952,7 @@ ppc_parse_name (const char *name, expres
+@@ -942,7 +948,7 @@ ppc_parse_name (const char *name, expres
  /* Local variables.  */
  
  /* Whether to target xcoff64/elf64.  */
@@ -101,7 +101,7 @@
  
  /* Opcode hash table.  */
  static struct hash_control *ppc_hash;
-@@ -1172,7 +1178,7 @@ md_parse_option (int c, char *arg)
+@@ -1141,7 +1147,7 @@ md_parse_option (int c, char *arg)
        if (strcmp (arg, "64") == 0)
  	{
  #ifdef BFD64
@@ -110,7 +110,7 @@
  	  if (ppc_cpu & PPC_OPCODE_VLE)
  	    as_bad (_("the use of -mvle requires -a32."));
  #else
-@@ -1180,7 +1186,7 @@ md_parse_option (int c, char *arg)
+@@ -1149,7 +1155,7 @@ md_parse_option (int c, char *arg)
  #endif
  	}
        else if (strcmp (arg, "32") == 0)
@@ -119,10 +119,11 @@
        else
  	return 0;
        break;
-@@ -1363,6 +1369,37 @@ PowerPC options:\n\
- -nops=count             when aligning, more than COUNT nops uses a branch\n"));
+@@ -1338,6 +1344,38 @@ PowerPC options:\n\
+ -ppc476-workaround      warn if emitting data to code sections\n"));
  }
  
++
 +/* Set ppc_obj64 if it is not already set.  */
 +
 +#define ppc_obj64 (ppc_get_obj64 ())

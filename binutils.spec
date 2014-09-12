@@ -39,14 +39,23 @@
 %define gold_default 1
 %endif
 
+%define ver 2.24.0
+%define linaro 2014.09
+
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
-Version:	2.24.51.0.3
-Release:	15
+%if "%{linaro}" != ""
+Version:	%{ver}_%{linaro}
+Source0:	http://cbuild.validation.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}.tar.xz
+%else
+Version:	%{ver}
+Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
+%endif
+Epoch:		1
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
-Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz.sign
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
@@ -94,21 +103,14 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-Patch11:	binutils-2.24.51.0.3-addr2line-dynsymtab.patch
-# Correct bug introduced by patch 12
-Patch13:	binutils-2.24.51.0.2-aarch64-em.patch
 # Fix decoding of abstract instance names using DW_FORM_ref_addr.
 Patch16:	binutils-2.24-DW_FORM_ref_addr.patch
-# Fix compiling using gcc 4.9
-Patch17:	binutils-2.24-set-section-macros.patch
 # Fix detections of uncompressed .debug_str sections that look like they have been compressed.
 Patch18:	binutils-2.24-fake-zlib-sections.patch
 # Fix detections little endian PPC shared libraries
 Patch19:	binutils-2.24-ldforcele.patch
-Patch20:	binutils-2.24-arm-static-tls.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
-Patch22:	binutils-2.24.51.0.3-symbol-warning.patch
 Patch23:	binutils-2.24-aarch64-ld-shared-non-PIC-xfail.patch
 
 # Mandriva patches
@@ -180,7 +182,11 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
+%if "%{linaro}" != ""
+%setup -q -n binutils-linaro-%{ver}-%{linaro}
+%else
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
+%endif
 %patch01 -p0 -b .libtool-lib64~
 # Needs porting, and we don't care about the target for now
 #patch02 -p1 -b .ppc64-pie~
@@ -196,17 +202,12 @@ to consider using libelf instead of BFD.
 #patch08 -p0 -b .relro~
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
-%patch11 -p1 -b .addr2line~
-%patch13 -p1 -b .aarch64~
 %patch16 -p0 -b .ref-addr~
-%patch17 -p0 -b .sec-macros~
 %patch18 -p0 -b .fake-zlib~
 %ifarch ppc64le
 %patch19 -p0 -b .ldforcele~
 %endif
-%patch20 -p1 -b .armstatictls~
 #patch21 -p1 -b .fatlto~
-%patch22 -p1 -b .symwarn~
 %patch23 -p1 -b .ld-aarch64-xfails~
 
 %patch121 -p1 -b .linux32~
