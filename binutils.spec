@@ -70,7 +70,6 @@ Source102:	nm
 %if "%{name}" == "binutils"
 %rename		%{lib_name}
 %endif
-Conflicts:	gcc-c++ < 3.2.3-1mdk
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
