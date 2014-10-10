@@ -19,6 +19,7 @@
 %endif
 %define program_prefix %{target_platform}-
 %define package_prefix cross-%{target_cpu}-
+%define	_srcrpmfilename	binutils-%{version}-%{release}.src.rpm
 %else
 %define target_cpu %{_target_cpu}
 %define target_platform %{_target_platform}
