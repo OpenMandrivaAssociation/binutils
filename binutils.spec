@@ -13,7 +13,7 @@
 
 %if %{build_cross}
 %define target_cpu %{cross}
-%define target_platform %{target_cpu}-%{_target_vendor}-%{_target_os}%{?_gnu}
+%global	target_platform	%(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/%{target_cpu}-%{_target_os}/macros --target=%{target_cpu} -E %%{_target_platform})
 %if "%{target_cpu}" == "spu"
 %define target_platform %{target_cpu}-unknown-elf
 %endif
@@ -26,13 +26,12 @@
 %define package_prefix %{nil}
 %endif
 
-%define arch %(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
-%define isarch() %(case %{arch} in (%1) echo 1;; (*) echo 0;; esac)
-
+%define arch		%(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
+%define isarch()	%(case " %* " in (*" %{arch} "*) echo 1;; (*) echo 0;; esac)
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
 
-%ifarch aarch64
+%if %isarch aarch64
 # gold on aarch64 doesn't exist
 %define gold_default 0
 %else
@@ -190,7 +189,7 @@ to consider using libelf instead of BFD.
 %patch01 -p0 -b .libtool-lib64~
 # Needs porting, and we don't care about the target for now
 #patch02 -p1 -b .ppc64-pie~
-%ifarch ia64
+%if %isarch ia64
 %if "%{_lib}" == "lib64"
 %patch03 -p0 -b .ia64-lib64~
 %endif
@@ -204,7 +203,7 @@ to consider using libelf instead of BFD.
 %patch10 -p0 -b .no-config-h-check~
 %patch16 -p0 -b .ref-addr~
 %patch18 -p0 -b .fake-zlib~
-%ifarch ppc64le
+%if %isarch ppc64le
 %patch19 -p0 -b .ldforcele~
 %endif
 #patch21 -p1 -b .fatlto~
@@ -313,12 +312,12 @@ CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %else
 						--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib \
 %endif
-%ifarch armv7l armv7hl
+%if %isarch armv7l armv7hl
 						--with-cpu=cortex-a8 \
 						--with-tune=cortex-a8 \
 						--with-arch=armv7-a \
 						--with-mode=thumb \
-%ifarch armv7l
+%if %isarch armv7l
 						--with-float=softfp \
 %else
 						--with-float=hard \
@@ -426,7 +425,7 @@ rm -rf %{buildroot}%{_prefix}/%{_target_platform}/
 # Sanity check --enable-64-bit-bfd really works.
 grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
 # Fix multilib conflicts of generated values by __WORDSIZE-based expressions.
-%ifarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64 %arm
+%if %isarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64 %{arm}
 sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
     -e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
     -e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
