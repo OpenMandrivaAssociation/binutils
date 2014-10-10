@@ -546,8 +546,12 @@ cd -
 %{_libdir}/libbfd-*.so
 %{_libdir}/libopcodes-*.so
 %else
+%dir %{_prefix}/%{target_platform}/
+%dir %{_prefix}/%{target_platform}/bin/
 %{_prefix}/%{target_platform}/bin/*
-%{_prefix}/%{target_platform}/lib/ldscripts
+%dir %{_prefix}/%{target_platform}/lib
+%dir %{_prefix}/%{target_platform}/lib/ldscripts
+%{_prefix}/%{target_platform}/lib/ldscripts/*
 %endif
 
 %ifarch %{spu_arches}
