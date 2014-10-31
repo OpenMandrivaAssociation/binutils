@@ -40,13 +40,14 @@
 %endif
 
 %define ver 2.24.0
-%define linaro 2014.09
+%define linaro 2014.11
+%define linaro_spin 2
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 %if "%{linaro}" != ""
 Version:	%{ver}_%{linaro}
-Source0:	http://cbuild.validation.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}.tar.xz
+Source0:	http://cbuild.validation.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
 Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
@@ -182,7 +183,7 @@ to consider using libelf instead of BFD.
 
 %prep
 %if "%{linaro}" != ""
-%setup -q -n binutils-linaro-%{ver}-%{linaro}
+%setup -q -n binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}
 %else
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
 %endif
