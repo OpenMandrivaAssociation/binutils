@@ -53,7 +53,7 @@ Version:	%{ver}
 Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
