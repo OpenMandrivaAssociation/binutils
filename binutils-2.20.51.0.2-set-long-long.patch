@@ -28,9 +28,9 @@ diff -rcp ../binutils-2.20.51.0.7.original/bfd/configure ./bfd/configure
       BFD_HOSTPTR_T="unsigned long long"
     fi
   fi
-diff -rcp ../binutils-2.20.51.0.7.original/bfd/configure.in ./bfd/configure.in
-*** ../binutils-2.20.51.0.7.original/bfd/configure.in	2010-04-08 15:23:58.000000000 +0100
---- ./bfd/configure.in	2010-04-08 15:24:06.000000000 +0100
+diff -rcp ../binutils-2.20.51.0.7.original/bfd/configure.ac ./bfd/configure.ac
+*** ../binutils-2.20.51.0.7.original/bfd/configure.ac	2010-04-08 15:23:58.000000000 +0100
+--- ./bfd/configure.ac	2010-04-08 15:24:06.000000000 +0100
 *************** if test "x${ac_cv_sizeof_long}" = "x8"; 
 *** 153,163 ****
     BFD_HOST_64BIT_LONG=1

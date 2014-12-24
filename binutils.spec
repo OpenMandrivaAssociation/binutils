@@ -30,18 +30,13 @@
 %define arch		%(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
 %define isarch()	%(case " %* " in (*" %{arch} "*) echo 1;; (*) echo 0;; esac)
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm}|sed 's/[ ]/\|/g')
+%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm} aarch64|sed 's/[ ]/\|/g')
 
-%if %isarch aarch64
-# gold on aarch64 doesn't exist
-%define gold_default 0
-%else
 %define gold_default 1
-%endif
 
-%define ver 2.24.0
-%define linaro 2014.11
-%define linaro_spin 2
+%define ver 2.25
+%define linaro %{nil}
+%define linaro_spin %{nil}
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
@@ -50,10 +45,10 @@ Version:	%{ver}_%{linaro}
 Source0:	http://cbuild.validation.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
-Source0:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
+Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	4
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -103,15 +98,10 @@ Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
-# Fix decoding of abstract instance names using DW_FORM_ref_addr.
-Patch16:	binutils-2.24-DW_FORM_ref_addr.patch
-# Fix detections of uncompressed .debug_str sections that look like they have been compressed.
-Patch18:	binutils-2.24-fake-zlib-sections.patch
 # Fix detections little endian PPC shared libraries
 Patch19:	binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
-Patch23:	binutils-2.24-aarch64-ld-shared-non-PIC-xfail.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -202,13 +192,10 @@ to consider using libelf instead of BFD.
 #patch08 -p0 -b .relro~
 %patch09 -p0 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
-%patch16 -p0 -b .ref-addr~
-%patch18 -p0 -b .fake-zlib~
 %if %isarch ppc64le
 %patch19 -p0 -b .ldforcele~
 %endif
 #patch21 -p1 -b .fatlto~
-%patch23 -p1 -b .ld-aarch64-xfails~
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
@@ -259,6 +246,12 @@ mipsel)
   ;;
 mips)
   ADDITIONAL_TARGETS="mips64-%{_target_vendor}-%{_target_os}"
+  ;;
+arm*)
+  ADDITIONAL_TARGETS="aarch64-linux-gnu"
+  ;;
+aarch64*)
+  ADDITIONAL_TARGETS="armv7hl-linux-gnueabihf"
   ;;
 esac
 %ifarch %{spu_arches}
