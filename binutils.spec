@@ -34,15 +34,15 @@
 
 %define gold_default 1
 
-%define ver 2.25
-%define linaro %{nil}
-%define linaro_spin %{nil}
+%define ver 2.25.0
+%define linaro 2015.01
+%define linaro_spin 2
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
 %if "%{linaro}" != ""
 Version:	%{ver}_%{linaro}
-Source0:	http://cbuild.validation.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
+Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
