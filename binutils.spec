@@ -248,10 +248,10 @@ mips)
   ADDITIONAL_TARGETS="mips64-%{_target_vendor}-%{_target_os}"
   ;;
 arm*)
-  ADDITIONAL_TARGETS="aarch64-linux-gnu"
+  #ADDITIONAL_TARGETS="aarch64-linux-gnu"
   ;;
 aarch64*)
-  ADDITIONAL_TARGETS="armv7hl-linux-gnueabihf"
+  #ADDITIONAL_TARGETS="armv7hl-linux-gnueabihf"
   ;;
 esac
 %ifarch %{spu_arches}
