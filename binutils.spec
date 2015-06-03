@@ -48,7 +48,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
