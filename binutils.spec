@@ -48,7 +48,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -220,6 +220,11 @@ sed -e 's#testsuite##g' -i gold/Makefile.am
 find gold -name Makefile.in|xargs rm -f
 cd gold
 autoreconf -fiv
+%endif
+
+%if "%{_lib}" != "lib"
+# Fix bogus lib hardcode...
+sed -i -e 's,/lib/,/%{_lib}/,g' bfd/plugin.c
 %endif
 
 %build
@@ -508,6 +513,8 @@ install -c -m 755 %{SOURCE102} nm
 cd -
 %endif
 
+mkdir -p %{buildroot}%{_libdir}/bfd-plugins
+
 %if "%{name}" == "binutils"
 %files -f binutils.lang
 %else
@@ -533,6 +540,7 @@ cd -
 %ifarch %{spu_arches}
 %{_bindir}/ppu-as
 %endif
+%{_libdir}/bfd-plugins
 %{_mandir}/man1/*
 %if "%{name}" == "binutils"
 %{_infodir}/*info*
