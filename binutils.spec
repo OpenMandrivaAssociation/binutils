@@ -296,7 +296,7 @@ mkdir objs
 pushd objs
 export CC="%__cc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%__cxx -D_GNU_SOURCE=1"
-CONFIGURE_TOP=.. %configure2_5x $TARGET_CONFIG	--with-bugurl=%{bugurl} \
+CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %if %{gold_default}
 						--enable-ld=yes \
 						--enable-gold=default \
