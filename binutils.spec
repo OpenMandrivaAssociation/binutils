@@ -34,6 +34,8 @@
 
 %define gold_default 1
 
+%bcond_without gold
+
 %define ver 2.25.0
 %define linaro 2015.01
 %define linaro_spin 2
@@ -311,12 +313,17 @@ pushd objs
 export CC="%__cc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%__cxx -D_GNU_SOURCE=1"
 CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
+%if %{with gold}
 %if %{gold_default}
 						--enable-ld=yes \
 						--enable-gold=default \
 %else
 						--enable-ld=default \
 						--enable-gold=yes \
+%endif
+%else
+						--enable-ld=default \
+						--disable-gold \
 %endif
 						--enable-plugins \
 						--enable-threads \
