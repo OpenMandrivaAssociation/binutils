@@ -48,7 +48,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -124,6 +124,10 @@ Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
 # --build-id=sha1
 # --icf=safe
 Patch129:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
+# https://bugs.linaro.org/show_bug.cgi?id=1652
+Patch130:	binutils-2015.01-linaro-bug1652.patch
+# musl's libintl is good enough, we don't need the internal copy
+Patch132:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch131:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
@@ -203,12 +207,22 @@ to consider using libelf instead of BFD.
 # things fall back to it...
 %patch128 -p1 -b .defaults~
 %patch129 -p1 -b .gold_defaults~
+%patch130 -p1 -b .1652~
 %patch131 -p1 -b .gold_testsuite~
+%patch132 -p1 -b .musl~
 # later
 #%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
+
+# glibc and musl have gettext built in -- no need to bundle
+# another copy...
+#rm -rf intl/*.h
+#for i in intl/*.c; do
+#	rm -f $i
+#	touch $i
+#done
 
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
