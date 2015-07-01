@@ -30,7 +30,7 @@
 %define arch		%(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
 %define isarch()	%(case " %* " in (*" %{arch} "*) echo 1;; (*) echo 0;; esac)
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{arm} aarch64|sed 's/[ ]/\|/g')
+%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
 
 %define gold_default 1
 
