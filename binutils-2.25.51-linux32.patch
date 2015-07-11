@@ -1,6 +1,6 @@
---- binutils-linaro-2.24.0-2014.09/gas/config/tc-i386.c.linux32~	2014-08-29 17:48:57.000000000 +0200
-+++ binutils-linaro-2.24.0-2014.09/gas/config/tc-i386.c	2014-09-12 22:55:22.246069154 +0200
-@@ -36,6 +36,15 @@
+--- binutils-2.25.51/gas/config/tc-i386.c.linux32~	2015-07-11 12:40:57.000000000 +0200
++++ binutils-2.25.51/gas/config/tc-i386.c	2015-07-11 14:12:08.854190023 +0200
+@@ -33,6 +33,15 @@
  #include "elf/x86-64.h"
  #include "opcodes/i386-init.h"
  
@@ -13,10 +13,10 @@
 +#define is_linux32() (0)
 +#endif
 +
- #ifndef REGISTER_WARNINGS
- #define REGISTER_WARNINGS 1
- #endif
-@@ -2194,7 +2203,7 @@ update_code_flag (int value, int check)
+ #ifdef TE_LINUX
+ /* Default to compress debug sections for Linux.  */
+ enum compressed_debug_section_type flag_compress_debug
+@@ -2158,7 +2167,7 @@ update_code_flag (int value, int check)
        else
  	as_error = as_bad;
        (*as_error) (_("64bit mode not supported on `%s'."),
@@ -25,7 +25,7 @@
      }
    if (value == CODE_32BIT && !cpu_arch_flags.bitfield.cpui386)
      {
-@@ -2203,7 +2212,7 @@ update_code_flag (int value, int check)
+@@ -2167,7 +2176,7 @@ update_code_flag (int value, int check)
        else
  	as_error = as_bad;
        (*as_error) (_("32bit mode not supported on `%s'."),
@@ -34,16 +34,16 @@
      }
    stackop_size = '\0';
  }
-@@ -2331,7 +2340,7 @@ check_cpu_arch_compatible (const char *n
+@@ -2295,7 +2304,7 @@ check_cpu_arch_compatible (const char *n
  	 use default_arch.  */
        arch = cpu_arch_name;
        if (!arch)
 -	arch = default_arch;
-+	arch = (is_linux32 () ? "i386" : default_arch);
++	arch = (is_linux32() ? "i386" : default_arch);
      }
  
-   /* If we are targeting Intel L1OM, we must enable it.  */
-@@ -3912,7 +3921,7 @@ check_suffix:
+   /* If we are targeting Intel MCU, we must enable it.  */
+@@ -3936,7 +3945,7 @@ check_suffix:
      {
        as_bad (_("`%s' is not supported on `%s%s'"),
  	      current_templates->start->name,
@@ -52,7 +52,7 @@
  	      cpu_sub_arch_name ? cpu_sub_arch_name : "");
        return NULL;
      }
-@@ -9975,7 +9984,7 @@ md_show_usage (FILE *stream)
+@@ -10126,7 +10135,7 @@ md_show_usage (FILE *stream)
  const char *
  i386_target_format (void)
  {
@@ -61,18 +61,18 @@
      {
        update_code_flag (CODE_64BIT, 1);
        if (default_arch[6] == '\0')
-@@ -9983,7 +9992,7 @@ i386_target_format (void)
+@@ -10134,7 +10143,7 @@ i386_target_format (void)
        else
  	x86_elf_abi = X86_64_X32_ABI;
      }
 -  else if (!strcmp (default_arch, "i386"))
-+  else if (!strcmp (default_arch, "i386") || is_linux32 ())
++  else if (!strcmp (default_arch, "i386") || is_linux32())
      update_code_flag (CODE_32BIT, 1);
-   else
-     as_fatal (_("unknown architecture"));
---- binutils-linaro-2.24.0-2014.09/gas/config/tc-ppc.c.linux32~	2014-08-29 17:48:57.000000000 +0200
-+++ binutils-linaro-2.24.0-2014.09/gas/config/tc-ppc.c	2014-09-12 22:56:17.696375929 +0200
-@@ -42,6 +42,10 @@
+   else if (!strcmp (default_arch, "iamcu"))
+     {
+--- binutils-2.25.51/gas/config/tc-ppc.c.linux32~	2015-07-11 12:40:57.000000000 +0200
++++ binutils-2.25.51/gas/config/tc-ppc.c	2015-07-11 14:08:48.657485631 +0200
+@@ -40,6 +40,10 @@
  #include "libxcoff.h"
  #endif
  
@@ -83,7 +83,7 @@
  /* This is the assembler for the PowerPC or POWER (RS/6000) chips.  */
  
  /* Tell the main code what the endianness is.  */
-@@ -98,6 +102,8 @@ static bfd_boolean reg_names_p = TARGET_
+@@ -96,6 +100,8 @@ static bfd_boolean reg_names_p = TARGET_
  static void ppc_macro (char *, const struct powerpc_macro *);
  static void ppc_byte (int);
  
@@ -92,7 +92,7 @@
  #if defined (OBJ_XCOFF) || defined (OBJ_ELF)
  static void ppc_tc (int);
  static void ppc_machine (int);
-@@ -942,7 +948,7 @@ ppc_parse_name (const char *name, expres
+@@ -935,7 +941,7 @@ ppc_parse_name (const char *name, expres
  /* Local variables.  */
  
  /* Whether to target xcoff64/elf64.  */
@@ -101,7 +101,7 @@
  
  /* Opcode hash table.  */
  static struct hash_control *ppc_hash;
-@@ -1141,7 +1147,7 @@ md_parse_option (int c, char *arg)
+@@ -1134,7 +1140,7 @@ md_parse_option (int c, char *arg)
        if (strcmp (arg, "64") == 0)
  	{
  #ifdef BFD64
@@ -110,7 +110,7 @@
  	  if (ppc_cpu & PPC_OPCODE_VLE)
  	    as_bad (_("the use of -mvle requires -a32."));
  #else
-@@ -1149,7 +1155,7 @@ md_parse_option (int c, char *arg)
+@@ -1142,7 +1148,7 @@ md_parse_option (int c, char *arg)
  #endif
  	}
        else if (strcmp (arg, "32") == 0)
@@ -119,7 +119,7 @@
        else
  	return 0;
        break;
-@@ -1338,6 +1344,38 @@ PowerPC options:\n\
+@@ -1332,6 +1338,38 @@ PowerPC options:\n\
  -ppc476-workaround      warn if emitting data to code sections\n"));
  }
  

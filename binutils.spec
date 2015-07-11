@@ -36,9 +36,9 @@
 
 %bcond_without gold
 
-%define ver 2.25.0
-%define linaro 2015.01
-%define linaro_spin 2
+%define ver 2.25.51
+%define linaro %{nil}
+%define linaro_spin 0
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		%{package_prefix}binutils
@@ -47,7 +47,7 @@ Version:	%{ver}_%{linaro}
 Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
-Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
+Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
 Release:	5
@@ -92,12 +92,12 @@ Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 #Patch04:	binutils-2.20.51.0.2-version.patch
 Patch05:	binutils-2.20.51.0.2-set-long-long.patch
 Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
-Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
+Patch07:	binutils-2.25.51-sec-merge-emit.patch
 # we already set our own set of defaults...
 # Enable -zrelro by default: BZ #621983
 #Patch08:	binutils-2.22.52.0.1-relro-on-by-default.patch
 # Local patch - export demangle.h with the binutils-devel rpm.
-Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
+Patch09:	binutils-2.25.51-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 # Fix detections little endian PPC shared libraries
@@ -107,7 +107,7 @@ Patch19:	binutils-2.24-ldforcele.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
-Patch121:	binutils-2.22.52.0.4-linux32.patch
+Patch121:	binutils-2.25.51-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch127:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
@@ -132,7 +132,7 @@ Patch130:	binutils-2015.01-linaro-bug1652.patch
 Patch132:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
-Patch131:	binutils-2.23.51.0.8-fix-overrides-for-gold-testsuite.patch
+Patch131:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
 Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
@@ -194,9 +194,9 @@ to consider using libelf instead of BFD.
 #patch04 -p0 -b .version~
 %patch05 -p0 -b .set-long-long~
 %patch06 -p0 -b .copy-osabi~
-%patch07 -p0 -b .sec-merge-emit~
+%patch07 -p1 -b .sec-merge-emit~
 #patch08 -p0 -b .relro~
-%patch09 -p0 -b .export-demangle-h~
+%patch09 -p1 -b .export-demangle-h~
 %patch10 -p0 -b .no-config-h-check~
 %if %isarch ppc64le
 %patch19 -p0 -b .ldforcele~
@@ -209,7 +209,9 @@ to consider using libelf instead of BFD.
 # things fall back to it...
 %patch128 -p1 -b .defaults~
 %patch129 -p1 -b .gold_defaults~
+%if "%{linaro}" != ""
 %patch130 -p1 -b .1652~
+%endif
 %patch131 -p1 -b .gold_testsuite~
 %patch132 -p1 -b .musl~
 # later
@@ -239,8 +241,9 @@ autoreconf -fiv
 %endif
 
 %if "%{_lib}" != "lib"
-# Fix bogus lib hardcode...
+# Fix bogus lib hardcodes...
 sed -i -e 's,/lib/,/%{_lib}/,g' bfd/plugin.c
+sed -i -e 's,tooldir)/lib,tooldir)/%{_lib},g' gold/Makefile.*
 %endif
 
 %build

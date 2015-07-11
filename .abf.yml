@@ -1,3 +1,3 @@
 sources:
   spu_ovl.o: d5ebd9a79e64af4efd9d4f012bcfe9c2d055335f
-  binutils-linaro-2.25.0-2015.01-2.tar.xz: 194f85bf029c10e889db4b8b299979e81a234829
+  binutils-2.25.51.tar.xz: 8c8cd601fac539b753d82c22a50500af4db1471f
