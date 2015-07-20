@@ -136,6 +136,7 @@ Patch131:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
 Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
+Patch135:	binutils-2.25.51-lto.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -217,6 +218,7 @@ to consider using libelf instead of BFD.
 # later
 #%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
+%patch135 -p1 -b .lto~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
