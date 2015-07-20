@@ -19,6 +19,7 @@ elif echo $PARENT |grep -qE -- 'qemu'; then
 fi
 if ! $WRAPPED; then
 	for i in "$@"; do
+		[ "`echo $i |cut -b1`" = "-" ] && continue
 		if echo $i |grep -qE '\.o$' && [ -e $i ]; then
 			if LANG=C file $i |grep -q "LLVM IR bitcode"; then
 				which llvm-ar &>/dev/null && REAL_AR=llvm-ar

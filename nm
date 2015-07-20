@@ -21,7 +21,8 @@ fi
 # already wrapped...
 if ! $WRAPPED; then
 	for i in "$@"; do
-		if echo $i |grep -qE '\.a$' && [ -e $i ]; then
+		[ "`echo $i |cut -b1`" = "-" ] && continue
+		if echo $i |grep -qE '\.(o|a)$' && [ -e $i ]; then
 			if LANG=C gcc-nm $i 2>&1 |grep -q "File format not recognized"; then
 				which llvm-nm &>/dev/null && REAL_NM=llvm-nm
 				break
