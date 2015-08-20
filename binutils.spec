@@ -50,7 +50,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	8
+Release:	9
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -91,7 +91,6 @@ Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch04:	binutils-2.20.51.0.2-version.patch
 Patch05:	binutils-2.20.51.0.2-set-long-long.patch
-Patch06:	binutils-2.20.51.0.10-copy-osabi.patch
 Patch07:	binutils-2.25.51-sec-merge-emit.patch
 # we already set our own set of defaults...
 # Enable -zrelro by default: BZ #621983
@@ -194,7 +193,6 @@ to consider using libelf instead of BFD.
 %endif
 #patch04 -p0 -b .version~
 %patch05 -p0 -b .set-long-long~
-%patch06 -p0 -b .copy-osabi~
 %patch07 -p1 -b .sec-merge-emit~
 #patch08 -p0 -b .relro~
 %patch09 -p1 -b .export-demangle-h~
