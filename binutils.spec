@@ -50,7 +50,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	10
+Release:	11
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -138,6 +138,7 @@ Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
+Patch135:	binutils-2.25.1-dynamic_list.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -220,6 +221,7 @@ to consider using libelf instead of BFD.
 #%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
+%patch136 -p1 -b .qt~
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
