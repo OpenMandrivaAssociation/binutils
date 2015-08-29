@@ -138,7 +138,7 @@ Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
-Patch135:	binutils-2.25.1-dynamic_list.patch
+Patch136:	binutils-2.25.1-dynamic_list.patch
 
 %description
 Binutils is a collection of binary utilities, including:
