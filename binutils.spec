@@ -50,7 +50,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	11
+Release:	12
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -103,8 +103,6 @@ Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 Patch19:	binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
-# fix from git
-Patch22:	binutils-2.25.51-pr18703_regression.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -203,7 +201,6 @@ to consider using libelf instead of BFD.
 %patch19 -p0 -b .ldforcele~
 %endif
 #patch21 -p1 -b .fatlto~
-%patch22 -p1 -b .pr18703
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
