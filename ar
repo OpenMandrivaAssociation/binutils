@@ -13,7 +13,7 @@ elif echo $PARENT |grep -qE -- 'qemu'; then
 	# Fun... We're running inside qemu binfmt_misc emulation,
 	# so we have to determine our parent the evil and less
 	# reliable way...
-	if grep -qP -- '-ar\x00' /proc/$PPID/cmdline; then
+	if grep -qE -- '-ar' /proc/$PPID/cmdline; then
 		WRAPPED=true
 	fi
 fi
