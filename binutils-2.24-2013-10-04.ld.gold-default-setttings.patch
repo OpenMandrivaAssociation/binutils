@@ -1,6 +1,6 @@
---- binutils-2.24.51.0.1/gold/options.cc.gold_defaults~	2013-12-02 14:07:40.456512646 +0100
-+++ binutils-2.24.51.0.1/gold/options.cc	2013-12-02 14:13:02.668484442 +0100
-@@ -1242,6 +1242,22 @@ General_options::finalize()
+--- binutils-2.25.90/gold/options.cc.gold_defaults~	2015-10-12 18:36:54.000000000 +0200
++++ binutils-2.25.90/gold/options.cc	2015-12-22 15:15:33.370641398 +0100
+@@ -1265,6 +1265,22 @@ General_options::finalize()
      gold_fatal(_("Options --incremental-changed, --incremental-unchanged, "
  		 "--incremental-unknown require the use of --incremental"));
  
@@ -23,25 +23,18 @@
    // Check for options that are not compatible with incremental linking.
    // Where an option can be disabled without seriously changing the semantics
    // of the link, we turn the option off; otherwise, we issue a fatal error.
---- binutils-2.24-2013-10-04/gold/options.h.gold_defaults~	2013-07-20 01:07:08.000000000 +0200
-+++ binutils-2.24-2013-10-04/gold/options.h	2013-10-20 21:14:31.751162119 +0200
-@@ -639,13 +639,13 @@ class General_options
- 
-   DEFINE_bool_alias(allow_multiple_definition, muldefs, options::TWO_DASHES,
- 		    '\0', N_("Allow multiple definitions of symbols"),
--		    N_("Do not allow multiple definitions"), false);
-+		    N_("Do not allow multiple definitions"), false); // not yet
- 
-   DEFINE_bool(allow_shlib_undefined, options::TWO_DASHES, '\0', false,
- 	      N_("Allow unresolved references in shared libraries"),
- 	      N_("Do not allow unresolved references in shared libraries"));
+--- binutils-2.25.90/gold/options.h.gold_defaults~	2015-12-22 15:02:14.000000000 +0100
++++ binutils-2.25.90/gold/options.h	2015-12-22 15:16:38.815740066 +0100
+@@ -649,7 +649,7 @@ class General_options
+ 	      N_("(aarch64 only) Do not apply link-time values "
+ 	         "for dynamic relocations"));
  
 -  DEFINE_bool(as_needed, options::TWO_DASHES, '\0', false,
 +  DEFINE_bool(as_needed, options::TWO_DASHES, '\0', true,
  	      N_("Only set DT_NEEDED for shared libraries if used"),
  	      N_("Always DT_NEEDED for shared libraries"));
  
-@@ -845,7 +845,7 @@ class General_options
+@@ -852,7 +852,7 @@ class General_options
  		N_("Min fraction of empty buckets in dynamic hash"),
  		N_("FRACTION"));
  
@@ -50,7 +43,7 @@
  	      N_("Dynamic hash style"), N_("[sysv,gnu,both]"),
  	      {"sysv", "gnu", "both"});
  
-@@ -963,7 +963,7 @@ class General_options
+@@ -970,7 +970,7 @@ class General_options
    DEFINE_string(output, options::TWO_DASHES, 'o', "a.out",
  		N_("Set output file name"), N_("FILE"));
  
@@ -59,7 +52,7 @@
  	      N_("Optimize output file size"), N_("LEVEL"));
  
    DEFINE_string(oformat, options::EXACTLY_TWO_DASHES, '\0', "elf",
-@@ -1104,7 +1104,7 @@ class General_options
+@@ -1117,7 +1117,7 @@ class General_options
    DEFINE_special(static, options::ONE_DASH, '\0',
  		 N_("Do not link against shared libraries"), NULL);
  
@@ -68,7 +61,7 @@
  	      N_("Identical Code Folding. "
  		 "\'--icf=safe\' Folds ctors, dtors and functions whose"
  		 " pointers are definitely not taken."),
-@@ -1189,14 +1189,14 @@ class General_options
+@@ -1202,14 +1202,14 @@ class General_options
    DEFINE_special(version_script, options::TWO_DASHES, '\0',
  		 N_("Read version script"), N_("FILE"));
  
@@ -85,7 +78,7 @@
  	      N_("Warn if the stack is executable"),
  	      N_("Do not warn if the stack is executable (default)"));
  
-@@ -1210,9 +1210,9 @@ class General_options
+@@ -1223,9 +1223,9 @@ class General_options
  	      N_("Warn when skipping an incompatible library"),
  	      N_("Don't warn when skipping an incompatible library"));
  
@@ -98,7 +91,7 @@
  
    DEFINE_bool(warn_unresolved_symbols, options::TWO_DASHES, '\0', false,
  	      N_("Report unresolved symbols as warnings"),
-@@ -1313,7 +1313,7 @@ class General_options
+@@ -1332,7 +1332,7 @@ class General_options
    DEFINE_bool(origin, options::DASH_Z, '\0', false,
  	      N_("Mark DSO to indicate that needs immediate $ORIGIN "
  		 "processing at runtime"), NULL);

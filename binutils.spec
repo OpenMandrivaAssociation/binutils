@@ -36,7 +36,7 @@
 
 %bcond_without gold
 
-%define ver 2.25.51
+%define ver 2.25.90
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -50,7 +50,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	14
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
