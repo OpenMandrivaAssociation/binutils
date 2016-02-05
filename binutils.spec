@@ -50,7 +50,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -217,6 +217,17 @@ to consider using libelf instead of BFD.
 #%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
+
+# Some distributions (e.g. Fedora 23 for Opteron A1100) use 64 kB pages on aarch64.
+# Adjust the page size so binaries built with our toolchain can run there.
+sed -i -e '/#define.*ELF_COMMONPAGESIZE/s/0x1000$/0x10000/' bfd/elf*ppc.c
+sed -i -e '/#define.*ELF_COMMONPAGESIZE/s/0x1000$/0x10000/' bfd/elf*aarch64.c
+sed -i -e '/common_pagesize/s/4 /64 /' gold/powerpc.cc
+sed -i -e '/pagesize/s/0x1000,/0x10000,/' gold/aarch64.cc
+# Build libbfd.so and libopcodes.so with -Bsymbolic-functions if possible.
+sed -i -e 's/^libbfd_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' bfd/Makefile.{am,in}
+sed -i -e 's/^libopcodes_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' opcodes/Makefile.{am,in}
+
 # for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
 cp %{SOURCE3} ld/emultempl/
 
