@@ -1,3 +1,4 @@
+#define cross aarch64-linux-gnu
 
 %define lib_major 2
 %define lib_name_orig %{package_prefix}%mklibname binutils
@@ -50,7 +51,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -86,23 +87,33 @@ BuildRequires:	pkgconfig(isl) pkgconfig(cloog-isl)
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
-Patch02:	binutils-2.23.51.0.2-ppc64-pie.patch
+Patch02:	binutils-2.20.51.0.10-ppc64-pie.patch
 Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch04:	binutils-2.20.51.0.2-version.patch
-Patch05:	binutils-2.20.51.0.2-set-long-long.patch
-Patch07:	binutils-2.25.51-sec-merge-emit.patch
+Patch04:	binutils-2.23.52.0.1-addr2line-dynsymtab.patch
+Patch05:	binutils-2.25-set-long-long.patch
+Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
 # we already set our own set of defaults...
 # Enable -zrelro by default: BZ #621983
 #Patch08:	binutils-2.22.52.0.1-relro-on-by-default.patch
+Patch08:	binutils-2.25.1-cleansweep.patch
 # Local patch - export demangle.h with the binutils-devel rpm.
-Patch09:	binutils-2.25.51-export-demangle.h.patch
+Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 # Fix detections little endian PPC shared libraries
 Patch19:	binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
+Patch21:	binutils-2.26-Bsymbolic_PIE.patch
+Patch22:	binutils-2.26-common-definitions.patch
+Patch23:	binutils-2.26-fix-GOT-offset-calculation.patch
+Patch24:	binutils-2.26-fix-compile-warnings.patch
+Patch25:	binutils-2.26-formatting.patch
+Patch26:	binutils-2.26-lto.patch
+Patch27:	binutils-2.26-x86-PIE-relocations.patch
+Patch28:	binutils-rh1312151.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -183,7 +194,7 @@ to consider using libelf instead of BFD.
 %else
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
 %endif
-%patch01 -p0 -b .libtool-lib64~
+%patch01 -p1 -b .libtool-lib64~
 # Needs porting, and we don't care about the target for now
 #patch02 -p1 -b .ppc64-pie~
 %if %isarch ia64
@@ -191,16 +202,24 @@ to consider using libelf instead of BFD.
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-#patch04 -p0 -b .version~
-%patch05 -p0 -b .set-long-long~
+%patch04 -p1 -b .addr2line~
+%patch05 -p1 -b .set-long-long~
 %patch07 -p1 -b .sec-merge-emit~
-#patch08 -p0 -b .relro~
+%patch08 -p0 -b .cleansweep~
 %patch09 -p1 -b .export-demangle-h~
-%patch10 -p0 -b .no-config-h-check~
+%patch10 -p1 -b .no-config-h-check~
 %if %isarch ppc64le
 %patch19 -p0 -b .ldforcele~
 %endif
 #patch21 -p1 -b .fatlto~
+%patch21 -p1 -b .BsymbolicPIE~
+%patch22 -p1 -b .commondef~
+%patch23 -p1 -b .GOT~
+%patch24 -p1 -b .warn~
+%patch25 -p0 -b .formatting~
+%patch26 -p1 -b .lto~
+%patch27 -p1 -b .reloc~
+%patch28 -p1 -b .1312151~
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
