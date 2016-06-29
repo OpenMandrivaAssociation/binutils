@@ -37,7 +37,7 @@
 
 %bcond_without gold
 
-%define ver 2.26
+%define ver 2.26.1
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -106,14 +106,8 @@ Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 Patch19:	binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
-Patch21:	binutils-2.26-Bsymbolic_PIE.patch
-Patch22:	binutils-2.26-common-definitions.patch
-Patch23:	binutils-2.26-fix-GOT-offset-calculation.patch
 Patch24:	binutils-2.26-fix-compile-warnings.patch
-Patch25:	binutils-2.26-formatting.patch
 Patch26:	binutils-2.26-lto.patch
-Patch27:	binutils-2.26-x86-PIE-relocations.patch
-Patch28:	binutils-rh1312151.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -212,14 +206,8 @@ to consider using libelf instead of BFD.
 %patch19 -p0 -b .ldforcele~
 %endif
 #patch21 -p1 -b .fatlto~
-%patch21 -p1 -b .BsymbolicPIE~
-%patch22 -p1 -b .commondef~
-%patch23 -p1 -b .GOT~
 %patch24 -p1 -b .warn~
-%patch25 -p0 -b .formatting~
 %patch26 -p1 -b .lto~
-%patch27 -p1 -b .reloc~
-%patch28 -p1 -b .1312151~
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
