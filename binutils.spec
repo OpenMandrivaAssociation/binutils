@@ -51,7 +51,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -83,7 +83,8 @@ BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
-BuildRequires:	pkgconfig(isl) pkgconfig(cloog-isl)
+BuildRequires:	pkgconfig(isl)
+BuildRequires:	pkgconfig(cloog-isl)
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
@@ -331,8 +332,8 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 rm -rf objs
 mkdir objs
 pushd objs
-export CC="%__cc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
-export CXX="%__cxx -D_GNU_SOURCE=1"
+export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
+export CXX="%{__cxx} -D_GNU_SOURCE=1"
 CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %if %{with gold}
 %if %{gold_default}
@@ -366,10 +367,16 @@ CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 						--with-fpu=vfpv3-d16 \
 						--with-abi=aapcs-linux \
 %endif
+%if "%{distepoch}" < "2015"
+%ifnarch %{ix86}
+						--enable-lto \
+%endif
+%endif
 						--disable-werror \
 						--enable-static \
 						--with-separate-debug-dir=%{_prefix}/lib/debug \
-						--enable-initfini-array
+						--enable-initfini-array \
+						--with-system-zlib
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
 # make once again when it happens...
@@ -408,9 +415,15 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 				--enable-ld=yes \
 				--enable-gold=default \
 %endif
+%if "%{distepoch}" < "2015"
+%ifnarch %{ix86}
+				--enable-lto \
+%endif
+%endif
 				--disable-werror \
 				--with-bugurl=%{bugurl} \
-				--enable-initfini-array
+				--enable-initfini-array \
+				--with-system-zlib
     # make sure we use the fully built libbfd & libopcodes libs
     # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
     # again to configure and rebuild all of those though...
