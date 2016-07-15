@@ -37,7 +37,7 @@
 
 %bcond_without gold
 
-%define ver 2.26
+%define ver 2.26.1
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -51,7 +51,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -83,7 +83,8 @@ BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
-BuildRequires:	pkgconfig(isl) pkgconfig(cloog-isl)
+BuildRequires:	pkgconfig(isl)
+BuildRequires:	pkgconfig(cloog-isl)
 
 # Fedora patches:
 Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
@@ -106,14 +107,8 @@ Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
 Patch19:	binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
-Patch21:	binutils-2.26-Bsymbolic_PIE.patch
-Patch22:	binutils-2.26-common-definitions.patch
-Patch23:	binutils-2.26-fix-GOT-offset-calculation.patch
 Patch24:	binutils-2.26-fix-compile-warnings.patch
-Patch25:	binutils-2.26-formatting.patch
 Patch26:	binutils-2.26-lto.patch
-Patch27:	binutils-2.26-x86-PIE-relocations.patch
-Patch28:	binutils-rh1312151.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -212,14 +207,8 @@ to consider using libelf instead of BFD.
 %patch19 -p0 -b .ldforcele~
 %endif
 #patch21 -p1 -b .fatlto~
-%patch21 -p1 -b .BsymbolicPIE~
-%patch22 -p1 -b .commondef~
-%patch23 -p1 -b .GOT~
 %patch24 -p1 -b .warn~
-%patch25 -p0 -b .formatting~
 %patch26 -p1 -b .lto~
-%patch27 -p1 -b .reloc~
-%patch28 -p1 -b .1312151~
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
@@ -343,8 +332,8 @@ TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
 rm -rf objs
 mkdir objs
 pushd objs
-export CC="%__cc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
-export CXX="%__cxx -D_GNU_SOURCE=1"
+export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
+export CXX="%{__cxx} -D_GNU_SOURCE=1"
 CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %if %{with gold}
 %if %{gold_default}
@@ -378,10 +367,16 @@ CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 						--with-fpu=vfpv3-d16 \
 						--with-abi=aapcs-linux \
 %endif
+%if "%{distepoch}" < "2015"
+%ifnarch %{ix86}
+						--enable-lto \
+%endif
+%endif
 						--disable-werror \
 						--enable-static \
 						--with-separate-debug-dir=%{_prefix}/lib/debug \
-						--enable-initfini-array
+						--enable-initfini-array \
+						--with-system-zlib
 # There seems to be some problems with builds of gold randomly failing whenever
 # going through the build system, so let's try workaround this by trying to do
 # make once again when it happens...
@@ -420,9 +415,15 @@ if [[ -n "$ALTERNATE_TARGETS" ]]; then
 				--enable-ld=yes \
 				--enable-gold=default \
 %endif
+%if "%{distepoch}" < "2015"
+%ifnarch %{ix86}
+				--enable-lto \
+%endif
+%endif
 				--disable-werror \
 				--with-bugurl=%{bugurl} \
-				--enable-initfini-array
+				--enable-initfini-array \
+				--with-system-zlib
     # make sure we use the fully built libbfd & libopcodes libs
     # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
     # again to configure and rebuild all of those though...

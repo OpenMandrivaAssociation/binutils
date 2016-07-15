@@ -4,33 +4,33 @@ PARENT="`readlink /proc/$PPID/exe`"
 WRAPPED=false
 # If /proc isn't mounted, let's do the least evil thing we can
 if [ -z "$PARENT" ]; then
-	WRAPPED=true
+    WRAPPED=true
 elif echo $PARENT |grep -qE -- '-nm$'; then
-	# If we're being called by gcc-nm or llvm-nm, we're already
-	# wrapped (and need to make sure we don't call ourselves recursively)
-	WRAPPED=true
+# If we're being called by gcc-nm or llvm-nm, we're already
+# wrapped (and need to make sure we don't call ourselves recursively)
+    WRAPPED=true
 elif echo $PARENT |grep -qE -- 'qemu'; then
-	# Fun... We're running inside qemu binfmt_misc emulation,
-	# so we have to determine our parent the evil and less
-	# reliable way...
-	if grep -qE -- '-nm' /proc/$PPID/cmdline; then
-		WRAPPED=true
-	fi
+# Fun... We're running inside qemu binfmt_misc emulation,
+# so we have to determine our parent the evil and less
+# reliable way...
+    if grep -qE -- '-nm' /proc/$PPID/cmdline; then
+	WRAPPED=true
+    fi
 fi
 # If we're being called by gcc-nm or llvm-nm, we're
 # already wrapped...
 if ! $WRAPPED; then
-	for i in "$@"; do
-		[ "`echo $i |cut -b1`" = "-" ] && continue
-		if echo $i |grep -qE '\.(o|a)$' && [ -e $i ]; then
-			if LANG=C gcc-nm $i 2>&1 |grep -q "File format not recognized"; then
-				which llvm-nm &>/dev/null && REAL_NM=llvm-nm
-				break
-			fi
-		fi
-	done
-	if [ "$REAL_NM" = "binutils-nm" ] && which gcc-nm &>/dev/null; then
-		REAL_NM=gcc-nm
+    for i in "$@"; do
+	[ "`echo $i |cut -b1`" = "-" ] && continue
+	if echo $i |grep -qE '\.(o|a)$' && [ -e $i ]; then
+	    if LANG=C gcc-nm $i 2>&1 |grep -q "File format not recognized"; then
+		which llvm-nm &>/dev/null && REAL_NM=llvm-nm
+		break
+	    fi
 	fi
+    done
+    if [ "$REAL_NM" = "binutils-nm" ] && which gcc-nm &>/dev/null; then
+	REAL_NM=gcc-nm
+    fi
 fi
 exec $REAL_NM "$@"
