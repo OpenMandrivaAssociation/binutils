@@ -109,7 +109,7 @@ Patch19:	binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
 Patch24:	binutils-2.26-fix-compile-warnings.patch
-Patch26:	binutils-2.26-lto.patch
+Patch26:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-lto.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
