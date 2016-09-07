@@ -60,7 +60,7 @@ URL:		http://sources.redhat.com/binutils/
 Source2:	build_cross_binutils.sh
 Source3:	spu_ovl.o
 Source4:	embedspu.sh
-Source5:	binutils-2.19.50.0.1-output-format.sed
+Source5:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.19.50.0.1-output-format.sed
 Source10:	binutils.rpmlintrc
 # Wrapper scripts for ar, ranlib and nm that know how to deal with
 # LTO bytecode, regardless of whether it's gcc or clang
@@ -88,28 +88,31 @@ BuildRequires:	pkgconfig(isl)
 BuildRequires:	pkgconfig(cloog-isl)
 
 # Fedora patches:
-Patch01:	binutils-2.20.51.0.2-libtool-lib64.patch
-Patch02:	binutils-2.20.51.0.10-ppc64-pie.patch
-Patch03:	binutils-2.20.51.0.2-ia64-lib64.patch
+Patch01:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-libtool-lib64.patch
+Patch02:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.10-ppc64-pie.patch
+Patch03:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch04:	binutils-2.20.51.0.2-version.patch
-Patch04:	binutils-2.23.52.0.1-addr2line-dynsymtab.patch
-Patch05:	binutils-2.25-set-long-long.patch
-Patch07:	binutils-2.20.51.0.10-sec-merge-emit.patch
+Patch04:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.23.52.0.1-addr2line-dynsymtab.patch
+Patch05:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.25-set-long-long.patch
+Patch07:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.10-sec-merge-emit.patch
 # we already set our own set of defaults...
 # Enable -zrelro by default: BZ #621983
 #Patch08:	binutils-2.22.52.0.1-relro-on-by-default.patch
-Patch08:	binutils-2.25.1-cleansweep.patch
+Patch08:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.25.1-cleansweep.patch
 # Local patch - export demangle.h with the binutils-devel rpm.
-Patch09:	binutils-2.22.52.0.1-export-demangle.h.patch
+Patch09:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
-Patch10:	binutils-2.22.52.0.4-no-config-h-check.patch
+Patch10:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.22.52.0.4-no-config-h-check.patch
 # Fix detections little endian PPC shared libraries
-Patch19:	binutils-2.24-ldforcele.patch
+Patch19:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.24-ldforcele.patch
 # already in our more recent version
 #Patch21:	binutils-2.24-fat-lto-objects.patch
-Patch24:	binutils-2.26-fix-compile-warnings.patch
+Patch24:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-fix-compile-warnings.patch
 Patch26:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-lto.patch
+Patch27:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-arm-aarch64-default-relro.patch
+Patch28:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-local-dynsym-count.patch
+Patch29:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-monotonic-section-offsets.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -208,7 +211,10 @@ to consider using libelf instead of BFD.
 %endif
 #patch21 -p1 -b .fatlto~
 %patch24 -p1 -b .warn~
-#patch26 -p1 -b .lto~
+%patch26 -p1 -b .lto~
+%patch27 -p1 -b .armrelro~
+%patch28 -p1 -b .dynsym~
+%patch29 -p1 -b .monotonic~
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
