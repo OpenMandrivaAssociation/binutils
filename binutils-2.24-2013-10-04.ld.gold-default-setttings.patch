@@ -91,12 +91,3 @@
  
    DEFINE_bool(warn_unresolved_symbols, options::TWO_DASHES, '\0', false,
  	      N_("Report unresolved symbols as warnings"),
-@@ -1332,7 +1332,7 @@ class General_options
-   DEFINE_bool(origin, options::DASH_Z, '\0', false,
- 	      N_("Mark DSO to indicate that needs immediate $ORIGIN "
- 		 "processing at runtime"), NULL);
--  DEFINE_bool(relro, options::DASH_Z, '\0', false,
-+  DEFINE_bool(relro, options::DASH_Z, '\0', true,
- 	      N_("Where possible mark variables read-only after relocation"),
- 	      N_("Don't mark variables read-only after relocation"));
-   DEFINE_bool(text, options::DASH_Z, '\0', false,

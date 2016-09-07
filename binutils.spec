@@ -1,3 +1,4 @@
+%define _disable_lto 1
 #define cross aarch64-linux-gnu
 
 %define lib_major 2
@@ -37,7 +38,7 @@
 
 %bcond_without gold
 
-%define ver 2.26.1
+%define ver 2.27
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -51,7 +52,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
 %endif
 Epoch:		1
-Release:	4
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -127,7 +128,6 @@ Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
 # --warn-execstack
 # --warn-shared-textrel
 # --warn-unresolved-symbols
-# -z relro
 # --build-id=sha1
 # --icf=safe
 Patch129:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
@@ -208,7 +208,7 @@ to consider using libelf instead of BFD.
 %endif
 #patch21 -p1 -b .fatlto~
 %patch24 -p1 -b .warn~
-%patch26 -p1 -b .lto~
+#patch26 -p1 -b .lto~
 
 %patch121 -p1 -b .linux32~
 #patch27 -p1 -b .skip_gold_check~
@@ -374,6 +374,7 @@ CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %endif
 						--disable-werror \
 						--enable-static \
+						--enable-relro \
 						--with-separate-debug-dir=%{_prefix}/lib/debug \
 						--enable-initfini-array \
 						--with-system-zlib
@@ -383,7 +384,7 @@ CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
 %make tooldir=%{_prefix}
 
 %if "%{name}" == "binutils"
-make -C bfd/doc html
+%make -C bfd/doc html
 mkdir -p ../html
 cp -f bfd/doc/bfd.html/* ../html
 popd
