@@ -1,3 +1,3 @@
 sources:
   spu_ovl.o: d5ebd9a79e64af4efd9d4f012bcfe9c2d055335f
-  binutils-2.27.tar.bz2: 6e472ddae565a2b1447e6f2393809bb8799982cf
+  binutils-2.27.51.tar.xz: 124af2e2e53ef419afbd0b98d55333a518c75be6

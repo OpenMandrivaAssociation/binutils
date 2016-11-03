@@ -38,7 +38,7 @@
 
 %bcond_without gold
 
-%define ver 2.27
+%define ver 2.27.51
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -49,7 +49,7 @@ Version:	%{ver}_%{linaro}
 Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
-Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
+Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
 Release:	1
@@ -110,9 +110,9 @@ Patch19:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.2
 #Patch21:	binutils-2.24-fat-lto-objects.patch
 Patch24:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-fix-compile-warnings.patch
 Patch26:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-lto.patch
-Patch27:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-arm-aarch64-default-relro.patch
-Patch28:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-local-dynsym-count.patch
-Patch29:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-monotonic-section-offsets.patch
+# already in our more recent version
+#Patch28:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-local-dynsym-count.patch
+#Patch29:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-monotonic-section-offsets.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -212,12 +212,8 @@ to consider using libelf instead of BFD.
 #patch21 -p1 -b .fatlto~
 %patch24 -p1 -b .warn~
 %patch26 -p1 -b .lto~
-%patch27 -p1 -b .armrelro~
-%patch28 -p1 -b .dynsym~
-%patch29 -p1 -b .monotonic~
 
 %patch121 -p1 -b .linux32~
-#patch27 -p1 -b .skip_gold_check~
 # Modify the defaults of the BFD linker as well, since many
 # things fall back to it...
 %patch128 -p1 -b .defaults~
