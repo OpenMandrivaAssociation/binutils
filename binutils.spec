@@ -573,6 +573,19 @@ cd -
 
 mkdir -p %{buildroot}%{_libdir}/bfd-plugins
 
+%if "%{cross}" != "%%{cross}"
+# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
+longplatform=$(grep ^target_alias= objs/Makefile |cut -d= -f2-)
+shortplatform="%{cross}"
+#shortplatform=$(echo $longplatform |cut -d- -f1)-$(echo $longplatform |cut -d- -f3)-$(echo $longplatform |cut -d- -f4)
+if [ "$longplatform" != "shortplatform" ]; then
+	cd %{buildroot}%{_bindir}
+	for i in $longplatform-*; do
+		ln -s $i $(echo $i |sed -e "s,$longplatform,$shortplatform,")
+	done
+fi
+%endif
+
 %if "%{name}" == "binutils"
 %files -f binutils.lang
 %else
