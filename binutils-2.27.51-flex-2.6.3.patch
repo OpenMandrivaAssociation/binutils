@@ -1,11 +1,11 @@
---- binutils-2.27.51/binutils/syslex.l.omv~	2017-01-17 22:39:02.454917339 +0100
-+++ binutils-2.27.51/binutils/syslex.l	2017-01-17 22:39:37.841050603 +0100
+--- binutils-2.27.90/binutils/syslex.l.yywrap~	2017-01-17 23:32:32.000000000 +0100
++++ binutils-2.27.90/binutils/syslex.l	2017-01-17 23:56:02.112615921 +0100
 @@ -1,4 +1,4 @@
 -%option noinput nounput
 +%option noinput nounput noyywrap
  
  %{
- /* Copyright (C) 2001-2016 Free Software Foundation, Inc.
+ /* Copyright (C) 2001-2017 Free Software Foundation, Inc.
 @@ -36,10 +36,6 @@
  #define YY_NO_UNPUT
  #endif
@@ -17,8 +17,8 @@
  extern int yylex (void);
  %}
  %%
---- binutils-2.27.51/ld/ldlex.l.omv~	2017-01-17 22:42:02.423599530 +0100
-+++ binutils-2.27.51/ld/ldlex.l	2017-01-17 22:42:17.366656621 +0100
+--- binutils-2.27.90/ld/ldlex.l.yywrap~	2017-01-17 23:32:34.000000000 +0100
++++ binutils-2.27.90/ld/ldlex.l	2017-01-17 23:54:57.809163173 +0100
 @@ -1,4 +1,4 @@
 -%option nounput
 +%option nounput noyywrap

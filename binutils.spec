@@ -38,7 +38,7 @@
 
 %bcond_without gold
 
-%define ver 2.27.51
+%define ver 2.27.90
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -93,7 +93,6 @@ Patch02:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.2
 Patch03:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch04:	binutils-2.20.51.0.2-version.patch
-Patch04:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.23.52.0.1-addr2line-dynsymtab.patch
 Patch05:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.25-set-long-long.patch
 Patch07:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.10-sec-merge-emit.patch
 # we already set our own set of defaults...
@@ -202,7 +201,6 @@ to consider using libelf instead of BFD.
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-%patch04 -p1 -b .addr2line~
 %patch05 -p1 -b .set-long-long~
 %patch07 -p1 -b .sec-merge-emit~
 %patch08 -p0 -b .cleansweep~
