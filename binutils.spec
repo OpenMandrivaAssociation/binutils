@@ -230,7 +230,7 @@ to consider using libelf instead of BFD.
 %patch136 -p1 -b .yywrap~
 
 # Need to regenerate lex files
-rm -f binutils/syslex.c ld/ldlex.c
+rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
 
 # Some distributions (e.g. Fedora 23 for Opteron A1100) use 64 kB pages on aarch64.
 # Adjust the page size so binaries built with our toolchain can run there.

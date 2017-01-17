@@ -1,5 +1,43 @@
---- binutils-2.27.90/binutils/syslex.l.yywrap~	2017-01-17 23:32:32.000000000 +0100
-+++ binutils-2.27.90/binutils/syslex.l	2017-01-17 23:56:02.112615921 +0100
+diff --git a/binutils/arlex.l b/binutils/arlex.l
+index b5b12d1d88..43350df292 100644
+--- a/binutils/arlex.l
++++ b/binutils/arlex.l
+@@ -1,4 +1,4 @@
+-%option noinput nounput
++%option noinput nounput noyywrap
+ 
+ %{
+ /* arlex.l - Strange script language lexer */
+@@ -88,7 +88,3 @@ int linenumber;
+ "\n"	 	 { linenumber ++; return NEWLINE; }
+ 
+ %%
+-#ifndef yywrap
+-/* Needed for lex, though not flex. */
+-int yywrap(void) { return 1; }
+-#endif
+diff --git a/binutils/deflex.l b/binutils/deflex.l
+index de09b6157e..24e974ca18 100644
+--- a/binutils/deflex.l
++++ b/binutils/deflex.l
+@@ -1,4 +1,4 @@
+-%option noinput nounput
++%option noinput nounput noyywrap
+ 
+ %{/* deflex.l - Lexer for .def files */
+ 
+@@ -91,7 +91,3 @@ int linenumber;
+ "@"	 	{ return '@';}
+ ","		{ return ',';}
+ %%
+-#ifndef yywrap
+-/* Needed for lex, though not flex. */
+-int yywrap(void) { return 1; }
+-#endif
+diff --git a/binutils/syslex.l b/binutils/syslex.l
+index 86cb17de91..7fcc714fc0 100644
+--- a/binutils/syslex.l
++++ b/binutils/syslex.l
 @@ -1,4 +1,4 @@
 -%option noinput nounput
 +%option noinput nounput noyywrap
@@ -17,15 +55,62 @@
  extern int yylex (void);
  %}
  %%
---- binutils-2.27.90/ld/ldlex.l.yywrap~	2017-01-17 23:32:34.000000000 +0100
-+++ binutils-2.27.90/ld/ldlex.l	2017-01-17 23:54:57.809163173 +0100
+diff --git a/gas/config/bfin-lex.l b/gas/config/bfin-lex.l
+index 03a4ce875b..f270a4b75c 100644
+--- a/gas/config/bfin-lex.l
++++ b/gas/config/bfin-lex.l
+@@ -1,3 +1,5 @@
++%option noyywrap
++
+ /* bfin-lex.l  ADI Blackfin lexer
+    Copyright (C) 2005-2017 Free Software Foundation, Inc.
+ 
+@@ -545,12 +547,3 @@ set_start_state (void)
+ {
+   BEGIN KEYWORD;
+ }
+-
+-
+-#ifndef yywrap
+-int
+-yywrap ()
+-{
+-  return 1;
+-}
+-#endif
+diff --git a/gas/itbl-lex.l b/gas/itbl-lex.l
+index d9e243c8ab..4a7c51214c 100644
+--- a/gas/itbl-lex.l
++++ b/gas/itbl-lex.l
+@@ -1,3 +1,5 @@
++%option noyywrap
++
+ /* itbl-lex.l
+    Copyright (C) 1997-2017 Free Software Foundation, Inc.
+ 
+@@ -102,11 +104,3 @@ HEX	[0-9A-Fa-f]
+     return yytext[0];
+   }
+ %%
+-
+-#ifndef yywrap
+-int
+-yywrap ()
+-  {
+-    return 1;
+-  }
+-#endif
+diff --git a/ld/ldlex.l b/ld/ldlex.l
+index bddaaf812c..fa9b924426 100644
+--- a/ld/ldlex.l
++++ b/ld/ldlex.l
 @@ -1,4 +1,4 @@
 -%option nounput
 +%option nounput noyywrap
  
  %{
  
-@@ -86,10 +86,6 @@ static void lex_warn_invalid (char *wher
+@@ -86,10 +86,6 @@ static void lex_warn_invalid (char *where, char *what);
  */
  #define RTOKEN(x)  {  yylval.token = x; return x; }
  
