@@ -1,0 +1,38 @@
+--- binutils-2.27.51/binutils/syslex.l.omv~	2017-01-17 22:39:02.454917339 +0100
++++ binutils-2.27.51/binutils/syslex.l	2017-01-17 22:39:37.841050603 +0100
+@@ -1,4 +1,4 @@
+-%option noinput nounput
++%option noinput nounput noyywrap
+ 
+ %{
+ /* Copyright (C) 2001-2016 Free Software Foundation, Inc.
+@@ -36,10 +36,6 @@
+ #define YY_NO_UNPUT
+ #endif
+ 
+-#ifndef yywrap
+-static int yywrap (void) { return 1; }
+-#endif
+-
+ extern int yylex (void);
+ %}
+ %%
+--- binutils-2.27.51/ld/ldlex.l.omv~	2017-01-17 22:42:02.423599530 +0100
++++ binutils-2.27.51/ld/ldlex.l	2017-01-17 22:42:17.366656621 +0100
+@@ -1,4 +1,4 @@
+-%option nounput
++%option nounput noyywrap
+ 
+ %{
+ 
+@@ -86,10 +86,6 @@ static void lex_warn_invalid (char *wher
+ */
+ #define RTOKEN(x)  {  yylval.token = x; return x; }
+ 
+-/* Some versions of flex want this.  */
+-#ifndef yywrap
+-int yywrap (void) { return 1; }
+-#endif
+ %}
+ 
+ %a 4000
