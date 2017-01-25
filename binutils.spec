@@ -144,8 +144,8 @@ Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
-# Make it compile with flex > 2.6.1
-Patch136:	binutils-2.27.51-flex-2.6.3.patch
+
+Patch136:	binutils-2.27.90-fix-warnings.patch
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -227,7 +227,7 @@ to consider using libelf instead of BFD.
 #%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
-%patch136 -p1 -b .yywrap~
+%patch136 -p1 -b .warnings~
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
