@@ -38,7 +38,7 @@
 
 %bcond_without gold
 
-%define ver 2.27.90
+%define ver 2.28
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -49,7 +49,7 @@ Version:	%{ver}_%{linaro}
 Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
-Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
+Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.gz
 %endif
 Epoch:		1
 Release:	1
