@@ -36,6 +36,8 @@
 
 %define gold_default 1
 
+%bcond_without default_lld
+
 %bcond_without gold
 
 %define ver 2.28
@@ -52,7 +54,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.gz
 %endif
 Epoch:		1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -146,6 +148,10 @@ Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
+
+%if %{with default_lld}
+Requires:	lld
+%endif
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -589,6 +595,15 @@ if [ "%{cross}" != "%%{cross}" ]; then
 		done
 	fi
 fi
+
+%if %{with default_lld}
+# For now, let's keep %{_bindir}/ld in here even if it points
+# to lld...
+# Least surprise for now, but ultimately %{_bindir}/ld should
+# move to lld
+rm -f %{buildroot}%{_bindir}/ld
+ln -s ld.lld %{buildroot}%{_bindir}/ld
+%endif
 
 %if "%{name}" == "binutils"
 %files -f binutils.lang
