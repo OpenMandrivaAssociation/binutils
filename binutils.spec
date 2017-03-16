@@ -36,7 +36,10 @@
 
 %define gold_default 1
 
+%if %mdvver > 3000000
+# (tpg) enable LLD linker only on newer than 3.0x
 %bcond_without default_lld
+%endif
 
 %bcond_without gold
 
