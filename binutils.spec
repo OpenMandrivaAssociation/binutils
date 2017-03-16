@@ -36,9 +36,14 @@
 
 %define gold_default 1
 
+%if %mdvver > 3000000
+# (tpg) enable LLD linker only on newer than 3.0x
+%bcond_without default_lld
+%endif
+
 %bcond_without gold
 
-%define ver 2.27.51
+%define ver 2.28
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -49,10 +54,10 @@ Version:	%{ver}_%{linaro}
 Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
 %else
 Version:	%{ver}
-Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
+Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.gz
 %endif
 Epoch:		1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -93,7 +98,6 @@ Patch02:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.2
 Patch03:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-ia64-lib64.patch
 # We don't want this one!
 #Patch04:	binutils-2.20.51.0.2-version.patch
-Patch04:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.23.52.0.1-addr2line-dynsymtab.patch
 Patch05:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.25-set-long-long.patch
 Patch07:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.10-sec-merge-emit.patch
 # we already set our own set of defaults...
@@ -145,6 +149,12 @@ Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
+
+Patch136:	binutils-2.27.90-fix-warnings.patch
+
+%if %{with default_lld}
+Requires:	lld
+%endif
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -200,7 +210,6 @@ to consider using libelf instead of BFD.
 %patch03 -p0 -b .ia64-lib64~
 %endif
 %endif
-%patch04 -p1 -b .addr2line~
 %patch05 -p1 -b .set-long-long~
 %patch07 -p1 -b .sec-merge-emit~
 %patch08 -p0 -b .cleansweep~
@@ -227,6 +236,10 @@ to consider using libelf instead of BFD.
 #%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
+%patch136 -p1 -b .warnings~
+
+# Need to regenerate lex files
+rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
 
 # Some distributions (e.g. Fedora 23 for Opteron A1100) use 64 kB pages on aarch64.
 # Adjust the page size so binaries built with our toolchain can run there.
@@ -573,17 +586,26 @@ cd -
 
 mkdir -p %{buildroot}%{_libdir}/bfd-plugins
 
-%if "%{cross}" != "%%{cross}"
-# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
-longplatform=$(grep ^target_alias= objs/Makefile |cut -d= -f2-)
-shortplatform="%{cross}"
-#shortplatform=$(echo $longplatform |cut -d- -f1)-$(echo $longplatform |cut -d- -f3)-$(echo $longplatform |cut -d- -f4)
-if [ "$longplatform" != "shortplatform" ]; then
-	cd %{buildroot}%{_bindir}
-	for i in $longplatform-*; do
-		ln -s $i $(echo $i |sed -e "s,$longplatform,$shortplatform,")
-	done
+if [ "%{cross}" != "%%{cross}" ]; then
+	# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
+	longplatform=$(grep ^target_alias= objs/Makefile |cut -d= -f2-)
+	shortplatform="%{cross}"
+	#shortplatform=$(echo $longplatform |cut -d- -f1)-$(echo $longplatform |cut -d- -f3)-$(echo $longplatform |cut -d- -f4)
+	if [ "$longplatform" != "shortplatform" ]; then
+		cd %{buildroot}%{_bindir}
+		for i in $longplatform-*; do
+			ln -s $i $(echo $i |sed -e "s,$longplatform,$shortplatform,")
+		done
+	fi
 fi
+
+%if %{with default_lld}
+# For now, let's keep %{_bindir}/ld in here even if it points
+# to lld...
+# Least surprise for now, but ultimately %{_bindir}/ld should
+# move to lld
+rm -f %{buildroot}%{_bindir}/ld
+ln -s ld.lld %{buildroot}%{_bindir}/ld
 %endif
 
 %if "%{name}" == "binutils"
