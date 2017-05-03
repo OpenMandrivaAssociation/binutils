@@ -599,6 +599,7 @@ if [ "%{cross}" != "%%{cross}" ]; then
 	fi
 fi
 
+%if !%{build_cross}
 %if %{with default_lld}
 # For now, let's keep %{_bindir}/ld in here even if it points
 # to lld...
@@ -606,6 +607,7 @@ fi
 # move to lld
 rm -f %{buildroot}%{_bindir}/ld
 ln -s ld.lld %{buildroot}%{_bindir}/ld
+%endif
 %endif
 
 %if "%{name}" == "binutils"
