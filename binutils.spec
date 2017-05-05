@@ -591,7 +591,7 @@ if [ "%{cross}" != "%%{cross}" ]; then
 	longplatform=$(grep ^target_alias= objs/Makefile |cut -d= -f2-)
 	shortplatform="%{cross}"
 	#shortplatform=$(echo $longplatform |cut -d- -f1)-$(echo $longplatform |cut -d- -f3)-$(echo $longplatform |cut -d- -f4)
-	if [ "$longplatform" != "shortplatform" ]; then
+	if [ "$longplatform" != "$shortplatform" ]; then
 		cd %{buildroot}%{_bindir}
 		for i in $longplatform-*; do
 			ln -s $i $(echo $i |sed -e "s,$longplatform,$shortplatform,")
