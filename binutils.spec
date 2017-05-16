@@ -36,10 +36,7 @@
 
 %define gold_default 1
 
-%if %mdvver > 3000000
-# (tpg) enable LLD linker only on newer than 3.0x
-%bcond_without default_lld
-%endif
+%bcond_with default_lld
 
 %bcond_without gold
 
@@ -57,7 +54,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.gz
 %endif
 Epoch:		1
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
