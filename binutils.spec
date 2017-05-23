@@ -1,36 +1,26 @@
+# Listed targets are short form and will be expanded by rpm
+# gnueabihf variants etc. are inserted by rpm into long_targets
+%global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
+%global long_targets %(
+	for i in %{targets}; do
+		CPU=$(echo $i |cut -d- -f1)
+		OS=$(if [ -n "$(echo $i |cut -d- -f4)" ]; then echo $i |cut -d- -f3; else echo $i |cut -d- -f4; fi)
+		echo -n "$(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/${CPU}-${OS}/macros --target=${CPU} -E %%{_target_platform}) "
+	done
+)
+
+
 %define _disable_lto 1
-#define cross aarch64-linux-gnu
 
 %define lib_major 2
-%define lib_name_orig %{package_prefix}%mklibname binutils
+%define lib_name_orig %mklibname binutils
 %define lib_name %{lib_name_orig}%{lib_major}
 %define dev_name %mklibname binutils -d
-
-# Allow SPU support for native PowerPC arches, not cross env packages
-%define spu_arches ppc ppc64
 
 # Define if building a cross-binutils
 %define build_cross 0
 %{expand: %{?cross:	%%global build_cross 1}}
 
-%if %{build_cross}
-%define target_cpu %{cross}
-%global	target_platform	%(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/%{target_cpu}-%{_target_os}/macros --target=%{target_cpu} -E %%{_target_platform})
-%if "%{target_cpu}" == "spu"
-%define target_platform %{target_cpu}-unknown-elf
-%endif
-%define program_prefix %{target_platform}-
-%define package_prefix cross-%{target_cpu}-
-%define	_srcrpmfilename	binutils-%{version}-%{release}.src.rpm
-%else
-%define target_cpu %{_target_cpu}
-%define target_platform %{_target_platform}
-%define program_prefix %{nil}
-%define package_prefix %{nil}
-%endif
-
-%define arch		%(echo %{target_cpu}|sed -e "s/\(i.86\|athlon\)/i386/" -e "s/amd64/x86_64/" -e "s/\(sun4.*\|sparcv[89]\)/sparc/")
-%define isarch()	%(case " %* " in (*" %{arch} "*) echo 1;; (*) echo 0;; esac)
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
 
@@ -45,7 +35,7 @@
 %define linaro_spin 0
 
 Summary:	GNU Binary Utility Development Utilities
-Name:		%{package_prefix}binutils
+Name:		binutils
 %if "%{linaro}" != ""
 Version:	%{ver}_%{linaro}
 Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
@@ -54,14 +44,11 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.gz
 %endif
 Epoch:		1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz.sign
-Source2:	build_cross_binutils.sh
-Source3:	spu_ovl.o
-Source4:	embedspu.sh
 Source5:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.19.50.0.1-output-format.sed
 Source10:	binutils.rpmlintrc
 # Wrapper scripts for ar, ranlib and nm that know how to deal with
@@ -69,9 +56,7 @@ Source10:	binutils.rpmlintrc
 Source100:	ar
 Source101:	ranlib
 Source102:	nm
-%if "%{name}" == "binutils"
 %rename		%{lib_name}
-%endif
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
@@ -170,15 +155,6 @@ Binutils is a collection of binary utilities, including:
 Install binutils if you need to perform any of these types of actions on
 binary files.  Most programmers will want to install binutils.
 
-%ifarch %{spu_arches}
-%package -n	spu-binutils
-Summary:	GNU Binary Utility Development Utilities for Cell SPU
-Group:		Development/Other
-
-%description -n	spu-binutils
-This package contains the binutils with Cell SPU support.
-%endif
-
 %package -n	%{dev_name}
 Summary:	Main library for %{name}
 Group:		Development/Other
@@ -202,19 +178,11 @@ to consider using libelf instead of BFD.
 %patch01 -p1 -b .libtool-lib64~
 # Needs porting, and we don't care about the target for now
 #patch02 -p1 -b .ppc64-pie~
-%if %isarch ia64
-%if "%{_lib}" == "lib64"
-%patch03 -p0 -b .ia64-lib64~
-%endif
-%endif
 %patch05 -p1 -b .set-long-long~
 %patch07 -p1 -b .sec-merge-emit~
 %patch08 -p0 -b .cleansweep~
 %patch09 -p1 -b .export-demangle-h~
 %patch10 -p1 -b .no-config-h-check~
-%if %isarch ppc64le
-%patch19 -p0 -b .ldforcele~
-%endif
 #patch21 -p1 -b .fatlto~
 %patch24 -p1 -b .warn~
 %patch26 -p1 -b .lto~
@@ -248,28 +216,7 @@ sed -i -e '/pagesize/s/0x1000,/0x10000,/' gold/aarch64.cc
 sed -i -e 's/^libbfd_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' bfd/Makefile.{am,in}
 sed -i -e 's/^libopcodes_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' opcodes/Makefile.{am,in}
 
-# for boostrapping, can be rebuilt afterwards in --enable-maintainer-mode
-cp %{SOURCE3} ld/emultempl/
-
-# glibc and musl have gettext built in -- no need to bundle
-# another copy...
-#rm -rf intl/*.h
-#for i in intl/*.c; do
-#	rm -f $i
-#	touch $i
-#done
-
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
-
-# (proyvind): for weird reasons, gold testsuite failes building on arm with
-# 'execvp: /bin/sh: Argument list too long' when invoking make...
-%ifarch %{arm}
-sed -e 's#2\.64#2.69#g' -i config/override.m4 gold/configure.ac configure.ac
-sed -e 's#testsuite##g' -i gold/Makefile.am
-find gold -name Makefile.in|xargs rm -f
-cd gold
-autoreconf -fiv
-%endif
 
 %if "%{_lib}" != "lib"
 # Fix bogus lib hardcodes...
@@ -277,222 +224,111 @@ sed -i -e 's,/lib/,/%{_lib}/,g' bfd/plugin.c
 sed -i -e 's,tooldir)/lib,tooldir)/%{_lib},g' gold/Makefile.*
 %endif
 
-%build
-# Additional targets
-ADDITIONAL_TARGETS=""
-case %{target_cpu} in
-ppc | powerpc)
-  ADDITIONAL_TARGETS="powerpc64-%{_target_vendor}-%{_target_os}"
-  ;;
-ppc64)
-  ADDITIONAL_TARGETS=""
-  ;;
-ia64)
-  ADDITIONAL_TARGETS="i586-%{_target_vendor}-%{_target_os}"
-  ;;
-i*86 | athlon*)
-  ADDITIONAL_TARGETS="x86_64-%{_target_vendor}-%{_target_os}"
-  ;;
-sparc*)
-  ADDITIONAL_TARGETS="sparc64-%{_target_vendor}-%{_target_os}"
-  ;;
-mipsel)
-  ADDITIONAL_TARGETS="mips64el-%{_target_vendor}-%{_target_os}"
-  ;;
-mips)
-  ADDITIONAL_TARGETS="mips64-%{_target_vendor}-%{_target_os}"
-  ;;
-arm*)
-  #ADDITIONAL_TARGETS="aarch64-linux-gnu"
-  ;;
-aarch64*)
-  #ADDITIONAL_TARGETS="armv7hl-linux-gnueabihf"
-  ;;
-esac
-%ifarch %{spu_arches}
-if [[ -n "$ADDITIONAL_TARGETS" ]]; then
-  ADDITIONAL_TARGETS="$ADDITIONAL_TARGETS,spu-unknown-elf"
-else
-  ADDITIONAL_TARGETS="spu-unknown-elf"
-fi
-%endif
-if [[ -n "$ADDITIONAL_TARGETS" ]]; then
-  TARGET_CONFIG="$TARGET_CONFIG --enable-targets=$ADDITIONAL_TARGETS"
-fi
-
-case %{target_cpu} in
-ppc | powerpc | i*86 | athlon* | sparc* | mips* | s390* | sh* | arm* | aarch64)
-  TARGET_CONFIG="$TARGET_CONFIG --enable-64-bit-bfd"
-  ;;
-esac
-
-%if "%{name}" != "binutils"
-%define _program_prefix %{program_prefix}
-TARGET_CONFIG="$TARGET_CONFIG --target=%{target_platform}"
-%endif
-
-# Don't build shared libraries in cross binutils
-%if "%{name}" == "binutils"
-TARGET_CONFIG="$TARGET_CONFIG --enable-shared --with-pic"
-%endif
-
-# Binutils comes with its own custom libtool
-# [gb] FIXME: but system libtool also works and has relink fix
-%define __libtoolize /bin/true
-
-# Build main binaries
-rm -rf objs
-mkdir objs
-pushd objs
 export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1"
-CONFIGURE_TOP=.. %configure $TARGET_CONFIG	--with-bugurl=%{bugurl} \
+for i in %{long_targets}; do
+	mkdir BUILD-$i
+	cd BUILD-$i
+	if [ "%{_target_platform}" = "$i" ]; then
+		# Native build -- we want shared libs here...
+		EXTRA_CONFIG="--enable-shared --with-pic"
+	else
+		# Cross build -- need to set program_prefix and friends...
+		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static"
+	fi
+	case $i in
+	i*86|athlon)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=x86_64-$(echo $i |cut -d- -f2-)"
+		;;
+	aarch64)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
+		;;
+	armv7*)
+		EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
+		;;
+	x86_64)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
+		;;
+	esac
+	CONFIGURE_TOP=.. %configure \
+		--enable-64-bit-bfd \
+		$EXTRA_CONFIG \
+		--with-bugurl=%{bugurl} \
 %if %{with gold}
 %if %{gold_default}
-						--enable-ld=yes \
-						--enable-gold=default \
+		--enable-ld=yes \
+		--enable-gold=default \
 %else
-						--enable-ld=default \
-						--enable-gold=yes \
+		--enable-ld=default \
+		--enable-gold=yes \
 %endif
 %else
-						--enable-ld=default \
-						--disable-gold \
+		--enable-ld=default \
+		--disable-gold \
 %endif
-						--enable-plugins \
-						--enable-threads \
+		--enable-plugins \
+		--enable-threads \
 %if "%{_lib}" == "lib64"
-						--with-lib-path=/%{_lib}:%{_libdir}:%{_prefix}/local/%{_lib}:/lib:%{_prefix}/lib:%{_prefix}/local/lib \
+		--with-lib-path=/%{_lib}:%{_libdir}:%{_prefix}/local/%{_lib}:/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib \
 %else
-						--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib \
+		--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib \
 %endif
-%if %isarch armv7l armv7hl
-						--with-cpu=cortex-a8 \
-						--with-tune=cortex-a8 \
-						--with-arch=armv7-a \
-						--with-mode=thumb \
-%if %isarch armv7l
-						--with-float=softfp \
-%else
-						--with-float=hard \
-%endif
-						--with-fpu=vfpv3-d16 \
-						--with-abi=aapcs-linux \
-%endif
-%if "%{distepoch}" < "2015"
-%ifnarch %{ix86}
-						--enable-lto \
-%endif
-%endif
-						--disable-werror \
-						--enable-static \
-						--enable-relro \
-						--with-separate-debug-dir=%{_prefix}/lib/debug \
-						--enable-initfini-array \
-						--with-system-zlib
-# There seems to be some problems with builds of gold randomly failing whenever
-# going through the build system, so let's try workaround this by trying to do
-# make once again when it happens...
-%make tooldir=%{_prefix}
+		--enable-lto \
+		--disable-werror \
+		--enable-static \
+		--enable-relro \
+		--with-separate-debug-dir=%{_prefix}/lib/debug \
+		--enable-initfini-array \
+		--with-system-zlib
+	cd ..
+done
 
-%if "%{name}" == "binutils"
-%make -C bfd/doc html
-mkdir -p ../html
-cp -f bfd/doc/bfd.html/* ../html
-popd
-%endif
+%build
+for i in %{long_targets}; do
+	cd BUILD-$i
+	%make
+	cd ..
+done
 
-# Build alternate binaries (spu-gas in particular)
-case "$ADDITIONAL_TARGETS," in
-%ifarch %{spu_arches}
-*spu-*-elf,*)
-  ALTERNATE_TARGETS="spu-unknown-elf"
-  ;;
-%endif
-*)
-  ;;
-esac
-if [[ -n "$ALTERNATE_TARGETS" ]]; then
-  for target in $ALTERNATE_TARGETS; do
-    cpu=`echo "$target" | sed -e "s/-.*//"`
-    rm -rf objs-$cpu
-    mkdir objs-$cpu
-    pushd objs-$cpu
-    CONFIGURE_TOP=.. %configure	--enable-shared \
-				--target=$target \
-				--program-prefix=$cpu- \
-%if "%{distepoch}" < "2012"
-				--enable-ld=default \
-				--enable-gold=yes \
-%else
-				--enable-ld=yes \
-				--enable-gold=default \
-%endif
-%if "%{distepoch}" < "2015"
-%ifnarch %{ix86}
-				--enable-lto \
-%endif
-%endif
-				--disable-werror \
-				--with-bugurl=%{bugurl} \
-				--enable-initfini-array \
-				--with-system-zlib
-    # make sure we use the fully built libbfd & libopcodes libs
-    # XXX could have been simpler to just pass $ADDITIONAL_TARGETS
-    # again to configure and rebuild all of those though...
-    for dso in bfd opcodes; do
-    %make all-$dso
-    rm -f $dso/.libs/lib$dso-%{version}.so
-    ln -s ../../../objs/$dso/.libs/lib$dso-%{version}.so $dso/.libs/
-    done
-    %make all-binutils all-gas all-ld
-    popd
-  done
-fi
+%make -C BUILD-%{_target_platform}/bfd/doc html
+mkdir -p html
+cp -f BUILD-%{_target_platform}/bfd/doc/bfd.html/* html
 
-%if !%{build_cross}
 %check
 # All Tests must pass on x86 and x86_64
 echo ====================TESTING=========================
 # workaround for not using colorgcc when building due to colorgcc
-# messes up output redirection..
+# messing up output redirection..
 PATH=${PATH#%{_datadir}/colorgcc:}
-%if %isarch i386|x86_64|ppc|ppc64|spu
-%make -k -C objs check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
-[[ -d objs-spu ]] && \
-%make -C objs-spu check-gas CFLAGS="" CXXFLAGS="" LDFLAGS=""
-%else
-%make -C objs -k check CFLAGS="" CXXFLAGS="" LDFLAGS="" || echo make check failed
-%endif
+%make -k -C BUILD-%{_target_platform} check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 echo ====================TESTING END=====================
 
 logfile="%{name}-%{version}-%{release}.log"
 rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
-%endif
 
 %install
-mkdir -p %{buildroot}%{_prefix}
-%makeinstall_std -C objs
+for i in %{long_targets}; do
+	[ "$i" = "%{_target_platform}" ] && continue
+	cd BUILD-$i
+	%makeinstall_std
+	cd ..
+done
+# We install the native version last to make sure we get all
+# the man pages etc. for the native version rather than a random
+# cross compiler that happens to go last
+cd BUILD-%{_target_platform}
+%makeinstall_std
+cp libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
+cd ..
 
-rm -f %{buildroot}%{_mandir}/man1/{dlltool,nlmconv,windres}*
+rm -f %{buildroot}%{_mandir}/man1/*{dlltool,nlmconv,windres}*
 rm -f %{buildroot}%{_infodir}/dir
-rm -f %{buildroot}%{_libdir}/lib{bfd,opcodes}.so
 
-%if "%{name}" == "binutils"
-make -C objs prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
-install -m 644 include/libiberty.h %{buildroot}%{_includedir}/
-if [ -e objs/libiberty/pic/libiberty.a ]; then
-	# Ship with the PIC libiberty
-	install -m 644 objs/libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
-else
-	install -m 644 objs/libiberty/libiberty.a %{buildroot}%{_libdir}/
-fi
-rm -rf %{buildroot}%{_prefix}/%{_target_platform}/
+# [ -d BUILD-%{_target_platform} ] && %make -C BUILD-%{_target_platform} prefix=%{buildroot}%{_prefix} infodir=%{buildroot}%{_infodir} install-info
 
 # Sanity check --enable-64-bit-bfd really works.
 grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
 # Fix multilib conflicts of generated values by __WORDSIZE-based expressions.
-%if %isarch %{ix86} x86_64 ppc ppc64 s390 s390x sh3 sh4 sparc sparc64 %{arm}
 sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
     -e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
     -e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
@@ -503,11 +339,10 @@ sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
 #endif/' \
     -e 's/^#define BFD_HOST_U_64_BIT unsigned \(long \)\?long *$/#define BFD_HOST_U_64_BIT unsigned BFD_HOST_64_BIT/' \
     %{buildroot}%{_prefix}/include/bfd.h
-%endif
 touch -r bfd/bfd-in2.h %{buildroot}%{_prefix}/include/bfd.h
 
 # Generate .so linker scripts for dependencies; imported from glibc/Makerules:
-
+rm -f %{buildroot}%{_libdir}/libbfd.so %{buildroot}%{_libdir}/libopcodes.so
 # This fragment of linker script gives the OUTPUT_FORMAT statement
 # for the configuration we are building.
 OUTPUT_FORMAT="\
@@ -532,44 +367,23 @@ $OUTPUT_FORMAT
 INPUT ( %{_libdir}/libopcodes.a -lbfd -lz )
 EOH
 
-# Symlinks for compatibility with crosscompilers
-cd %buildroot%_bindir
+cd %{buildroot}%{_bindir}
+# Symlinks for native tools compatibility with crosscompilers
 for i in *; do
-	ln -s $i %_target_platform-$i
+	echo $i |grep -q -- - && continue
+	[ -e %{_target_platform}-$i ] || ln -s $i %{_target_platform}-$i
+done
+
+# Default ld, if one is missing...
+for i in *-ld.bfd; do
+	[ -e ${i/.bfd/} ] || ln -s $i ${i/.bfd}
 done
 cd -
 
-%else
-if [ -f "%{buildroot}%{_bindir}/%{target_platform}-ld.bfd" -a ! -e "%{buildroot}%{_bindir}/%{target_platform}-ld" ]; then
-	ln -s %{target_platform}-ld.bfd "%{buildroot}%{_bindir}/%{target_platform}-ld"
-fi
-rm -f  %{buildroot}%{_libdir}/libiberty.a
-rm -rf %{buildroot}%{_infodir}
-rm -rf %{buildroot}%{_datadir}/locale/
-rm -f  %{buildroot}%{_prefix}/%{_target_platform}/%{target_cpu}-linux/lib/*.la
-%endif
+rm -f  %{buildroot}%{_prefix}/*/*/lib/*.la
 
-%if "%{name}" == "binutils"
 %find_lang binutils --all-name
-%endif
 
-# Alternate binaries
-[[ -d objs-spu ]] && {
-destdir=`mktemp -d`
-make -C objs-spu DESTDIR=$destdir install-binutils install-gas install-ld
-mv $destdir%{_bindir}/spu-* %{buildroot}%{_bindir}/
-mkdir -p %{buildroot}%{_prefix}/spu/bin
-mv $destdir%{_prefix}/spu-unknown-elf/bin/* %{buildroot}%{_prefix}/spu/bin/
-rm -rf $destdir
-cat > %{buildroot}%{_bindir}/ppu-as << EOF
-#!/bin/sh
-exec %{_bindir}/as -mcell -maltivec \${1+"\$@"}
-EOF
-chmod +x %{buildroot}%{_bindir}/ppu-as
-install -m 755 %{SOURCE4} %{buildroot}%{_bindir}/embedspu
-}
-
-%if "%{name}" == "binutils"
 # Replace ar, ranlib and nm with LTO friendly wrappers
 cd %{buildroot}%{_bindir}
 mv ar binutils-ar
@@ -579,24 +393,29 @@ install -c -m 755 %{SOURCE100} ar
 install -c -m 755 %{SOURCE101} ranlib
 install -c -m 755 %{SOURCE102} nm
 cd -
-%endif
 
 mkdir -p %{buildroot}%{_libdir}/bfd-plugins
 
-if [ "%{cross}" != "%%{cross}" ]; then
+for i in %{long_targets}; do
 	# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
-	longplatform=$(grep ^target_alias= objs/Makefile |cut -d= -f2-)
-	shortplatform="%{cross}"
-	#shortplatform=$(echo $longplatform |cut -d- -f1)-$(echo $longplatform |cut -d- -f3)-$(echo $longplatform |cut -d- -f4)
-	if [ "$longplatform" != "$shortplatform" ]; then
+	longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
+	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
+		shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
 		cd %{buildroot}%{_bindir}
-		for i in $longplatform-*; do
-			ln -s $i $(echo $i |sed -e "s,$longplatform,$shortplatform,")
+		for j in $longplatform-*; do
+			ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
 		done
+		cd -
 	fi
-fi
+	if [ "$longplatform" != "$i" ]; then
+		cd %{buildroot}%{_bindir}
+		for j in $longplatform-*; do
+			ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
+		done
+		cd -
+	fi
+done
 
-%if !%{build_cross}
 %if %{with default_lld}
 # For now, let's keep %{_bindir}/ld in here even if it points
 # to lld...
@@ -605,57 +424,59 @@ fi
 rm -f %{buildroot}%{_bindir}/ld
 ln -s ld.lld %{buildroot}%{_bindir}/ld
 %endif
-%endif
 
-%if "%{name}" == "binutils"
 %files -f binutils.lang
-%else
-%files
-%endif
-%{_bindir}/*addr2line
-%{_bindir}/*ar
-%{_bindir}/*as
-%{_bindir}/*c++filt
-%optional %{_bindir}/*dwp
-%{_bindir}/*elfedit
-%{_bindir}/*gprof
-%{_bindir}/*ld
-%{_bindir}/*ld.bfd
-%{_bindir}/*nm
-%{_bindir}/*objcopy
-%{_bindir}/*objdump
-%{_bindir}/*ranlib
-%{_bindir}/*readelf
-%{_bindir}/*size
-%{_bindir}/*strings
-%{_bindir}/*strip
-%ifarch %{spu_arches}
-%{_bindir}/ppu-as
-%endif
+%{_bindir}/addr2line
+%{_bindir}/ar
+%{_bindir}/binutils-ar
+%{_bindir}/as
+%{_bindir}/c++filt
+%optional %{_bindir}/dwp
+%{_bindir}/elfedit
+%{_bindir}/gprof
+%{_bindir}/ld
+%{_bindir}/ld.bfd
+%optional %{_bindir}/ld.gold
+%{_bindir}/nm
+%{_bindir}/binutils-nm
+%{_bindir}/objcopy
+%{_bindir}/objdump
+%{_bindir}/ranlib
+%{_bindir}/binutils-ranlib
+%{_bindir}/readelf
+%{_bindir}/size
+%{_bindir}/strings
+%{_bindir}/strip
+%{_bindir}/%{_target_platform}-addr2line
+%{_bindir}/%{_target_platform}-ar
+%{_bindir}/%{_target_platform}-as
+%{_bindir}/%{_target_platform}-c++filt
+%optional %{_bindir}/%{_target_platform}-dwp
+%{_bindir}/%{_target_platform}-elfedit
+%{_bindir}/%{_target_platform}-gprof
+%{_bindir}/%{_target_platform}-ld
+%{_bindir}/%{_target_platform}-ld.bfd
+%optional %{_bindir}/%{_target_platform}-ld.gold
+%{_bindir}/%{_target_platform}-nm
+%{_bindir}/%{_target_platform}-objcopy
+%{_bindir}/%{_target_platform}-objdump
+%{_bindir}/%{_target_platform}-ranlib
+%{_bindir}/%{_target_platform}-readelf
+%{_bindir}/%{_target_platform}-size
+%{_bindir}/%{_target_platform}-strings
+%{_bindir}/%{_target_platform}-strip
 %{_libdir}/bfd-plugins
 %{_mandir}/man1/*
-%if "%{name}" == "binutils"
 %{_infodir}/*info*
 %{_libdir}/libbfd-*.so
 %{_libdir}/libopcodes-*.so
-%else
-%dir %{_prefix}/%{target_platform}/
-%dir %{_prefix}/%{target_platform}/bin/
-%{_prefix}/%{target_platform}/bin/*
-%dir %{_prefix}/%{target_platform}/lib
-%dir %{_prefix}/%{target_platform}/lib/ldscripts
-%{_prefix}/%{target_platform}/lib/ldscripts/*
-%endif
+%{_prefix}/%{_target_platform}
+%(
+if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
+	echo "%{_bindir}/$(echo %{_target_platform} |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
+fi
+)
 
-%ifarch %{spu_arches}
-%files -n spu-binutils
-%{_bindir}/spu-*
-%{_bindir}/embedspu
-%dir %{_prefix}/spu/bin
-%{_prefix}/spu/bin
-%endif
-
-%if "%{name}" == "binutils"
 %files -n %{dev_name}
 %doc html
 %{_includedir}/*.h
@@ -664,4 +485,27 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
 %{_libdir}/libiberty.a
-%endif
+
+%(
+for i in %{long_targets}; do
+	[ "$i" = "%{_target_platform}" ] && continue
+	cat <<EOF
+%package -n cross-${i}-binutils
+Summary: Binutils for crosscompiling to ${i}
+Group: Development/Other
+
+%description -n cross-${i}-binutils
+Binutils for crosscompiling to ${i}
+
+%files -n cross-${i}-binutils
+%{_prefix}/${i}
+%{_bindir}/${i}-*
+EOF
+
+	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
+		shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
+		echo "%{_bindir}/${shortplatform}-*"
+	fi
+	echo
+done
+)
