@@ -232,6 +232,11 @@ for i in %{long_targets}; do
 	if [ "%{_target_platform}" = "$i" ]; then
 		# Native build -- we want shared libs here...
 		EXTRA_CONFIG="--enable-shared --with-pic"
+%ifarch %{arm}
+		# FIXME as of 2.28, gold seems to be unstable on 32-bit ARM
+		# This should be removed when it stabilizes
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-ld=default --enable-gold=yes"
+%endif
 	else
 		# Cross build -- need to set program_prefix and friends...
 		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static"
@@ -252,7 +257,6 @@ for i in %{long_targets}; do
 	esac
 	CONFIGURE_TOP=.. %configure \
 		--enable-64-bit-bfd \
-		$EXTRA_CONFIG \
 		--with-bugurl=%{bugurl} \
 %if %{with gold}
 %if %{gold_default}
@@ -266,6 +270,7 @@ for i in %{long_targets}; do
 		--enable-ld=default \
 		--disable-gold \
 %endif
+		$EXTRA_CONFIG \
 		--enable-plugins \
 		--enable-threads \
 %if "%{_lib}" == "lib64"
