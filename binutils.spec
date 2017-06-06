@@ -1,10 +1,10 @@
 # Listed targets are short form and will be expanded by rpm
 # gnueabihf variants etc. are inserted by rpm into long_targets
-%global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
+%global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux x32-linux aarch64-linuxmusl armv7hl-linuxmusl i586-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl
 %global long_targets %(
 	for i in %{targets}; do
 		CPU=$(echo $i |cut -d- -f1)
-		OS=$(if [ -n "$(echo $i |cut -d- -f4)" ]; then echo $i |cut -d- -f3; else echo $i |cut -d- -f4; fi)
+		OS=$(echo $i |cut -d- -f2)
 		echo -n "$(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/${CPU}-${OS}/macros --target=${CPU} -E %%{_target_platform}) "
 	done
 )
