@@ -44,7 +44,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.gz
 %endif
 Epoch:		1
-Release:	4
+Release:	5
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -232,14 +232,9 @@ for i in %{long_targets}; do
 	if [ "%{_target_platform}" = "$i" ]; then
 		# Native build -- we want shared libs here...
 		EXTRA_CONFIG="--enable-shared --with-pic"
-%ifarch %{arm}
-		# FIXME as of 2.28, gold seems to be unstable on 32-bit ARM
-		# This should be removed when it stabilizes
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-ld=default --enable-gold=yes"
-%endif
 	else
 		# Cross build -- need to set program_prefix and friends...
-		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static"
+		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
 	fi
 	case $i in
 	i*86|athlon)
@@ -255,6 +250,13 @@ for i in %{long_targets}; do
 		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
 		;;
 	esac
+
+	if echo $i |grep -qE '^arm'; then
+		# FIXME as of 2.28, gold seems to be unstable when linking 32-bit ARM code
+		# This should be removed when it stabilizes
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-ld=default --enable-gold=yes"
+	fi
+
 	CONFIGURE_TOP=.. %configure \
 		--enable-64-bit-bfd \
 		--with-bugurl=%{bugurl} \
@@ -317,6 +319,7 @@ for i in %{long_targets}; do
 	cd BUILD-$i
 	%makeinstall_std
 	cd ..
+	mkdir -p %{buildroot}%{_prefix}/$i/include
 done
 # We install the native version last to make sure we get all
 # the man pages etc. for the native version rather than a random
