@@ -17,6 +17,10 @@
 %define lib_name %{lib_name_orig}%{lib_major}
 %define dev_name %mklibname binutils -d
 
+%ifarch %{arm}
+%global optflags %{optflags} -fuse-ld=bfd
+%endif
+
 # Define if building a cross-binutils
 %define build_cross 0
 %{expand: %{?cross:	%%global build_cross 1}}
