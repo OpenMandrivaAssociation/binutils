@@ -34,7 +34,7 @@
 
 %bcond_without gold
 
-%define ver 2.28.51
+%define ver 2.28.90
 %define linaro %{nil}
 %define linaro_spin 0
 
