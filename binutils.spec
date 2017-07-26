@@ -34,7 +34,7 @@
 
 %bcond_without gold
 
-%define ver 2.28.90
+%define ver 2.29
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -48,7 +48,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	5
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -137,6 +137,7 @@ Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
+Patch137:	binutils-2.29-clang-5.0.patch
 
 %if %{with default_lld}
 Requires:	lld
@@ -206,6 +207,7 @@ to consider using libelf instead of BFD.
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
 %patch136 -p1 -b .warnings~
+%patch137 -p1 -b .clang5~
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
