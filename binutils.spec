@@ -34,7 +34,7 @@
 
 %bcond_without gold
 
-%define ver 2.29
+%define ver 2.29.0
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -48,7 +48,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -207,7 +207,7 @@ to consider using libelf instead of BFD.
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
 %patch136 -p1 -b .warnings~
-%patch137 -p1 -b .clang5~
+#patch137 -p1 -b .clang5~
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c

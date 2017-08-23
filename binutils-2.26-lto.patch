@@ -1,5 +1,5 @@
---- binutils-2.28.51/bfd/bfd.c.lto~	2017-06-07 14:54:13.466052518 +0200
-+++ binutils-2.28.51/bfd/bfd.c	2017-06-17 18:57:51.806347277 +0200
+--- binutils-2.29.0/bfd/bfd.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/bfd.c	2017-08-23 20:00:33.092473188 +0200
 @@ -57,6 +57,14 @@ CODE_FRAGMENT
  .    bfd_byte data[1];
  .  };
@@ -35,7 +35,7 @@
  .  {* The number of sections.  *}
  .  unsigned int section_count;
  .
-@@ -2290,3 +2304,36 @@ bfd_convert_section_contents (bfd *ibfd,
+@@ -2314,3 +2328,36 @@ bfd_convert_section_contents (bfd *ibfd,
    *ptr_size = size;
    return TRUE;
  }
@@ -72,8 +72,8 @@
 +    }
 +  return NULL;
 +}
---- binutils-2.28.51/bfd/bfd-in2.h.lto~	2017-06-17 18:57:51.803347349 +0200
-+++ binutils-2.28.51/bfd/bfd-in2.h	2017-06-17 18:57:51.807347252 +0200
+--- binutils-2.29.0/bfd/bfd-in2.h.lto~	2017-08-23 20:00:33.088473197 +0200
++++ binutils-2.29.0/bfd/bfd-in2.h	2017-08-23 20:00:33.093473186 +0200
 @@ -1119,6 +1119,9 @@ bfd_boolean bfd_fill_in_gnu_debuglink_se
  
  char *bfd_follow_build_id_debuglink (bfd *abfd, const char *dir);
@@ -94,7 +94,7 @@
  /* Pointer to the common section.  */
  #define bfd_com_section_ptr (&_bfd_std_section[0])
  /* Pointer to the undefined section.  */
-@@ -6711,6 +6717,14 @@ struct bfd_build_id
+@@ -6713,6 +6719,14 @@ struct bfd_build_id
      bfd_byte data[1];
    };
  
@@ -109,7 +109,7 @@
  struct bfd
  {
    /* The filename the application opened the BFD with.  */
-@@ -6889,6 +6903,9 @@ struct bfd
+@@ -6891,6 +6905,9 @@ struct bfd
    /* Set if this is a plugin output file.  */
    unsigned int lto_output : 1;
  
@@ -119,7 +119,7 @@
    /* Set to dummy BFD created when claimed by a compiler plug-in
       library.  */
    bfd *plugin_dummy_bfd;
-@@ -6914,6 +6931,9 @@ struct bfd
+@@ -6916,6 +6933,9 @@ struct bfd
    /* The last section on the section list.  */
    struct bfd_section *section_last;
  
@@ -129,7 +129,7 @@
    /* The number of sections.  */
    unsigned int section_count;
  
-@@ -7227,6 +7247,8 @@ bfd_boolean bfd_convert_section_contents
+@@ -7229,6 +7249,8 @@ bfd_boolean bfd_convert_section_contents
     (bfd *ibfd, asection *isec, bfd *obfd,
      bfd_byte **ptr, bfd_size_type *ptr_size);
  
@@ -138,9 +138,9 @@
  /* Extracted from archive.c.  */
  symindex bfd_get_next_mapent
     (bfd *abfd, symindex previous, carsym **sym);
---- binutils-2.28.51/bfd/elf.c.lto~	2017-06-07 14:54:13.491051934 +0200
-+++ binutils-2.28.51/bfd/elf.c	2017-06-17 18:57:51.808347228 +0200
-@@ -2595,6 +2595,7 @@ static const struct bfd_elf_special_sect
+--- binutils-2.29.0/bfd/elf.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/elf.c	2017-08-23 20:00:33.094473183 +0200
+@@ -2602,6 +2602,7 @@ static const struct bfd_elf_special_sect
    { STRING_COMMA_LEN (".gnu.linkonce.b"), -2, SHT_NOBITS,      SHF_ALLOC + SHF_WRITE },
    { STRING_COMMA_LEN (".gnu.lto_"),       -1, SHT_PROGBITS,    SHF_EXCLUDE },
    { STRING_COMMA_LEN (".got"),             0, SHT_PROGBITS,    SHF_ALLOC + SHF_WRITE },
@@ -148,8 +148,8 @@
    { STRING_COMMA_LEN (".gnu.version"),     0, SHT_GNU_versym,  0 },
    { STRING_COMMA_LEN (".gnu.version_d"),   0, SHT_GNU_verdef,  0 },
    { STRING_COMMA_LEN (".gnu.version_r"),   0, SHT_GNU_verneed, 0 },
---- binutils-2.28.51/bfd/format.c.lto~	2017-06-07 14:54:13.539050813 +0200
-+++ binutils-2.28.51/bfd/format.c	2017-06-17 18:57:51.808347228 +0200
+--- binutils-2.29.0/bfd/format.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/format.c	2017-08-23 20:00:33.094473183 +0200
 @@ -46,6 +46,9 @@ SUBSECTION
  #include "sysdep.h"
  #include "bfd.h"
@@ -229,9 +229,9 @@
        /* File position has moved, BTW.  */
        return TRUE;
      }
---- binutils-2.28.51/bfd/opncls.c.lto~	2017-06-17 18:57:51.808347228 +0200
-+++ binutils-2.28.51/bfd/opncls.c	2017-06-18 12:42:05.054770036 +0200
-@@ -2042,3 +2042,69 @@ bfd_follow_build_id_debuglink (bfd *abfd
+--- binutils-2.29.0/bfd/opncls.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/opncls.c	2017-08-23 20:00:33.094473183 +0200
+@@ -2056,3 +2056,69 @@ bfd_follow_build_id_debuglink (bfd *abfd
  				   get_build_id_name,
  				   check_build_id_file, &build_id);
  }
@@ -301,8 +301,8 @@
 +  fclose (file);
 +  return name;
 +}
---- binutils-2.28.51/bfd/plugin.c.lto~	2017-06-17 18:50:53.443564509 +0200
-+++ binutils-2.28.51/bfd/plugin.c	2017-06-17 18:57:51.809347204 +0200
+--- binutils-2.29.0/bfd/plugin.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/plugin.c	2017-08-23 20:00:33.094473183 +0200
 @@ -132,6 +132,146 @@ register_claim_file (ld_plugin_claim_fil
    return LDPS_OK;
  }
@@ -525,8 +525,8 @@
    return nsyms;
  }
  
---- binutils-2.28.51/bfd/plugin.h.lto~	2017-06-07 14:54:13.551050533 +0200
-+++ binutils-2.28.51/bfd/plugin.h	2017-06-17 18:57:51.809347204 +0200
+--- binutils-2.29.0/bfd/plugin.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/plugin.h	2017-08-23 20:00:33.094473183 +0200
 @@ -33,6 +33,8 @@ typedef struct plugin_data_struct
  {
    int nsyms;
@@ -536,8 +536,8 @@
  }
  plugin_data_struct;
  
---- binutils-2.28.51/bfd/section.c.lto~	2017-06-07 14:54:13.567050159 +0200
-+++ binutils-2.28.51/bfd/section.c	2017-06-17 18:57:51.809347204 +0200
+--- binutils-2.29.0/bfd/section.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/bfd/section.c	2017-08-23 20:00:33.095473181 +0200
 @@ -591,6 +591,9 @@ CODE_FRAGMENT
  .#define BFD_COM_SECTION_NAME "*COM*"
  .#define BFD_IND_SECTION_NAME "*IND*"
@@ -548,9 +548,9 @@
  .{* Pointer to the common section.  *}
  .#define bfd_com_section_ptr (&_bfd_std_section[0])
  .{* Pointer to the undefined section.  *}
---- binutils-2.28.51/binutils/readelf.c.lto~	2017-06-07 14:54:13.612049108 +0200
-+++ binutils-2.28.51/binutils/readelf.c	2017-06-17 18:57:51.810347179 +0200
-@@ -4115,6 +4115,7 @@ get_section_type_name (unsigned int sh_t
+--- binutils-2.29.0/binutils/readelf.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/binutils/readelf.c	2017-08-23 20:00:33.096473179 +0200
+@@ -4130,6 +4130,7 @@ get_section_type_name (unsigned int sh_t
      case 0x7ffffffd:		return "AUXILIARY";
      case 0x7fffffff:		return "FILTER";
      case SHT_GNU_LIBLIST:	return "GNU_LIBLIST";
@@ -558,24 +558,24 @@
  
      default:
        if ((sh_type >= SHT_LOPROC) && (sh_type <= SHT_HIPROC))
---- binutils-2.28.51/gas/testsuite/gas/elf/section9.d.lto~	2017-06-07 14:54:13.823044180 +0200
-+++ binutils-2.28.51/gas/testsuite/gas/elf/section9.d	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/gas/testsuite/gas/elf/section9.d.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/gas/testsuite/gas/elf/section9.d	2017-08-23 20:00:33.096473179 +0200
 @@ -4,4 +4,5 @@
  #...
  [ 	]*\[.*\][ 	]+\.gnu\.lto_main[ 	]+PROGBITS.*[ 	]+E[   ]+.*
  [ 	]*\[.*\][ 	]+\.gnu\.lto_\.pureconst[ 	]+PROGBITS.*[ 	]+E[   ]+.*
 +[ 	]*\[.*\][ 	]+\.gnu_object_only[ 	]+GNU_OBJECT_ONLY.*[ 	]+E[   ]+.*
  #pass
---- binutils-2.28.51/gas/testsuite/gas/elf/section9.s.lto~	2017-06-07 14:54:13.823044180 +0200
-+++ binutils-2.28.51/gas/testsuite/gas/elf/section9.s	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/gas/testsuite/gas/elf/section9.s.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/gas/testsuite/gas/elf/section9.s	2017-08-23 20:00:33.096473179 +0200
 @@ -2,3 +2,5 @@
  	.byte 0,0,0,0
  	.section .gnu.lto_.pureconst,"",%progbits
  	.byte 0,0,0,0
 +	.section .gnu_object_only
 +	.byte 0,0,0,0
---- binutils-2.28.51/include/bfdlink.h.lto~	2017-06-17 18:50:53.537562192 +0200
-+++ binutils-2.28.51/include/bfdlink.h	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/include/bfdlink.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/include/bfdlink.h	2017-08-23 20:00:33.096473179 +0200
 @@ -436,6 +436,12 @@ struct bfd_link_info
    /* TRUE if ok to have multiple definition.  */
    unsigned int allow_multiple_definition: 1;
@@ -589,8 +589,8 @@
    /* TRUE if ok to have version with no definition.  */
    unsigned int allow_undefined_version: 1;
  
---- binutils-2.28.51/include/elf/common.h.lto~	2017-06-07 14:54:14.460029302 +0200
-+++ binutils-2.28.51/include/elf/common.h	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/include/elf/common.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/include/elf/common.h	2017-08-23 20:00:33.096473179 +0200
 @@ -502,6 +502,7 @@
  #define SHT_GNU_ATTRIBUTES 0x6ffffff5	/* Object attributes */
  #define SHT_GNU_HASH	0x6ffffff6	/* GNU style symbol hash table */
@@ -599,8 +599,8 @@
  
  /* The next three section types are defined by Solaris, and are named
     SHT_SUNW*.  We use them in GNU code, so we also define SHT_GNU*
---- binutils-2.28.51/ld/emultempl/aarch64elf.em.lto~	2017-06-07 14:54:14.493028531 +0200
-+++ binutils-2.28.51/ld/emultempl/aarch64elf.em	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/ld/emultempl/aarch64elf.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/aarch64elf.em	2017-08-23 20:00:33.097473176 +0200
 @@ -273,7 +273,7 @@ gld${EMULATION_NAME}_after_allocation (v
  }
  
@@ -625,8 +625,8 @@
  # Call the extra arm-elf function
 -LDEMUL_FINISH=gld${EMULATION_NAME}_finish
 +LDEMUL_FINISH=aarch64_finish
---- binutils-2.28.51/ld/emultempl/alphaelf.em.lto~	2017-06-07 14:54:14.493028531 +0200
-+++ binutils-2.28.51/ld/emultempl/alphaelf.em	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/ld/emultempl/alphaelf.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/alphaelf.em	2017-08-23 20:00:33.097473176 +0200
 @@ -104,7 +104,7 @@ alpha_finish (void)
    if (limit_32bit)
      elf_elfheader (link_info.output_bfd)->e_flags |= EF_ALPHA_32BIT;
@@ -636,8 +636,8 @@
  }
  EOF
  
---- binutils-2.28.51/ld/emultempl/armelf.em.lto~	2017-06-07 14:54:14.493028531 +0200
-+++ binutils-2.28.51/ld/emultempl/armelf.em	2017-06-17 18:57:51.811347155 +0200
+--- binutils-2.29.0/ld/emultempl/armelf.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/armelf.em	2017-08-23 20:00:33.097473176 +0200
 @@ -414,7 +414,7 @@ gld${EMULATION_NAME}_after_allocation (v
  }
  
@@ -662,19 +662,19 @@
  # Call the extra arm-elf function
 -LDEMUL_FINISH=gld${EMULATION_NAME}_finish
 +LDEMUL_FINISH=arm_finish
---- binutils-2.28.51/ld/emultempl/avrelf.em.lto~	2017-06-07 14:54:14.493028531 +0200
-+++ binutils-2.28.51/ld/emultempl/avrelf.em	2017-06-17 18:57:51.811347155 +0200
-@@ -209,7 +209,7 @@ avr_finish (void)
-   else
-     elf_elfheader (abfd)->e_flags &= ~EF_AVR_LINKRELAX_PREPARED;
+--- binutils-2.29.0/ld/emultempl/avrelf.em.lto~	2017-08-23 20:00:33.097473176 +0200
++++ binutils-2.29.0/ld/emultempl/avrelf.em	2017-08-23 20:01:18.084369543 +0200
+@@ -225,7 +225,7 @@ avr_finish (void)
+ 	elf_elfheader (abfd)->e_flags &= ~EF_AVR_LINKRELAX_PREPARED;
+     }
  
 -  finish_default ();
 +  gld${EMULATION_NAME}_finish ();
  }
  EOF
  
---- binutils-2.28.51/ld/emultempl/elf32.em.lto~	2017-06-17 18:50:53.540562118 +0200
-+++ binutils-2.28.51/ld/emultempl/elf32.em	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/emultempl/elf32.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/elf32.em	2017-08-23 20:01:38.869321612 +0200
 @@ -66,6 +66,7 @@ static void gld${EMULATION_NAME}_before_
  static void gld${EMULATION_NAME}_after_allocation (void);
  static lang_output_section_statement_type *gld${EMULATION_NAME}_place_orphan
@@ -683,8 +683,8 @@
  EOF
  
  if [ "x${USE_LIBPATH}" = xyes ] ; then
-@@ -2006,6 +2007,8 @@ output_rel_find (asection *sec, int isdy
-   return last;
+@@ -2031,6 +2032,8 @@ elf_orphan_compatible (asection *in, ase
+ 					  in->owner, in);
  }
  
 +static int orphan_init_done = 0;
@@ -692,7 +692,7 @@
  /* Place an orphan section.  We use this to put random SHF_ALLOC
     sections in the right segment.  */
  
-@@ -2014,7 +2017,7 @@ gld${EMULATION_NAME}_place_orphan (asect
+@@ -2039,7 +2042,7 @@ gld${EMULATION_NAME}_place_orphan (asect
  				   const char *secname,
  				   int constraint)
  {
@@ -701,7 +701,7 @@
      {
        { ".text",
  	SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_READONLY | SEC_CODE,
-@@ -2044,6 +2047,7 @@ gld${EMULATION_NAME}_place_orphan (asect
+@@ -2069,6 +2072,7 @@ gld${EMULATION_NAME}_place_orphan (asect
  	SEC_HAS_CONTENTS,
  	0, 0, 0, 0 },
      };
@@ -709,7 +709,7 @@
    enum orphan_save_index
      {
        orphan_text = 0,
-@@ -2056,7 +2060,6 @@ gld${EMULATION_NAME}_place_orphan (asect
+@@ -2081,7 +2085,6 @@ gld${EMULATION_NAME}_place_orphan (asect
        orphan_sdata,
        orphan_nonalloc
      };
@@ -717,7 +717,7 @@
    struct orphan_save *place;
    lang_output_section_statement_type *after;
    lang_output_section_statement_type *os;
-@@ -2186,15 +2189,22 @@ gld${EMULATION_NAME}_place_orphan (asect
+@@ -2207,15 +2210,22 @@ gld${EMULATION_NAME}_place_orphan (asect
  
    if (!orphan_init_done)
      {
@@ -741,7 +741,7 @@
        orphan_init_done = 1;
      }
  
-@@ -2286,6 +2296,27 @@ gld${EMULATION_NAME}_place_orphan (asect
+@@ -2307,6 +2317,27 @@ gld${EMULATION_NAME}_place_orphan (asect
  EOF
  fi
  
@@ -769,7 +769,7 @@
  if test x"$LDEMUL_AFTER_ALLOCATION" != xgld"$EMULATION_NAME"_after_allocation; then
  fragment <<EOF
  
-@@ -2785,7 +2816,7 @@ struct ld_emulation_xfer_struct ld_${EMU
+@@ -2806,7 +2837,7 @@ struct ld_emulation_xfer_struct ld_${EMU
    ${LDEMUL_GET_SCRIPT-gld${EMULATION_NAME}_get_script},
    "${EMULATION_NAME}",
    "${OUTPUT_FORMAT}",
@@ -778,8 +778,8 @@
    ${LDEMUL_CREATE_OUTPUT_SECTION_STATEMENTS-NULL},
    ${LDEMUL_OPEN_DYNAMIC_ARCHIVE-gld${EMULATION_NAME}_open_dynamic_archive},
    ${LDEMUL_PLACE_ORPHAN-gld${EMULATION_NAME}_place_orphan},
---- binutils-2.28.51/ld/emultempl/ppc32elf.em.lto~	2017-06-07 14:54:14.495028485 +0200
-+++ binutils-2.28.51/ld/emultempl/ppc32elf.em	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/emultempl/ppc32elf.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/ppc32elf.em	2017-08-23 20:00:33.097473176 +0200
 @@ -211,7 +211,7 @@ ppc_finish (void)
  {
    if (params.ppc476_workaround)
@@ -789,8 +789,8 @@
  }
  
  EOF
---- binutils-2.28.51/ld/emultempl/ppc64elf.em.lto~	2017-06-07 14:54:14.495028485 +0200
-+++ binutils-2.28.51/ld/emultempl/ppc64elf.em	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/emultempl/ppc64elf.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/ppc64elf.em	2017-08-23 20:00:33.098473174 +0200
 @@ -561,7 +561,7 @@ gld${EMULATION_NAME}_after_allocation (v
  /* Final emulation specific call.  */
  
@@ -815,8 +815,8 @@
  LDEMUL_AFTER_ALLOCATION=gld${EMULATION_NAME}_after_allocation
 -LDEMUL_FINISH=gld${EMULATION_NAME}_finish
 +LDEMUL_FINISH=ppc_finish
---- binutils-2.28.51/ld/emultempl/spuelf.em.lto~	2017-06-07 14:54:14.496028461 +0200
-+++ binutils-2.28.51/ld/emultempl/spuelf.em	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/emultempl/spuelf.em.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/emultempl/spuelf.em	2017-08-23 20:00:33.098473174 +0200
 @@ -416,7 +416,7 @@ spu_elf_relink (void)
  /* Final emulation specific call.  */
  
@@ -842,8 +842,8 @@
 -LDEMUL_FINISH=gld${EMULATION_NAME}_finish
 +LDEMUL_FINISH=spu_finish
  LDEMUL_CHOOSE_TARGET=gld${EMULATION_NAME}_choose_target
---- binutils-2.28.51/ld/ldexp.c.lto~	2017-06-07 14:54:14.498028415 +0200
-+++ binutils-2.28.51/ld/ldexp.c	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/ldexp.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldexp.c	2017-08-23 20:00:33.098473174 +0200
 @@ -1630,14 +1630,15 @@ align_n (bfd_vma value, bfd_vma align)
  }
  
@@ -876,8 +876,8 @@
 +  if (!object_only)
 +    bfd_hash_table_free (&definedness_table);
  }
---- binutils-2.28.51/ld/ldexp.h.lto~	2017-06-07 14:54:14.498028415 +0200
-+++ binutils-2.28.51/ld/ldexp.h	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/ldexp.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldexp.h	2017-08-23 20:00:33.098473174 +0200
 @@ -229,8 +229,8 @@ fill_type *exp_get_fill
    (etree_type *, fill_type *, char *);
  bfd_vma exp_get_abs_int
@@ -889,8 +889,8 @@
 +void ldexp_finish (bfd_boolean);
  
  #endif
---- binutils-2.28.51/ld/ldfile.c.lto~	2017-06-07 14:54:14.498028415 +0200
-+++ binutils-2.28.51/ld/ldfile.c	2017-06-17 18:57:51.812347131 +0200
+--- binutils-2.29.0/ld/ldfile.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldfile.c	2017-08-23 20:00:33.098473174 +0200
 @@ -316,7 +316,9 @@ success:
        && !no_more_claiming
        && bfd_check_format (entry->the_bfd, bfd_object))
@@ -901,8 +901,8 @@
  
    /* It opened OK, the format checked out, and the plugins have had
       their chance to claim it, so this is success.  */
---- binutils-2.28.51/ld/ldlang.c.lto~	2017-06-17 18:50:53.542562069 +0200
-+++ binutils-2.28.51/ld/ldlang.c	2017-06-17 18:57:51.813347107 +0200
+--- binutils-2.29.0/ld/ldlang.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldlang.c	2017-08-23 20:00:33.099473172 +0200
 @@ -36,6 +36,7 @@
  #include "ldctor.h"
  #include "ldfile.h"
@@ -1976,8 +1976,8 @@
 +	break;
 +      }
 +}
---- binutils-2.28.51/ld/ldlang.h.lto~	2017-06-07 14:54:14.500028368 +0200
-+++ binutils-2.28.51/ld/ldlang.h	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/ldlang.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldlang.h	2017-08-23 20:00:33.099473172 +0200
 @@ -519,7 +519,7 @@ extern struct asneeded_minfo **asneeded_
  extern void (*output_bfd_hash_table_free_fn) (struct bfd_link_hash_table *);
  
@@ -2033,8 +2033,8 @@
 +extern void cmdline_remove_object_only_files (void);
 +
  #endif
---- binutils-2.28.51/ld/ldlex.h.lto~	2017-06-07 14:54:14.500028368 +0200
-+++ binutils-2.28.51/ld/ldlex.h	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/ldlex.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldlex.h	2017-08-23 20:00:33.099473172 +0200
 @@ -136,6 +136,7 @@ enum option_values
  #ifdef ENABLE_PLUGINS
    OPTION_PLUGIN,
@@ -2043,8 +2043,8 @@
  #endif /* ENABLE_PLUGINS */
    OPTION_DEFAULT_SCRIPT,
    OPTION_PRINT_OUTPUT_FORMAT,
---- binutils-2.28.51/ld/ldmain.c.lto~	2017-06-07 14:54:14.500028368 +0200
-+++ binutils-2.28.51/ld/ldmain.c	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/ldmain.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldmain.c	2017-08-23 20:00:33.099473172 +0200
 @@ -232,6 +232,9 @@ main (int argc, char **argv)
  
    xatexit (ld_cleanup);
@@ -2179,8 +2179,8 @@
 +      lex_string = NULL;
 +    }
 +}
---- binutils-2.28.51/ld/ldmain.h.lto~	2017-06-07 14:54:14.500028368 +0200
-+++ binutils-2.28.51/ld/ldmain.h	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/ldmain.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/ldmain.h	2017-08-23 20:00:33.099473172 +0200
 @@ -59,4 +59,6 @@ extern void add_wrap (const char *);
  extern void add_ignoresym (struct bfd_link_info *, const char *);
  extern void add_keepsyms_file (const char *);
@@ -2188,8 +2188,8 @@
 +extern void ld_parse_linker_script (void);
 +
  #endif
---- binutils-2.28.51/ld/lexsup.c.lto~	2017-06-17 18:50:53.543562044 +0200
-+++ binutils-2.28.51/ld/lexsup.c	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/lexsup.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/lexsup.c	2017-08-23 20:00:33.100473170 +0200
 @@ -174,6 +174,9 @@ static const struct ld_option ld_options
      '\0', N_("PLUGIN"), N_("Load named plugin"), ONE_DASH },
    { {"plugin-opt", required_argument, NULL, OPTION_PLUGIN_OPT},
@@ -2210,8 +2210,8 @@
  #endif /* ENABLE_PLUGINS */
  	case 'q':
  	  link_info.emitrelocations = TRUE;
---- binutils-2.28.51/ld/plugin.c.lto~	2017-06-07 14:54:14.501028345 +0200
-+++ binutils-2.28.51/ld/plugin.c	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/plugin.c.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/plugin.c	2017-08-23 20:00:33.100473170 +0200
 @@ -56,6 +56,9 @@ extern int errno;
  /* Report plugin symbols.  */
  bfd_boolean report_plugin_symbols;
@@ -2258,8 +2258,8 @@
  	  dlclose (curplug->dlhandle);
  	}
        curplug = curplug->next;
---- binutils-2.28.51/ld/plugin.h.lto~	2017-06-07 14:54:14.501028345 +0200
-+++ binutils-2.28.51/ld/plugin.h	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/plugin.h.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/plugin.h	2017-08-23 20:00:33.100473170 +0200
 @@ -24,6 +24,9 @@
  /* Report plugin symbols.  */
  extern bfd_boolean report_plugin_symbols;
@@ -2270,8 +2270,8 @@
  /* Set at all symbols read time, to avoid recursively offering the plugin
     its own newly-added input files and libs to claim.  */
  extern bfd_boolean no_more_claiming;
---- binutils-2.28.51/ld/scripttempl/armbpabi.sc.lto~	2017-06-07 14:54:14.507028205 +0200
-+++ binutils-2.28.51/ld/scripttempl/armbpabi.sc	2017-06-17 18:57:51.814347082 +0200
+--- binutils-2.29.0/ld/scripttempl/armbpabi.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/armbpabi.sc	2017-08-23 20:00:33.100473170 +0200
 @@ -36,7 +36,7 @@ INTERP=".interp       0 : { *(.interp) }
  PLT=".plt          ${RELOCATING-0} : { *(.plt) }"
  RODATA=".rodata       ${RELOCATING-0} : { *(.rodata${RELOCATING+ .rodata.* .gnu.linkonce.r.*}) }"
@@ -2281,8 +2281,8 @@
  if test -z "${NO_SMALL_DATA}"; then
    SBSS=".sbss         ${RELOCATING-0} :
    {
---- binutils-2.28.51/ld/scripttempl/elf32sh-symbian.sc.lto~	2017-06-07 14:54:14.507028205 +0200
-+++ binutils-2.28.51/ld/scripttempl/elf32sh-symbian.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/elf32sh-symbian.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/elf32sh-symbian.sc	2017-08-23 20:00:33.100473170 +0200
 @@ -88,7 +88,7 @@ fi
      PLT=".plt            : { *(.plt) } :dynamic :dyn"
  DYNAMIC=".dynamic        : { *(.dynamic) } :dynamic :dyn"
@@ -2292,8 +2292,8 @@
  test -z "$GOT" && GOT=".got          ${RELOCATING-0} : { *(.got.plt) *(.got) } :dynamic :dyn"
  INIT_ARRAY=".init_array   ${RELOCATING-0} :
    {
---- binutils-2.28.51/ld/scripttempl/elf64hppa.sc.lto~	2017-06-07 14:54:14.507028205 +0200
-+++ binutils-2.28.51/ld/scripttempl/elf64hppa.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/elf64hppa.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/elf64hppa.sc	2017-08-23 20:00:33.100473170 +0200
 @@ -132,7 +132,7 @@ fi
  DYNAMIC=".dynamic      ${RELOCATING-0} : { *(.dynamic) }"
  RODATA=".rodata       ${RELOCATING-0} : { *(.rodata${RELOCATING+ .rodata.* .gnu.linkonce.r.*}) }"
@@ -2303,8 +2303,8 @@
  if test -z "${NO_SMALL_DATA}"; then
    SBSS=".sbss         ${RELOCATING-0} :
    {
---- binutils-2.28.51/ld/scripttempl/elf.sc.lto~	2017-06-07 14:54:14.507028205 +0200
-+++ binutils-2.28.51/ld/scripttempl/elf.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/elf.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/elf.sc	2017-08-23 20:00:33.100473170 +0200
 @@ -172,7 +172,7 @@ RELA_IPLT=".rela.iplt    ${RELOCATING-0}
  DYNAMIC=".dynamic      ${RELOCATING-0} : { *(.dynamic) }"
  RODATA=".${RODATA_NAME}       ${RELOCATING-0} : { *(.${RODATA_NAME}${RELOCATING+ .${RODATA_NAME}.* .gnu.linkonce.r.*}) }"
@@ -2314,8 +2314,8 @@
  if test -z "${NO_SMALL_DATA}"; then
    SBSS=".${SBSS_NAME}         ${RELOCATING-0} :
    {
---- binutils-2.28.51/ld/scripttempl/elfxtensa.sc.lto~	2017-06-07 14:54:14.508028181 +0200
-+++ binutils-2.28.51/ld/scripttempl/elfxtensa.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/elfxtensa.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/elfxtensa.sc	2017-08-23 20:00:33.100473170 +0200
 @@ -145,7 +145,7 @@ fi
  DYNAMIC=".dynamic      ${RELOCATING-0} : { *(.dynamic) }"
  RODATA=".rodata       ${RELOCATING-0} : { *(.rodata${RELOCATING+ .rodata.* .gnu.linkonce.r.*}) }"
@@ -2325,8 +2325,8 @@
  INIT_LIT=".init.literal 0 : { *(.init.literal)	}"
  INIT=".init         0 : { *(.init)		}"
  FINI_LIT=".fini.literal 0 : { *(.fini.literal)	}"
---- binutils-2.28.51/ld/scripttempl/mep.sc.lto~	2017-06-07 14:54:14.509028158 +0200
-+++ binutils-2.28.51/ld/scripttempl/mep.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/mep.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/mep.sc	2017-08-23 20:00:33.100473170 +0200
 @@ -119,7 +119,7 @@ fi
  DYNAMIC=".dynamic      ${RELOCATING-0} : { *(.dynamic) }"
  RODATA=".rodata       ${RELOCATING-0} : { *(.rodata${RELOCATING+ .rodata.* .gnu.linkonce.r.*}) }"
@@ -2336,8 +2336,8 @@
  if test -z "${NO_SMALL_DATA}"; then
    SBSS=".sbss         ${RELOCATING-0} :
    {
---- binutils-2.28.51/ld/scripttempl/pep.sc.lto~	2017-06-07 14:54:14.509028158 +0200
-+++ binutils-2.28.51/ld/scripttempl/pep.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/pep.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/pep.sc	2017-08-23 20:00:33.101473167 +0200
 @@ -183,6 +183,7 @@ SECTIONS
      *(.drectve)
      ${RELOCATING+ *(.note.GNU-stack)}
@@ -2346,8 +2346,8 @@
    }
  
    .idata ${RELOCATING+BLOCK(__section_alignment__)} :
---- binutils-2.28.51/ld/scripttempl/pe.sc.lto~	2017-06-07 14:54:14.509028158 +0200
-+++ binutils-2.28.51/ld/scripttempl/pe.sc	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/scripttempl/pe.sc.lto~	2017-08-23 05:18:16.000000000 +0200
++++ binutils-2.29.0/ld/scripttempl/pe.sc	2017-08-23 20:00:33.101473167 +0200
 @@ -170,6 +170,7 @@ SECTIONS
      *(.drectve)
      ${RELOCATING+ *(.note.GNU-stack)}
@@ -2356,8 +2356,8 @@
    }
  
    .idata ${RELOCATING+BLOCK(__section_alignment__)} :
---- binutils-2.28.51/ld/testsuite/ld-plugin/lto-10a.c.lto~	2017-06-17 18:57:51.815347058 +0200
-+++ binutils-2.28.51/ld/testsuite/ld-plugin/lto-10a.c	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/testsuite/ld-plugin/lto-10a.c.lto~	2017-08-23 20:00:33.101473167 +0200
++++ binutils-2.29.0/ld/testsuite/ld-plugin/lto-10a.c	2017-08-23 20:00:33.101473167 +0200
 @@ -0,0 +1,6 @@
 +extern int foo(void);
 +
@@ -2365,8 +2365,8 @@
 +{
 +  return foo();
 +}
---- binutils-2.28.51/ld/testsuite/ld-plugin/lto-10b.c.lto~	2017-06-17 18:57:51.815347058 +0200
-+++ binutils-2.28.51/ld/testsuite/ld-plugin/lto-10b.c	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/testsuite/ld-plugin/lto-10b.c.lto~	2017-08-23 20:00:33.101473167 +0200
++++ binutils-2.29.0/ld/testsuite/ld-plugin/lto-10b.c	2017-08-23 20:00:33.101473167 +0200
 @@ -0,0 +1,7 @@
 +#include <stdio.h>
 +
@@ -2375,8 +2375,8 @@
 +  printf ("hello\n");
 +  return 0;
 +}
---- binutils-2.28.51/ld/testsuite/ld-plugin/lto-4a.c.lto~	2017-06-17 18:57:51.815347058 +0200
-+++ binutils-2.28.51/ld/testsuite/ld-plugin/lto-4a.c	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/testsuite/ld-plugin/lto-4a.c.lto~	2017-08-23 20:00:33.101473167 +0200
++++ binutils-2.29.0/ld/testsuite/ld-plugin/lto-4a.c	2017-08-23 20:00:33.101473167 +0200
 @@ -0,0 +1,7 @@
 +extern void foo(void);
 +
@@ -2385,8 +2385,8 @@
 +  foo();
 +  return 0;
 +}
---- binutils-2.28.51/ld/testsuite/ld-plugin/lto-4b.c.lto~	2017-06-17 18:57:51.815347058 +0200
-+++ binutils-2.28.51/ld/testsuite/ld-plugin/lto-4b.c	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/testsuite/ld-plugin/lto-4b.c.lto~	2017-08-23 20:00:33.101473167 +0200
++++ binutils-2.29.0/ld/testsuite/ld-plugin/lto-4b.c	2017-08-23 20:00:33.101473167 +0200
 @@ -0,0 +1,9 @@
 +#include <stdio.h>
 +
@@ -2397,8 +2397,8 @@
 +  bar ();
 +  printf ("hello foo\n");
 +}
---- binutils-2.28.51/ld/testsuite/ld-plugin/lto-4c.c.lto~	2017-06-17 18:57:51.815347058 +0200
-+++ binutils-2.28.51/ld/testsuite/ld-plugin/lto-4c.c	2017-06-17 18:57:51.815347058 +0200
+--- binutils-2.29.0/ld/testsuite/ld-plugin/lto-4c.c.lto~	2017-08-23 20:00:33.101473167 +0200
++++ binutils-2.29.0/ld/testsuite/ld-plugin/lto-4c.c	2017-08-23 20:00:33.101473167 +0200
 @@ -0,0 +1,6 @@
 +#include <stdio.h>
 +
@@ -2406,8 +2406,8 @@
 +{
 +  printf ("hello bar\n");
 +}
---- binutils-2.28.51/ld/testsuite/ld-plugin/lto.exp.lto~	2017-06-17 18:57:51.799347446 +0200
-+++ binutils-2.28.51/ld/testsuite/ld-plugin/lto.exp	2017-06-17 18:57:51.816347034 +0200
+--- binutils-2.29.0/ld/testsuite/ld-plugin/lto.exp.lto~	2017-08-23 20:00:33.085473204 +0200
++++ binutils-2.29.0/ld/testsuite/ld-plugin/lto.exp	2017-08-23 20:00:33.101473167 +0200
 @@ -86,6 +86,15 @@ set lto_link_tests [list \
    [list "Build liblto-3.a" \
     "" "-flto $lto_fat" \
