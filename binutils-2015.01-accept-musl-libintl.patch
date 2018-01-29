@@ -1,5 +1,5 @@
---- binutils-linaro-2.25.0-2015.01-2/config/gettext.m4.omv~	2015-06-21 22:25:34.071368100 +0200
-+++ binutils-linaro-2.25.0-2015.01-2/config/gettext.m4	2015-06-21 22:27:43.938986435 +0200
+--- binutils-2.30/config/gettext.m4.musl~	2018-01-13 14:31:15.000000000 +0100
++++ binutils-2.30/config/gettext.m4	2018-01-29 00:19:59.518736437 +0100
 @@ -135,10 +135,10 @@ AC_DEFUN([AM_GNU_GETTEXT],
  changequote(,)dnl
  typedef int array [2 * (__GNU_GETTEXT_SUPPORTED_REVISION(0) >= 1) - 1];
@@ -14,9 +14,9 @@
              gt_cv_func_gnugettext_libc=yes,
              gt_cv_func_gnugettext_libc=no)])
  
---- binutils-linaro-2.25.0-2015.01-2/intl/configure.omv~	2015-06-21 22:31:13.423777241 +0200
-+++ binutils-linaro-2.25.0-2015.01-2/intl/configure	2015-06-21 22:31:24.232663770 +0200
-@@ -5778,13 +5778,11 @@ else
+--- binutils-2.30/intl/configure.musl~	2018-01-29 00:19:59.519736438 +0100
++++ binutils-2.30/intl/configure	2018-01-29 00:22:14.879911251 +0100
+@@ -5819,13 +5819,11 @@ else
    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  #include <libintl.h>
@@ -26,7 +26,7 @@
  main ()
  {
  bindtextdomain ("", "");
--return (int) gettext ("") + _nl_msg_cat_cntr + *_nl_domain_bindings
+-return (int) gettext ("") + (int) ngettext ("", "", 0) + _nl_msg_cat_cntr + *_nl_domain_bindings
 +return (int) gettext ("")
    ;
    return 0;

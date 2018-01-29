@@ -39,7 +39,7 @@
 
 %bcond_without gold
 
-%define ver 2.29.1
+%define ver 2.30
 %define linaro %{nil}
 %define linaro_spin 0
 
@@ -290,6 +290,11 @@ for i in %{long_targets}; do
 		--with-lib-path=/%{_lib}:%{_libdir}:%{_prefix}/local/%{_lib}:/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib \
 %else
 		--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib \
+%endif
+%ifarch %{mips}
+		--enable-default-hash-style=sysv \
+%else
+		--enable-default-hash-style=gnu \
 %endif
 		--enable-lto \
 		--disable-werror \
