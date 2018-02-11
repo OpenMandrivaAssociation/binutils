@@ -53,7 +53,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -82,6 +82,9 @@ BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
 BuildRequires:	pkgconfig(isl)
 BuildRequires:	pkgconfig(cloog-isl)
+BuildRequires:	gmp-devel
+BuildRequires:	pkgconfig(mpfr)
+BuildRequires:	libmpc-devel
 
 # Fedora patches:
 Patch01:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-libtool-lib64.patch
@@ -208,7 +211,6 @@ to consider using libelf instead of BFD.
 %patch131 -p1 -b .gold_testsuite~
 %patch132 -p1 -b .musl~
 # later
-#%%patch33 -p1 -b .ld_13048~
 %patch134 -p1 -b .nls~
 %patch135 -p1 -b .lto~
 %patch136 -p1 -b .warnings~
@@ -303,6 +305,11 @@ for i in %{long_targets}; do
 		--enable-relro \
 		--with-separate-debug-dir=%{_prefix}/lib/debug \
 		--enable-initfini-array \
+		--disable-isl-version-check \
+		--with-mpc=%{_libdir} \
+		--with-mpfr=%{_libdir} \
+		--with-gmp=%{_libdir} \
+		--with-isl=%{_libdir} \
 		--with-system-zlib
 	cd ..
 done

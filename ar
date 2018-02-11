@@ -1,15 +1,15 @@
 #!/bin/sh
 REAL_AR=binutils-ar
-PARENT="`readlink /proc/$PPID/exe`"
+PARENT="$(readlink /proc/$PPID/exe)"
 WRAPPED=false
 # If /proc isn't mounted, let's do the least evil thing we can
 if [ -z "$PARENT" ]; then
     WRAPPED=true
-elif echo $PARENT |grep -qE -- '-ar$'; then
+elif echo "$PARENT" |grep -qE -- '-ar$'; then
 # If we're being called by gcc-ar or llvm-ar, we're already
 # wrapped (and need to make sure we don't call ourselves recursively)
     WRAPPED=true
-elif echo $PARENT |grep -qE -- 'qemu'; then
+elif echo "$PARENT" |grep -qE -- 'qemu'; then
 # Fun... We're running inside qemu binfmt_misc emulation,
 # so we have to determine our parent the evil and less
 # reliable way...
@@ -17,18 +17,18 @@ elif echo $PARENT |grep -qE -- 'qemu'; then
 	WRAPPED=true
     fi
 fi
-if ! $WRAPPED; then
+if ! "$WRAPPED"; then
     for i in "$@"; do
-	[ "`echo $i |cut -b1`" = "-" ] && continue
-	if echo $i |grep -qE '\.o$' && [ -e $i ]; then
-	    if LANG=C file $i |grep -q "LLVM IR bitcode"; then
+	[ "$(echo $i |cut -b1)" = '-' ] && continue
+	if echo "$i" |grep -qE '\.o$' && [ -e "$i" ]; then
+	    if LANG=C file "$i" |grep -q "LLVM IR bitcode"; then
 		which llvm-ar &>/dev/null && REAL_AR=llvm-ar
 		break
 	    fi
 	fi
     done
-    if [ "$REAL_AR" = "binutils-ar" ] && which gcc-ar &>/dev/null; then
+    if [ "$REAL_AR" = 'binutils-ar' ] && which gcc-ar &>/dev/null; then
 	REAL_AR=gcc-ar
     fi
 fi
-exec $REAL_AR "$@"
+exec "$REAL_AR" "$@"
