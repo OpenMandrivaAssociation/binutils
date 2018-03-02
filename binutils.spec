@@ -5,14 +5,14 @@
 %else
 # (tpg) set cross targets here for cooker
 #global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux x32-linux aarch64-linuxmusl armv7hl-linuxmusl i586-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl aarch64-android armv7nl-android armv8nl-android
-%global targets armv7hl-linux i586-linux i686-linux x86_64-linux x32-linux aarch64-linuxmusl armv7hl-linuxmusl i586-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl aarch64-android armv7nl-android armv8nl-android
+%global targets i686-linux
 %endif
 %global long_targets %(
-	for i in %{targets}; do
-		CPU=$(echo $i |cut -d- -f1)
-		OS=$(echo $i |cut -d- -f2)
-		echo -n "$(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/${CPU}-${OS}/macros --target=${CPU} -E %%{_target_platform}) "
-	done
+    for i in %{targets}; do
+	CPU=$(echo $i |cut -d- -f1)
+	OS=$(echo $i |cut -d- -f2)
+	echo -n "$(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/${CPU}-${OS}/macros --target=${CPU} -E %%{_target_platform}) "
+    done
 )
 
 
@@ -29,7 +29,7 @@
 
 # Define if building a cross-binutils
 %define build_cross 0
-%{expand: %{?cross:	%%global build_cross 1}}
+%{expand: %{?cross: %%global build_cross 1}}
 
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
@@ -169,15 +169,15 @@ Binutils is a collection of binary utilities, including:
 Install binutils if you need to perform any of these types of actions on
 binary files.  Most programmers will want to install binutils.
 
-%package -n	%{dev_name}
+%package -n %{dev_name}
 Summary:	Main library for %{name}
 Group:		Development/Other
 Provides:	%{name}-devel = %{version}-%{release}
 Provides:	%{lib_name}-devel = %{version}-%{release}
 Obsoletes:	%{lib_name}-devel <= %{version}-%{release}
-Requires:	zlib-devel
+Requires:	pkgconfig(zlib)
 
-%description -n	%{dev_name}
+%description -n %{dev_name}
 This package contains BFD and opcodes static libraries and associated
 header files.  Only *.a libraries are included, because BFD doesn't
 have a stable ABI.  Developers starting new projects are strongly encouraged
@@ -242,37 +242,38 @@ export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1 -std=gnu++14"
 
 for i in %{long_targets}; do
-	mkdir BUILD-$i
-	cd BUILD-$i
-	if [ "%{_target_platform}" = "$i" ]; then
-		# Native build -- we want shared libs here...
-		EXTRA_CONFIG="--enable-shared --with-pic"
-	else
-		# Cross build -- need to set program_prefix and friends...
-		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
-	fi
-	case $i in
+    mkdir BUILD-$i
+    cd BUILD-$i
+    if [ "%{_target_platform}" = "$i" ]; then
+# Native build -- we want shared libs here...
+	EXTRA_CONFIG="--enable-shared --with-pic"
+    else
+# Cross build -- need to set program_prefix and friends...
+	EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
+    fi
+
+    case $i in
 	i*86|athlon)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=x86_64-$(echo $i |cut -d- -f2-)"
-		;;
+	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=x86_64-$(echo $i |cut -d- -f2-)"
+	    ;;
 	aarch64)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
-		;;
+	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
+	    ;;
 	armv7*)
-		EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
-		;;
+	    EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
+	    ;;
 	x86_64)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
-		;;
-	esac
+	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
+	    ;;
+    esac
 
-	if echo $i |grep -qE '^arm'; then
-		# FIXME as of 2.28, gold seems to be unstable when linking 32-bit ARM code
-		# This should be removed when it stabilizes
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-ld=default --enable-gold=yes"
-	fi
+    if echo $i |grep -qE '^arm'; then
+# FIXME as of 2.28, gold seems to be unstable when linking 32-bit ARM code
+# This should be removed when it stabilizes
+	EXTRA_CONFIG="$EXTRA_CONFIG --enable-ld=default --enable-gold=yes"
+    fi
 
-	CONFIGURE_TOP=.. %configure \
+    CONFIGURE_TOP=.. %configure \
 		--enable-64-bit-bfd \
 		--with-bugurl=%{bugurl} \
 %if %{with gold}
@@ -312,14 +313,14 @@ for i in %{long_targets}; do
 		--with-gmp=%{_libdir} \
 		--with-isl=%{_libdir} \
 		--with-system-zlib
-	cd ..
+    cd ..
 done
 
 %build
 for i in %{long_targets}; do
-	cd BUILD-$i
-	%make
-	cd ..
+    cd BUILD-$i
+    %make
+    cd ..
 done
 
 %make -C BUILD-%{_target_platform}/bfd/doc html
@@ -340,11 +341,11 @@ rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
 
 %install
 for i in %{long_targets}; do
-	[ "$i" = "%{_target_platform}" ] && continue
-	cd BUILD-$i
-	%makeinstall_std
-	cd ..
-	mkdir -p %{buildroot}%{_prefix}/$i/include
+    [ "$i" = "%{_target_platform}" ] && continue
+    cd BUILD-$i
+    %makeinstall_std
+    cd ..
+    mkdir -p %{buildroot}%{_prefix}/$i/include
 done
 # We install the native version last to make sure we get all
 # the man pages etc. for the native version rather than a random
@@ -403,13 +404,13 @@ EOH
 cd %{buildroot}%{_bindir}
 # Symlinks for native tools compatibility with crosscompilers
 for i in *; do
-	echo $i |grep -q -- - && continue
-	[ -e %{_target_platform}-$i ] || ln -s $i %{_target_platform}-$i
+    echo $i |grep -q -- - && continue
+    [ -e %{_target_platform}-$i ] || ln -s $i %{_target_platform}-$i
 done
 
 # Default ld, if one is missing...
 for i in *-ld.bfd; do
-	[ -e ${i/.bfd/} ] || ln -s $i ${i/.bfd}
+    [ -e ${i/.bfd/} ] || ln -s $i ${i/.bfd}
 done
 cd -
 
@@ -430,23 +431,23 @@ cd -
 mkdir -p %{buildroot}%{_libdir}/bfd-plugins
 
 for i in %{long_targets}; do
-	# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
-	longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
-	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
-		shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
-		cd %{buildroot}%{_bindir}
-		for j in $longplatform-*; do
-			ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
-		done
-		cd -
-	fi
-	if [ "$longplatform" != "$i" ]; then
-		cd %{buildroot}%{_bindir}
-		for j in $longplatform-*; do
-			ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
-		done
-		cd -
-	fi
+# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
+    longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
+    if [ -n "$(echo $i |cut -d- -f4-)" ]; then
+	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
+	cd %{buildroot}%{_bindir}
+	for j in $longplatform-*; do
+	    ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
+	done
+	cd -
+    fi
+    if [ "$longplatform" != "$i" ]; then
+	cd %{buildroot}%{_bindir}
+	for j in $longplatform-*; do
+	    ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
+	done
+	cd -
+    fi
 done
 
 %if %{with default_lld}
@@ -506,7 +507,7 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_prefix}/%{_target_platform}
 %(
 if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
-	echo "%{_bindir}/$(echo %{_target_platform} |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
+    echo "%{_bindir}/$(echo %{_target_platform} |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
 fi
 )
 
@@ -521,24 +522,24 @@ fi
 
 %(
 for i in %{long_targets}; do
-	[ "$i" = "%{_target_platform}" ] && continue
-	cat <<EOF
+    [ "$i" = "%{_target_platform}" ] && continue
+    cat <<EOF
 %package -n cross-${i}-binutils
-Summary: Binutils for crosscompiling to ${i}
-Group: Development/Other
+Summary:	Binutils for crosscompiling to ${i}
+Group:	Development/Other
 
 %description -n cross-${i}-binutils
-Binutils for crosscompiling to ${i}
+Binutils for crosscompiling to ${i}.
 
 %files -n cross-${i}-binutils
 %{_prefix}/${i}
 %{_bindir}/${i}-*
 EOF
 
-	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
-		shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
-		echo "%{_bindir}/${shortplatform}-*"
-	fi
-	echo
+    if [ -n "$(echo $i |cut -d- -f4-)" ]; then
+	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
+	echo "%{_bindir}/${shortplatform}-*"
+    fi
+    echo
 done
 )
