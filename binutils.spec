@@ -4,8 +4,13 @@
 %global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
 %else
 # (tpg) set cross targets here for cooker
-#global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux x32-linux aarch64-linuxmusl armv7hl-linuxmusl i586-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl aarch64-android armv7nl-android armv8nl-android
-%global targets i686-linux
+%global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux x32-linux aarch64-linuxmusl armv7hl-linuxmusl i586-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl aarch64-android armv7nl-android armv8nl-android
+# (tpg) temporary disable build debuginfo for ix86
+%ifarch %{ix86}
+#error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
+%define _enable_debug_packages %{nil}
+%define debug_package          %{nil}
+%endif
 %endif
 %global long_targets %(
     for i in %{targets}; do
@@ -22,6 +27,9 @@
 %define lib_name_orig %mklibname binutils
 %define lib_name %{lib_name_orig}%{lib_major}
 %define dev_name %mklibname binutils -d
+
+# (tpg) optimize it a bit
+%global optflags %{optflags} -O3
 
 %ifarch %{arm}
 %global optflags %{optflags} -fuse-ld=bfd
@@ -54,7 +62,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
