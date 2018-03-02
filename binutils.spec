@@ -75,7 +75,7 @@ BuildRequires:	gcc
 BuildRequires:	gettext
 BuildRequires:	texinfo
 BuildRequires:	dejagnu
-BuildRequires:	zlib-devel
+BuildRequires:	pkgconfig(zlib)
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
