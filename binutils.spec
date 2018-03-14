@@ -4,7 +4,7 @@
 %global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
 %else
 # (tpg) set cross targets here for cooker
-%global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux x32-linux aarch64-linuxmusl armv7hl-linuxmusl i586-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl aarch64-android armv7nl-android armv8nl-android
+%global targets aarch64-linux armv7hl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-android armv7l-android armv8l-android
 # (tpg) temporary disable build debuginfo for ix86
 %ifarch %{ix86}
 #error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
@@ -16,7 +16,8 @@
     for i in %{targets}; do
 	CPU=$(echo $i |cut -d- -f1)
 	OS=$(echo $i |cut -d- -f2)
-	echo -n "$(rpm --macros %%{_usrlibrpm}/macros:%%{_usrlibrpm}/platform/${CPU}-${OS}/macros --target=${CPU} -E %%{_target_platform}) "
+	echo "${CPU}-${OS}: $(rpm --target=${CPU}-${OS} -E %%{_target_platform})" >>/tmp/junk
+	echo -n "$(rpm --target=${CPU}-${OS} -E %%{_target_platform}) "
     done
 )
 
@@ -48,26 +49,17 @@
 
 %bcond_without gold
 
-%define ver 2.30
-%define linaro %{nil}
-%define linaro_spin 0
-
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-%if "%{linaro}" != ""
-Version:	%{ver}_%{linaro}
-Source0:	http://abe.tcwglab.linaro.org/snapshots/binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}.tar.xz
-%else
-Version:	%{ver}
+Version:	2.30
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-%endif
 Epoch:		1
 Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
 #Source1:	http://ftp.kernel.org/pub/linux/devel/binutils/binutils-%{version}.tar.xz.sign
-Source5:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.19.50.0.1-output-format.sed
+Source5:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.19.50.0.1-output-format.sed
 Source10:	binutils.rpmlintrc
 # Wrapper scripts for ar, ranlib and nm that know how to deal with
 # LTO bytecode, regardless of whether it's gcc or clang
@@ -96,30 +88,30 @@ BuildRequires:	pkgconfig(mpfr)
 BuildRequires:	libmpc-devel
 
 # Fedora patches:
-Patch01:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-libtool-lib64.patch
-Patch02:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.10-ppc64-pie.patch
-Patch03:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.2-ia64-lib64.patch
-# We don't want this one!
-#Patch04:	binutils-2.20.51.0.2-version.patch
-Patch05:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.25-set-long-long.patch
-Patch07:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.20.51.0.10-sec-merge-emit.patch
-# we already set our own set of defaults...
-# Enable -zrelro by default: BZ #621983
-#Patch08:	binutils-2.22.52.0.1-relro-on-by-default.patch
-Patch08:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.25.1-cleansweep.patch
-# Local patch - export demangle.h with the binutils-devel rpm.
-Patch09:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.22.52.0.1-export-demangle.h.patch
+Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.51.0.2-libtool-lib64.patch
+# We don't want this one! Tends to break compatibility with scripts
+# on other distros
+#Patch02:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.25-version.patch
+# Export demangle.h with the binutils-devel rpm.
+Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.1-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
-Patch10:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.22.52.0.4-no-config-h-check.patch
-# Fix detections little endian PPC shared libraries
-Patch19:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.24-ldforcele.patch
-# already in our more recent version
-#Patch21:	binutils-2.24-fat-lto-objects.patch
-Patch24:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-fix-compile-warnings.patch
-Patch26:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.26-lto.patch
-# already in our more recent version
-#Patch28:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-local-dynsym-count.patch
-#Patch29:	http://pkgs.fedoraproject.org/cgit/rpms/binutils.git/plain/binutils-2.27-monotonic-section-offsets.patch
+Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
+Patch05:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.26-lto.patch
+Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-filename-in-error-messages.patch
+# FIXME this one serves a purpose (fix ltrace, LD_AUDIT) but reduces optimizations.
+# This should be an option instead of a hardcode in the longer term!
+#Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
+Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
+Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
+Patch10:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-revert-PowerPC-speculation-barriers.patch
+Patch11:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-skip-dwo-search-if-not-needed.patch
+Patch12:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-page-to-segment-assignment.patch
+Patch13:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.30-allow_R_AARCH64-symbols.patch
+Patch14:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-strip-unknown-relocs.patch
+Patch15:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-speed-up-objdump.patch
+Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.28-ignore-gold-duplicates.patch
+Patch17:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-ifunc-relocs-in-notes.patch
+Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-debug-section-marking.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -141,14 +133,11 @@ Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
 # --build-id=sha1
 # --icf=safe
 Patch129:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
-# https://bugs.linaro.org/show_bug.cgi?id=1652
-Patch130:	binutils-2015.01-linaro-bug1652.patch
 # musl's libintl is good enough, we don't need the internal copy
 Patch132:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch131:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
-Patch133:	binutils-2.21.53.0.1-ld_13048-Invalid-address-for-x32.patch
 # from upstream
 Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
@@ -192,38 +181,8 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%if "%{linaro}" != ""
-%setup -q -n binutils-linaro-%{ver}-%{linaro}%{?linaro_spin:-%{linaro_spin}}
-%else
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
-%endif
-%patch01 -p1 -b .libtool-lib64~
-# Needs porting, and we don't care about the target for now
-#patch02 -p1 -b .ppc64-pie~
-%patch05 -p1 -b .set-long-long~
-%patch07 -p1 -b .sec-merge-emit~
-%patch08 -p0 -b .cleansweep~
-%patch09 -p1 -b .export-demangle-h~
-%patch10 -p1 -b .no-config-h-check~
-#patch21 -p1 -b .fatlto~
-%patch24 -p1 -b .warn~
-%patch26 -p1 -b .lto~
-
-%patch121 -p1 -b .linux32~
-# Modify the defaults of the BFD linker as well, since many
-# things fall back to it...
-%patch128 -p1 -b .defaults~
-%patch129 -p1 -b .gold_defaults~
-%if "%{linaro}" != ""
-%patch130 -p1 -b .1652~
-%endif
-%patch131 -p1 -b .gold_testsuite~
-%patch132 -p1 -b .musl~
-# later
-%patch134 -p1 -b .nls~
-%patch135 -p1 -b .lto~
-%patch136 -p1 -b .warnings~
-#patch137 -p1 -b .clang5~
+%apply_patches
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
