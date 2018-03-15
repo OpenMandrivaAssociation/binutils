@@ -16,7 +16,6 @@
     for i in %{targets}; do
 	CPU=$(echo $i |cut -d- -f1)
 	OS=$(echo $i |cut -d- -f2)
-	echo "${CPU}-${OS}: $(rpm --target=${CPU}-${OS} -E %%{_target_platform})" >>/tmp/junk
 	echo -n "$(rpm --target=${CPU}-${OS} -E %%{_target_platform}) "
     done
 )
@@ -417,6 +416,13 @@ for i in %{long_targets}; do
     fi
 done
 
+# Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
+cd %{buildroot}%{_bindir}
+for i in *-openmandriva-*; do
+	ln -s $i ${i/-openmandriva-/-mandriva-}
+done
+cd -
+
 %if %{with default_lld}
 # For now, let's keep %{_bindir}/ld in here even if it points
 # to lld...
@@ -466,6 +472,7 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_bindir}/%{_target_platform}-size
 %{_bindir}/%{_target_platform}-strings
 %{_bindir}/%{_target_platform}-strip
+%(if echo %{_target_platform} |grep -q -- -openmandriva-; then echo "%{_bindir}/%(echo %{_target_platform} |sed -e 's,-openmandriva-,-mandriva-,')-*"; fi)
 %{_libdir}/bfd-plugins
 %{_mandir}/man1/*
 %{_infodir}/*info*
@@ -494,7 +501,14 @@ for i in %{long_targets}; do
 %package -n cross-${i}-binutils
 Summary:	Binutils for crosscompiling to ${i}
 Group:	Development/Other
+EOF
 
+    if echo $i |grep -q -- -openmandriva-; then
+        echo "Obsoletes: cross-${i/-openmandriva-/-mandriva-}-binutils < %{EVRD}"
+        echo "Provides: cross-${i/-openmandriva-/-mandriva-}-binutils = %{EVRD}"
+    fi
+
+    cat <<EOF
 %description -n cross-${i}-binutils
 Binutils for crosscompiling to ${i}.
 
@@ -506,6 +520,9 @@ EOF
     if [ -n "$(echo $i |cut -d- -f4-)" ]; then
 	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
 	echo "%{_bindir}/${shortplatform}-*"
+    fi
+    if echo $i |grep -q -- -openmandriva-; then
+        echo "%{_bindir}/${i/-openmandriva-/-mandriva-}-*"
     fi
     echo
 done
