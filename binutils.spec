@@ -208,7 +208,7 @@ export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1 -std=gnu++14"
 
 for i in %{long_targets}; do
-    mkdir BUILD-$i
+    mkdir -p BUILD-$i
     cd BUILD-$i
     if [ "%{_target_platform}" = "$i" ]; then
 # Native build -- we want shared libs here...
@@ -279,14 +279,14 @@ for i in %{long_targets}; do
 		--with-gmp=%{_libdir} \
 		--with-isl=%{_libdir} \
 		--with-system-zlib
-    cd ..
+    cd -
 done
 
 %build
 for i in %{long_targets}; do
     cd BUILD-$i
     %make
-    cd ..
+    cd -
 done
 
 %make -C BUILD-%{_target_platform}/bfd/doc html
@@ -310,7 +310,7 @@ for i in %{long_targets}; do
     [ "$i" = "%{_target_platform}" ] && continue
     cd BUILD-$i
     %makeinstall_std
-    cd ..
+    cd -
     mkdir -p %{buildroot}%{_prefix}/$i/include
 done
 # We install the native version last to make sure we get all
@@ -319,7 +319,7 @@ done
 cd BUILD-%{_target_platform}
 %makeinstall_std
 cp libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
-cd ..
+cd -
 
 rm -f %{buildroot}%{_mandir}/man1/*{dlltool,nlmconv,windres}*
 rm -f %{buildroot}%{_infodir}/dir
