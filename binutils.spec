@@ -32,6 +32,7 @@
 %global optflags %{optflags} -O3
 
 %ifarch %{arm}
+# FIXME remove when binutils links successfully with gold on arm32
 %global optflags %{optflags} -fuse-ld=bfd
 %endif
 
@@ -232,12 +233,6 @@ for i in %{long_targets}; do
 	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
 	    ;;
     esac
-
-    if echo $i |grep -qE '^arm'; then
-# FIXME as of 2.28, gold seems to be unstable when linking 32-bit ARM code
-# This should be removed when it stabilizes
-	EXTRA_CONFIG="$EXTRA_CONFIG --enable-ld=default --enable-gold=yes"
-    fi
 
     CONFIGURE_TOP=.. %configure \
 		--enable-64-bit-bfd \
