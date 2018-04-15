@@ -54,7 +54,7 @@ Name:		binutils
 Version:	2.30
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 Epoch:		1
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -144,6 +144,10 @@ Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch137:	binutils-2.29-clang-5.0.patch
+
+# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=aae8280935aab812c3666d1c5c0ea099e96927cc
+Patch138:	binutils-gold-arm-crash.patch
+
 
 %if %{with default_lld}
 Requires:	lld
