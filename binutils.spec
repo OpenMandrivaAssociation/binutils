@@ -54,7 +54,7 @@ Name:		binutils
 Version:	2.30
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 Epoch:		1
-Release:	4
+Release:	5
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -200,6 +200,12 @@ sed -i -e '/pagesize/s/0x1000,/0x10000,/' gold/aarch64.cc
 # Build libbfd.so and libopcodes.so with -Bsymbolic-functions if possible.
 sed -i -e 's/^libbfd_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' bfd/Makefile.{am,in}
 sed -i -e 's/^libopcodes_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' opcodes/Makefile.{am,in}
+
+%ifarch %{arm}
+# --icf=safe is unstable on 32-bit ARM
+# https://sourceware.org/bugzilla/show_bug.cgi?id=23046
+sed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
+%endif
 
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
