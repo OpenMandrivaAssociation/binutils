@@ -147,6 +147,8 @@ Patch137:	binutils-2.29-clang-5.0.patch
 
 # https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=aae8280935aab812c3666d1c5c0ea099e96927cc
 Patch138:	binutils-gold-arm-crash.patch
+# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commitdiff;h=d83d54033545c0e7b668950b127753c88a33f950;hp=f6a8b8c7ac2d5369070a6b76a94ee0f3052433ff
+Patch139:	binutils-gold-arm-crash-2.patch
 
 
 %if %{with default_lld}
@@ -202,9 +204,11 @@ sed -i -e 's/^libbfd_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' bfd/Makefile.{am
 sed -i -e 's/^libopcodes_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' opcodes/Makefile.{am,in}
 
 %ifarch %{arm}
+# This should be fixed with patches 138 and 139, but leaving it here for now
+# so we can restore the temporary fix if more problems occur.
 # --icf=safe is unstable on 32-bit ARM
 # https://sourceware.org/bugzilla/show_bug.cgi?id=23046
-sed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
+#ed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
 %endif
 
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
