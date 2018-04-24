@@ -1,0 +1,141 @@
+From 890d155592e66dc01fc4a9affba806c4e9fc36ba Mon Sep 17 00:00:00 2001
+From: Cary Coutant <ccoutant@gmail.com>
+Date: Mon, 23 Apr 2018 09:27:35 -0700
+Subject: [PATCH] Fix internal error caused by conflicting default version
+ definitions.
+
+gold/
+	PR gold/16504
+	* dynobj.cc (Versions::symbol_section_contents): Don't set
+	VERSYM_HIDDEN flag for undefined symbols.
+	* symtab.cc (Symbol_table::add_from_object): Don't override default
+	version definition with a different default version.
+	* symtab.h (Symbol::from_dyn): New method.
+	* testsuite/plugin_test.c (struct sym_info): Add ver field.
+	(claim_file_hook): Pass symbol version to plugin API.
+	(parse_readelf_line): Parse symbol version.
+	* testsuite/Makefile.am (ver_test_pr16504): New test case.
+	* testsuite/Makefile.in: Regenerate.
+	* testsuite/ver_test_pr16504.sh: New test script.
+	* testsuite/ver_test_pr16504_a.c: New source file.
+	* testsuite/ver_test_pr16504_a.script: New version script.
+	* testsuite/ver_test_pr16504_b.c: New source file.
+	* testsuite/ver_test_pr16504_b.script: New version script.
+---
+ gold/ChangeLog                           | 19 +++++++++++++
+ gold/dynobj.cc                           |  5 +++-
+ gold/symtab.cc                           | 47 ++++++++++++++++++++++++--------
+ gold/symtab.h                            |  5 ++++
+ gold/testsuite/Makefile.am               | 17 ++++++++++++
+ gold/testsuite/Makefile.in               | 22 +++++++++++++--
+ gold/testsuite/plugin_test.c             | 39 ++++++++++++++++++++------
+ gold/testsuite/ver_test_pr16504.sh       | 41 ++++++++++++++++++++++++++++
+ gold/testsuite/ver_test_pr16504_a.c      |  5 ++++
+ gold/testsuite/ver_test_pr16504_a.script |  4 +++
+ gold/testsuite/ver_test_pr16504_b.c      | 10 +++++++
+ gold/testsuite/ver_test_pr16504_b.script |  4 +++
+ 12 files changed, 196 insertions(+), 22 deletions(-)
+ create mode 100755 gold/testsuite/ver_test_pr16504.sh
+ create mode 100644 gold/testsuite/ver_test_pr16504_a.c
+ create mode 100644 gold/testsuite/ver_test_pr16504_a.script
+ create mode 100644 gold/testsuite/ver_test_pr16504_b.c
+ create mode 100644 gold/testsuite/ver_test_pr16504_b.script
+
+diff --git a/gold/dynobj.cc b/gold/dynobj.cc
+index d85adbc..7012802 100644
+--- a/gold/dynobj.cc
++++ b/gold/dynobj.cc
+@@ -1776,7 +1776,10 @@ Versions::symbol_section_contents(const Symbol_table* symtab,
+ 	version_index = this->version_index(symtab, dynpool, *p);
+       // If the symbol was defined as foo@V1 instead of foo@@V1, add
+       // the hidden bit.
+-      if ((*p)->version() != NULL && !(*p)->is_default())
++      if ((*p)->version() != NULL
++	  && (*p)->is_defined()
++	  && !(*p)->is_default()
++	  && !(*p)->from_dyn())
+         version_index |= elfcpp::VERSYM_HIDDEN;
+       elfcpp::Swap<16, big_endian>::writeval(pbuf + (*p)->dynsym_index() * 2,
+                                              version_index);
+diff --git a/gold/symtab.cc b/gold/symtab.cc
+index 34551ac..238834d 100644
+--- a/gold/symtab.cc
++++ b/gold/symtab.cc
+@@ -989,7 +989,7 @@ Symbol_table::add_from_object(Object* object,
+   // ins.first->second: the value (Symbol*).
+   // ins.second: true if new entry was inserted, false if not.
+ 
+-  Sized_symbol<size>* ret;
++  Sized_symbol<size>* ret = NULL;
+   bool was_undefined_in_reg;
+   bool was_common;
+   if (!ins.second)
+@@ -1049,17 +1049,42 @@ Symbol_table::add_from_object(Object* object,
+ 	  // it, then change it to NAME/VERSION.
+ 	  ret = this->get_sized_symbol<size>(insdefault.first->second);
+ 
+-	  was_undefined_in_reg = ret->is_undefined() && ret->in_reg();
+-	  // Commons from plugins are just placeholders.
+-	  was_common = ret->is_common() && ret->object()->pluginobj() == NULL;
+-
+-	  this->resolve(ret, sym, st_shndx, is_ordinary, orig_st_shndx, object,
+-			version, is_default_version);
+-          if (parameters->options().gc_sections())
+-            this->gc_mark_dyn_syms(ret);
+-	  ins.first->second = ret;
++	  // If the existing symbol already has a version,
++	  // don't override it with the new symbol.
++	  // This should only happen when the new symbol
++	  // is from a shared library.
++	  if (ret->version() != NULL)
++	    {
++	      if (!object->is_dynamic())
++	        {
++		  gold_warning(_("%s: conflicting default version definition"
++				 " for %s@@%s"),
++			       object->name().c_str(), name, version);
++		  if (ret->source() == Symbol::FROM_OBJECT)
++		    gold_info(_("%s: %s: previous definition of %s@@%s here"),
++			      program_name,
++			      ret->object()->name().c_str(),
++			      name, ret->version());
++	        }
++	      ret = NULL;
++	      is_default_version = false;
++	    }
++	  else
++	    {
++	      was_undefined_in_reg = ret->is_undefined() && ret->in_reg();
++	      // Commons from plugins are just placeholders.
++	      was_common = (ret->is_common()
++			    && ret->object()->pluginobj() == NULL);
++
++	      this->resolve(ret, sym, st_shndx, is_ordinary, orig_st_shndx,
++			    object, version, is_default_version);
++	      if (parameters->options().gc_sections())
++		this->gc_mark_dyn_syms(ret);
++	      ins.first->second = ret;
++	    }
+ 	}
+-      else
++
++      if (ret == NULL)
+ 	{
+ 	  was_undefined_in_reg = false;
+ 	  was_common = false;
+diff --git a/gold/symtab.h b/gold/symtab.h
+index fdb7511..089e156 100644
+--- a/gold/symtab.h
++++ b/gold/symtab.h
+@@ -344,6 +344,11 @@ class Symbol
+   set_in_dyn()
+   { this->in_dyn_ = true; }
+ 
++  // Return whether this symbol is defined in a dynamic object.
++  bool
++  from_dyn() const
++  { return this->source_ == FROM_OBJECT && this->object()->is_dynamic(); }
++
+   // Return whether this symbol has been seen in a real ELF object.
+   // (IN_REG will return TRUE if the symbol has been seen in either
+   // a real ELF object or an object claimed by a plugin.)

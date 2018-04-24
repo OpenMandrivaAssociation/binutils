@@ -54,7 +54,7 @@ Name:		binutils
 Version:	2.30
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 Epoch:		1
-Release:	5
+Release:	6
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -149,6 +149,8 @@ Patch137:	binutils-2.29-clang-5.0.patch
 Patch138:	binutils-gold-arm-crash.patch
 # https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commitdiff;h=d83d54033545c0e7b668950b127753c88a33f950;hp=f6a8b8c7ac2d5369070a6b76a94ee0f3052433ff
 Patch139:	binutils-gold-arm-crash-2.patch
+# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=patch;h=890d155592e66dc01fc4a9affba806c4e9fc36ba
+Patch140:	gold-fix-crash-on-conflicting-versions.patch
 
 
 %if %{with default_lld}
