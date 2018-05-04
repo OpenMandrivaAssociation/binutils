@@ -29,7 +29,7 @@
 %define dev_name %mklibname binutils -d
 
 # (tpg) optimize it a bit
-%global optflags %{optflags} -O3 -fdata-sections -ffunction-sections -fno-semantic-interposition -fstack-protector-strong
+%global optflags %{optflags} -O3 -fdata-sections -ffunction-sections -fstack-protector-strong
 
 %ifarch %{arm}
 # FIXME remove when binutils links successfully with gold on arm32
