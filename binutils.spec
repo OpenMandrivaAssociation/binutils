@@ -29,7 +29,7 @@
 %define dev_name %mklibname binutils -d
 
 # (tpg) optimize it a bit
-%global optflags %{optflags} -O3
+%global optflags %{optflags} -O3 -fdata-sections -ffunction-sections -fno-semantic-interposition -fstack-protector-strong
 
 %ifarch %{arm}
 # FIXME remove when binutils links successfully with gold on arm32
@@ -54,7 +54,7 @@ Name:		binutils
 Version:	2.30
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 Epoch:		1
-Release:	6
+Release:	7
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -281,10 +281,12 @@ for i in %{long_targets}; do
 		--enable-lto \
 		--disable-werror \
 		--enable-static \
-		--enable-relro \
+		--enable-relro=yes \
 		--with-separate-debug-dir=%{_prefix}/lib/debug \
 		--enable-initfini-array \
 		--disable-isl-version-check \
+		--enable-generate-build-notes=no \
+		--enable-compressed-debug-sections=none \
 		--with-mpc=%{_libdir} \
 		--with-mpfr=%{_libdir} \
 		--with-gmp=%{_libdir} \
