@@ -54,7 +54,7 @@ Name:		binutils
 Version:	2.30
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 Epoch:		1
-Release:	7
+Release:	8
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -112,6 +112,19 @@ Patch15:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-speed
 Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.28-ignore-gold-duplicates.patch
 Patch17:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-ifunc-relocs-in-notes.patch
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-debug-section-marking.patch
+Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-llvm-plugin.patch
+Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gas-build-notes.patch
+Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-7642.patch
+Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-7643.patch
+Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-7208.patch
+Patch24:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-10372.patch
+Patch25:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-10373.patch
+Patch26:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-7570.patch
+Patch27:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-6323.patch
+Patch28:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-6759.patch
+Patch29:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-7569.patch
+Patch30:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-CVE-2018-7568.patch
+
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -190,7 +203,7 @@ to consider using libelf instead of BFD.
 
 %prep
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
-%apply_patches
+%autopatch -p1
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
@@ -298,11 +311,11 @@ done
 %build
 for i in %{long_targets}; do
     cd BUILD-$i
-    %make
+    %make_build
     cd -
 done
 
-%make -C BUILD-%{_target_platform}/bfd/doc html
+%make_build -C BUILD-%{_target_platform}/bfd/doc html
 mkdir -p html
 cp -f BUILD-%{_target_platform}/bfd/doc/bfd.html/* html
 
@@ -312,7 +325,7 @@ echo ====================TESTING=========================
 # workaround for not using colorgcc when building due to colorgcc
 # messing up output redirection..
 PATH=${PATH#%{_datadir}/colorgcc:}
-%make -k -C BUILD-%{_target_platform} check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
+%make_build -k -C BUILD-%{_target_platform} check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 echo ====================TESTING END=====================
 
 logfile="%{name}-%{version}-%{release}.log"
@@ -322,15 +335,15 @@ rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
 for i in %{long_targets}; do
     [ "$i" = "%{_target_platform}" ] && continue
     cd BUILD-$i
-    %makeinstall_std
+    %make_install
     cd -
-    mkdir -p %{buildroot}%{_prefix}/$i/include
+    mkdir -p %{buildroot}%{_prefix}/"$i"/include
 done
 # We install the native version last to make sure we get all
 # the man pages etc. for the native version rather than a random
 # cross compiler that happens to go last
 cd BUILD-%{_target_platform}
-%makeinstall_std
+%make_install
 cp libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
 cd -
 
@@ -432,7 +445,7 @@ done
 # Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
 cd %{buildroot}%{_bindir}
 for i in *-openmandriva-*; do
-	ln -s $i ${i/-openmandriva-/-mandriva-}
+    ln -s $i ${i/-openmandriva-/-mandriva-}
 done
 cd -
 
