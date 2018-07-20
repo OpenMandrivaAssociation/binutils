@@ -4,7 +4,7 @@
 %global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
 %else
 # (tpg) set cross targets here for cooker
-%global targets aarch64-linux armv7hl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-android armv7l-android armv8l-android
+%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-android armv7l-android armv8l-android
 # (tpg) temporary disable build debuginfo for ix86
 %ifarch %{ix86}
 #error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
@@ -29,7 +29,7 @@
 %define dev_name %mklibname binutils -d
 
 # (tpg) optimize it a bit
-%global optflags %{optflags} -O3
+%global optflags %{optflags} -Ofast
 
 %ifarch %{arm}
 # FIXME remove when binutils links successfully with gold on arm32
@@ -51,7 +51,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.30
+Version:	2.31
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 Epoch:		1
 Release:	6
@@ -103,15 +103,7 @@ Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
 Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch10:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-revert-PowerPC-speculation-barriers.patch
-Patch11:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-skip-dwo-search-if-not-needed.patch
-Patch12:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-page-to-segment-assignment.patch
-Patch13:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.30-allow_R_AARCH64-symbols.patch
-Patch14:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-strip-unknown-relocs.patch
-Patch15:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-speed-up-objdump.patch
 Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.28-ignore-gold-duplicates.patch
-Patch17:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-ifunc-relocs-in-notes.patch
-Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-debug-section-marking.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -144,14 +136,7 @@ Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch137:	binutils-2.29-clang-5.0.patch
-
-# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;h=aae8280935aab812c3666d1c5c0ea099e96927cc
-Patch138:	binutils-gold-arm-crash.patch
-# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=commitdiff;h=d83d54033545c0e7b668950b127753c88a33f950;hp=f6a8b8c7ac2d5369070a6b76a94ee0f3052433ff
-Patch139:	binutils-gold-arm-crash-2.patch
-# https://sourceware.org/git/gitweb.cgi?p=binutils-gdb.git;a=patch;h=890d155592e66dc01fc4a9affba806c4e9fc36ba
-Patch140:	gold-fix-crash-on-conflicting-versions.patch
-
+Patch138:	binutils-2.31-clang7.patch
 
 %if %{with default_lld}
 Requires:	lld
@@ -191,6 +176,7 @@ to consider using libelf instead of BFD.
 %prep
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
 %apply_patches
+cp -f %{_datadir}/libtool/config/config.{guess,sub} .
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c

@@ -1,21 +1,24 @@
---- a/bfd/Makefile.am	2012-03-06 14:00:33.229957572 +0000
-+++ b/bfd/Makefile.am	2012-04-27 16:46:05.410974817 +0100
-@@ -18,7 +18,7 @@
- bfdlibdir = @bfdlibdir@
+diff -up binutils-2.31/bfd/Makefile.am.0003~ binutils-2.31/bfd/Makefile.am
+--- binutils-2.31/bfd/Makefile.am.0003~	2018-07-16 10:06:05.963201333 +0200
++++ binutils-2.31/bfd/Makefile.am	2018-07-16 10:09:21.353192372 +0200
+@@ -33,7 +33,7 @@ bfdlibdir = @bfdlibdir@
  bfdincludedir = @bfdincludedir@
  bfdlib_LTLIBRARIES = libbfd.la
--bfdinclude_HEADERS = $(BFD_H) $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h $(INCDIR)/bfdlink.h
-+bfdinclude_HEADERS = $(BFD_H) $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h $(INCDIR)/bfdlink.h $(INCDIR)/demangle.h
+ bfdinclude_HEADERS = $(BFD_H) $(INCDIR)/ansidecl.h $(INCDIR)/symcat.h \
+-		     $(INCDIR)/bfdlink.h $(INCDIR)/diagnostics.h
++		     $(INCDIR)/bfdlink.h $(INCDIR)/diagnostics.h $(INCDIR)/demangle.h
  else !INSTALL_LIBBFD
  # Empty these so that the respective installation directories will not be created.
  bfdlibdir =
---- binutils-2.26.orig/bfd/Makefile.in	2016-01-25 10:23:35.054721634 +0000
-+++ binutils-2.26/bfd/Makefile.in	2016-01-25 10:25:59.292607840 +0000
-@@ -350,6 +350,7 @@ libbfd_la_LDFLAGS = $(am__append_1) -rel
- @INSTALL_LIBBFD_FALSE@bfdinclude_HEADERS = $(am__append_2)
- @INSTALL_LIBBFD_TRUE@bfdinclude_HEADERS = $(BFD_H) \
- @INSTALL_LIBBFD_TRUE@	$(INCDIR)/ansidecl.h $(INCDIR)/symcat.h \
-+@INSTALL_LIBBFD_TRUE@	$(INCDIR)/demangle.h \
- @INSTALL_LIBBFD_TRUE@	$(INCDIR)/bfdlink.h $(am__append_2)
- @INSTALL_LIBBFD_FALSE@rpath_bfdlibdir = @bfdlibdir@
- @INSTALL_LIBBFD_FALSE@noinst_LTLIBRARIES = libbfd.la
+diff -up binutils-2.31/bfd/Makefile.in.0003~ binutils-2.31/bfd/Makefile.in
+--- binutils-2.31/bfd/Makefile.in.0003~	2018-07-16 10:06:05.964201333 +0200
++++ binutils-2.31/bfd/Makefile.in	2018-07-16 10:09:37.094191650 +0200
+@@ -248,7 +248,7 @@ am__can_run_installinfo = \
+   esac
+ am__bfdinclude_HEADERS_DIST = $(INCDIR)/plugin-api.h bfd.h \
+ 	$(INCDIR)/ansidecl.h $(INCDIR)/symcat.h $(INCDIR)/bfdlink.h \
+-	$(INCDIR)/diagnostics.h
++	$(INCDIR)/diagnostics.h $(INCDIR)/demangle.h
+ HEADERS = $(bfdinclude_HEADERS)
+ RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+   distclean-recursive maintainer-clean-recursive
