@@ -29,7 +29,7 @@
 %define dev_name %mklibname binutils -d
 
 # (tpg) optimize it a bit
-%global optflags %{optflags} -Ofast
+%global optflags %{optflags} -Ofast -fdata-sections -ffunction-sections -fstack-protector-strong
 
 %ifarch %{arm}
 # FIXME remove when binutils links successfully with gold on arm32
@@ -53,8 +53,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.31
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Epoch:		1
-Release:	6
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -104,6 +103,7 @@ Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-
 Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
 Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.28-ignore-gold-duplicates.patch
+Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-llvm-plugin.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -175,7 +175,7 @@ to consider using libelf instead of BFD.
 
 %prep
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
-%apply_patches
+%autopatch -p1
 cp -f %{_datadir}/libtool/config/config.{guess,sub} .
 
 # Need to regenerate lex files
@@ -267,10 +267,12 @@ for i in %{long_targets}; do
 		--enable-lto \
 		--disable-werror \
 		--enable-static \
-		--enable-relro \
+		--enable-relro=yes \
 		--with-separate-debug-dir=%{_prefix}/lib/debug \
 		--enable-initfini-array \
 		--disable-isl-version-check \
+		--enable-generate-build-notes=no \
+		--enable-compressed-debug-sections=none \
 		--with-mpc=%{_libdir} \
 		--with-mpfr=%{_libdir} \
 		--with-gmp=%{_libdir} \
@@ -282,11 +284,11 @@ done
 %build
 for i in %{long_targets}; do
     cd BUILD-$i
-    %make
+    %make_build
     cd -
 done
 
-%make -C BUILD-%{_target_platform}/bfd/doc html
+%make_build -C BUILD-%{_target_platform}/bfd/doc html
 mkdir -p html
 cp -f BUILD-%{_target_platform}/bfd/doc/bfd.html/* html
 
@@ -296,7 +298,7 @@ echo ====================TESTING=========================
 # workaround for not using colorgcc when building due to colorgcc
 # messing up output redirection..
 PATH=${PATH#%{_datadir}/colorgcc:}
-%make -k -C BUILD-%{_target_platform} check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
+%make_build -k -C BUILD-%{_target_platform} check CFLAGS="" CXXFLAGS="" LDFLAGS="" || :
 echo ====================TESTING END=====================
 
 logfile="%{name}-%{version}-%{release}.log"
@@ -306,15 +308,15 @@ rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
 for i in %{long_targets}; do
     [ "$i" = "%{_target_platform}" ] && continue
     cd BUILD-$i
-    %makeinstall_std
+    %make_install
     cd -
-    mkdir -p %{buildroot}%{_prefix}/$i/include
+    mkdir -p %{buildroot}%{_prefix}/"$i"/include
 done
 # We install the native version last to make sure we get all
 # the man pages etc. for the native version rather than a random
 # cross compiler that happens to go last
 cd BUILD-%{_target_platform}
-%makeinstall_std
+%make_install
 cp libiberty/pic/libiberty.a %{buildroot}%{_libdir}/
 cd -
 
@@ -416,7 +418,7 @@ done
 # Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
 cd %{buildroot}%{_bindir}
 for i in *-openmandriva-*; do
-	ln -s $i ${i/-openmandriva-/-mandriva-}
+    ln -s $i ${i/-openmandriva-/-mandriva-}
 done
 cd -
 
