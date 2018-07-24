@@ -4,7 +4,7 @@
 %global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
 %else
 # (tpg) set cross targets here for cooker
-%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-android armv7l-android armv8l-android
+%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-android armv7l-android armv8l-android i686-mingw32 x86_64-mingw32
 # (tpg) temporary disable build debuginfo for ix86
 %ifarch %{ix86}
 #error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
@@ -41,7 +41,7 @@
 %{expand: %{?cross: %%global build_cross 1}}
 
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} x86_64 ppc ppc64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
+%define gold_arches %(echo %{ix86} %{x86_64} ppc ppc64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
 
 %define gold_default 1
 
@@ -53,7 +53,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.31
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -222,7 +222,7 @@ for i in %{long_targets}; do
     fi
 
     case $i in
-	i*86|athlon)
+	i*86|athlon|znver1_32)
 	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=x86_64-$(echo $i |cut -d- -f2-)"
 	    ;;
 	aarch64)
@@ -231,7 +231,7 @@ for i in %{long_targets}; do
 	armv7*)
 	    EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
 	    ;;
-	x86_64)
+	x86_64|znver1)
 	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
 	    ;;
     esac
@@ -293,7 +293,7 @@ mkdir -p html
 cp -f BUILD-%{_target_platform}/bfd/doc/bfd.html/* html
 
 %check
-# All Tests must pass on x86 and x86_64
+# All Tests must pass
 echo ====================TESTING=========================
 # workaround for not using colorgcc when building due to colorgcc
 # messing up output redirection..
