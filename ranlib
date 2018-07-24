@@ -32,8 +32,5 @@ if ! "$WRAPPED"; then
 	    fi
 	fi
     done
-    if [ "$REAL_RANLIB" = 'binutils-ranlib' ] && which gcc-ranlib &>/dev/null; then
-	REAL_RANLIB=gcc-ranlib
-    fi
 fi
 exec "$REAL_RANLIB" "$@"
