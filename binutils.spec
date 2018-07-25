@@ -402,14 +402,14 @@ for i in %{long_targets}; do
 	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
 	cd %{buildroot}%{_bindir}
 	for j in $longplatform-*; do
-	    ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
+	    [ -e $(echo $j |sed -e "s,$longplatform,$shortplatform,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
 	done
 	cd -
     fi
     if [ "$longplatform" != "$i" ]; then
 	cd %{buildroot}%{_bindir}
 	for j in $longplatform-*; do
-	    ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
+	    [ -e $(echo $j |sed -e "s,$longplatform,$i,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
 	done
 	cd -
     fi
