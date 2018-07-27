@@ -53,7 +53,7 @@ Version:	%{ver}
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
 %endif
 Epoch:		1
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -143,6 +143,8 @@ Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch137:	binutils-2.29-clang-5.0.patch
+Patch138:	binutils-2.29-pr16504.patch
+Patch139:	binutils-2.28-ignore-gold-duplicates.patch
 
 %if %{with default_lld}
 Requires:	lld
@@ -213,6 +215,8 @@ to consider using libelf instead of BFD.
 %patch135 -p1 -b .lto~
 %patch136 -p1 -b .warnings~
 #patch137 -p1 -b .clang5~
+%patch138 -p1
+%patch139 -p1
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
