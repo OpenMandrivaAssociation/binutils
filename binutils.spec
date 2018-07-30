@@ -53,7 +53,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.31
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -396,7 +396,7 @@ cd -
 mkdir -p %{buildroot}%{_libdir}/bfd-plugins
 
 for i in %{long_targets}; do
-# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
+    # aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
     longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
     if [ -n "$(echo $i |cut -d- -f4-)" ]; then
 	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
@@ -415,10 +415,14 @@ for i in %{long_targets}; do
     fi
 done
 
-# Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
 cd %{buildroot}%{_bindir}
+# Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
 for i in *-openmandriva-*; do
     ln -s $i ${i/-openmandriva-/-mandriva-}
+done
+# And for armv7hl (as opposed to armv7hnl) -- it's the same binutils-wise
+for i in armv7hnl-*; do
+    ln -s $i ${i/armv7hnl-/armv7hl-}
 done
 cd -
 
@@ -472,6 +476,8 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_bindir}/%{_target_platform}-strings
 %{_bindir}/%{_target_platform}-strip
 %(if echo %{_target_platform} |grep -q -- -openmandriva-; then echo "%{_bindir}/%(echo %{_target_platform} |sed -e 's,-openmandriva-,-mandriva-,')-*"; fi)
+%(if echo %{_target_platform} |grep -q -- armv7hnl-; then echo "%{_bindir}/%(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,')-*"; fi)
+%(if echo %{_target_platform} |grep -q -- armv7hnl- && echo %{_target_platform} |grep -q -- -openmandriva-; then echo "%{_bindir}/%(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,;s,-openmandriva-,-mandriva-,g')-*"; fi)
 %{_libdir}/bfd-plugins
 %{_mandir}/man1/*
 %{_infodir}/*info*
@@ -519,9 +525,19 @@ EOF
     if [ -n "$(echo $i |cut -d- -f4-)" ]; then
 	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
 	echo "%{_bindir}/${shortplatform}-*"
+        if echo $shortplatform |grep -q armv7hnl-; then
+	    echo "%{_bindir}/${shortplatform/armv7hnl-/armv7hl-}-*"
+        fi
     fi
     if echo $i |grep -q -- -openmandriva-; then
-        echo "%{_bindir}/${i/-openmandriva-/-mandriva-}-*"
+        f=${i/-openmandriva-/-mandriva-}
+        echo "%{_bindir}/${f}-*"
+        if echo $i |grep -q armv7hnl-; then
+            echo "%{_bindir}/${f/armv7hnl-/armv7hl-}-*"
+        fi
+    fi
+    if echo $i |grep -q armv7hnl-; then
+        echo "%{_bindir}/${i/armv7hnl-/armv7hl-}-*"
     fi
     echo
 done
