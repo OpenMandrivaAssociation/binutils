@@ -24,7 +24,7 @@ if ! "$WRAPPED"; then
     for i in "$@"; do
 	[ "$(echo $i |cut -b1)" = '-' ] && continue
 	if echo "$i" |grep -qE '\.(o|a)$' && [ -e "$i" ]; then
-	    if LANG=C gcc-nm "$i" 2>&1 |grep -q "File format not recognized"; then
+	    if LANG=C gcc-nm "$i" 2>&1 |grep -qi "file format not recognized"; then
 		if which llvm-ranlib &>/dev/null; then
 		    REAL_RANLIB=llvm-ranlib
 		    break
