@@ -487,6 +487,9 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %(
 if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
     echo "%{_bindir}/$(echo %{_target_platform} |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
+    if echo %{_target_platform} |grep -q armv7hnl-; then
+        echo "%{_bindir}/$(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,g' |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
+    fi
 fi
 )
 
