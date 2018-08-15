@@ -51,9 +51,9 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.31
+Version:	2.31.1
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	5
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -92,7 +92,7 @@ Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.
 # on other distros
 #Patch02:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.25-version.patch
 # Export demangle.h with the binutils-devel rpm.
-Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.1-export-demangle.h.patch
+Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.31-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
 Patch05:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.26-lto.patch
@@ -102,8 +102,12 @@ Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
 Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.28-ignore-gold-duplicates.patch
-Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-llvm-plugin.patch
+Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
+Patch17:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-clear-version-info.patch
+Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
+Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-merge-attribute-sections.patch
+Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-note-merge-improvements.patch
+
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
