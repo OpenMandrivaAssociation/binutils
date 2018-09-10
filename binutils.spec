@@ -107,7 +107,8 @@ Patch17:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-clear
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-merge-attribute-sections.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-note-merge-improvements.patch
-
+Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-detect-corrupt-sym-version-info.patch
+Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-delay-ld-script-constant-eval.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
