@@ -1,7 +1,7 @@
-diff -up binutils-2.31/gold/x86_64.cc.omv~ binutils-2.31/gold/x86_64.cc
---- binutils-2.31/gold/x86_64.cc.omv~	2018-07-20 02:01:37.974499788 +0200
-+++ binutils-2.31/gold/x86_64.cc	2018-07-20 02:03:58.979232469 +0200
-@@ -1585,7 +1585,7 @@ Target_x86_64<size>::record_gnu_property
+diff -up binutils-2.31.90/gold/x86_64.cc.19~ binutils-2.31.90/gold/x86_64.cc
+--- binutils-2.31.90/gold/x86_64.cc.19~	2019-01-19 17:55:39.000000000 +0100
++++ binutils-2.31.90/gold/x86_64.cc	2019-01-20 01:26:26.338273975 +0100
+@@ -1592,7 +1592,7 @@ Target_x86_64<size>::record_gnu_property
  {
    uint32_t val = 0;
  
@@ -10,12 +10,3 @@ diff -up binutils-2.31/gold/x86_64.cc.omv~ binutils-2.31/gold/x86_64.cc
      {
      case elfcpp::GNU_PROPERTY_X86_ISA_1_USED:
      case elfcpp::GNU_PROPERTY_X86_ISA_1_NEEDED:
-@@ -1606,7 +1606,7 @@ Target_x86_64<size>::record_gnu_property
-       break;
-     }
- 
--  switch (pr_type)
-+  switch (static_cast<uint32_t>(pr_type))
-     {
-     case elfcpp::GNU_PROPERTY_X86_ISA_1_USED:
-       this->isa_1_used_ |= val;

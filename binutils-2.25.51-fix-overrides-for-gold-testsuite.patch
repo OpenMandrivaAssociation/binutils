@@ -1,15 +1,16 @@
---- binutils-2.25.51/gold/testsuite/Makefile.am.gold_testsuite~	2015-07-11 12:40:58.000000000 +0200
-+++ binutils-2.25.51/gold/testsuite/Makefile.am	2015-07-11 14:14:26.971972927 +0200
-@@ -1749,7 +1749,7 @@ check_SCRIPTS += plugin_test_1.sh
+diff -up binutils-2.31.90/gold/testsuite/Makefile.am.15~ binutils-2.31.90/gold/testsuite/Makefile.am
+--- binutils-2.31.90/gold/testsuite/Makefile.am.15~	2019-01-20 01:22:14.370775525 +0100
++++ binutils-2.31.90/gold/testsuite/Makefile.am	2019-01-20 01:24:18.406494295 +0100
+@@ -2260,7 +2260,7 @@ check_SCRIPTS += plugin_test_1.sh
  check_DATA += plugin_test_1.err
  MOSTLYCLEANFILES += plugin_test_1.err
  plugin_test_1: two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms gcctestdir/ld plugin_test.so
--	$(CXXLINK) -Bgcctestdir/ -Wl,--no-demangle,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
-+	$(CXXLINK) -Bgcctestdir/ -Wl,--no-as-needed,--no-demangle,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
+-	$(CXXLINK) -Wl,--no-demangle,--emit-relocs,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
++	$(CXXLINK) -Wl,--no-as-needed,--no-demangle,--emit-relocs,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
  plugin_test_1.err: plugin_test_1
  	@touch plugin_test_1.err
  
-@@ -2313,12 +2313,12 @@ MOSTLYCLEANFILES += strong_ref_weak_def_
+@@ -2967,12 +2967,12 @@ MOSTLYCLEANFILES += strong_ref_weak_def_
  strong_ref_weak_def_2.o: strong_ref_weak_def_2.c
  	$(COMPILE) -o $@ -c -fPIC $<
  strong_ref_weak_def_2.so: strong_ref_weak_def_2.o gcctestdir/ld
@@ -24,7 +25,7 @@
  		strong_ref_weak_def_2.so
  strong_ref_weak_def.stdout: strong_ref_weak_def_1.so
  	$(TEST_READELF) -sWD $< > $@
-@@ -2332,13 +2332,13 @@ MOSTLYCLEANFILES += dyn_weak_ref_1.so dy
+@@ -2986,13 +2986,13 @@ MOSTLYCLEANFILES += dyn_weak_ref_1.so dy
  dyn_weak_ref_2.o: dyn_weak_ref_2.c
  	$(COMPILE) -o $@ -c -fPIC $<
  dyn_weak_ref_2.so: dyn_weak_ref_2.o gcctestdir/ld
@@ -40,18 +41,19 @@
  dyn_weak_ref.stdout: dyn_weak_ref_1.so
  	$(TEST_READELF) -sWD $< > $@
  
---- binutils-2.25.51/gold/testsuite/Makefile.in.gold_testsuite~	2015-07-11 12:40:58.000000000 +0200
-+++ binutils-2.25.51/gold/testsuite/Makefile.in	2015-07-11 14:14:54.152929214 +0200
-@@ -5704,7 +5704,7 @@ uninstall-am:
+diff -up binutils-2.31.90/gold/testsuite/Makefile.in.15~ binutils-2.31.90/gold/testsuite/Makefile.in
+--- binutils-2.31.90/gold/testsuite/Makefile.in.15~	2019-01-20 01:22:14.371775539 +0100
++++ binutils-2.31.90/gold/testsuite/Makefile.in	2019-01-20 01:25:14.459273293 +0100
+@@ -8859,7 +8859,7 @@ uninstall-am:
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	test -d alt || mkdir -p alt
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	$(CXXCOMPILE) -c -o $@ $<
  @GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@plugin_test_1: two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms gcctestdir/ld plugin_test.so
--@GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@	$(CXXLINK) -Bgcctestdir/ -Wl,--no-demangle,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
-+@GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@	$(CXXLINK) -Bgcctestdir/ -Wl,--no-as-needed,--no-demangle,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
+-@GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@	$(CXXLINK) -Wl,--no-demangle,--emit-relocs,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
++@GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@	$(CXXLINK) -Wl,--no-as-needed,--no-demangle,--emit-relocs,--plugin,"./plugin_test.so",--plugin-opt,"_Z4f13iv" two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_test_2.o.syms empty.o.syms 2>plugin_test_1.err
  @GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@plugin_test_1.err: plugin_test_1
  @GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@	@touch plugin_test_1.err
  @GCC_TRUE@@NATIVE_LINKER_TRUE@@PLUGINS_TRUE@plugin_test_2: two_file_test_main.o two_file_test_1.o.syms two_file_test_1b.o.syms two_file_shared_2.so gcctestdir/ld plugin_test.so
-@@ -5990,25 +5990,25 @@ uninstall-am:
+@@ -9249,25 +9249,25 @@ uninstall-am:
  @GCC_TRUE@@NATIVE_LINKER_TRUE@strong_ref_weak_def_2.o: strong_ref_weak_def_2.c
  @GCC_TRUE@@NATIVE_LINKER_TRUE@	$(COMPILE) -o $@ -c -fPIC $<
  @GCC_TRUE@@NATIVE_LINKER_TRUE@strong_ref_weak_def_2.so: strong_ref_weak_def_2.o gcctestdir/ld

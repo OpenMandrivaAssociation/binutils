@@ -51,9 +51,9 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.31.1
+Version:	2.31.90
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -103,12 +103,7 @@ Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-
 Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
 Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
-Patch17:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-clear-version-info.patch
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
-Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-merge-attribute-sections.patch
-Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-note-merge-improvements.patch
-Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-detect-corrupt-sym-version-info.patch
-Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-delay-ld-script-constant-eval.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
@@ -140,7 +135,6 @@ Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
-Patch137:	binutils-2.29-clang-5.0.patch
 Patch138:	binutils-2.31-clang7.patch
 
 %if %{with default_lld}
