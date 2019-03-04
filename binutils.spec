@@ -29,7 +29,7 @@
 %define dev_name %mklibname binutils -d
 
 # (tpg) optimize it a bit
-%global optflags %{optflags} -Ofast -fdata-sections -ffunction-sections -fstack-protector-strong
+%global optflags %{optflags} -fstack-protector-strong
 
 %ifarch %{arm}
 # FIXME remove when binutils links successfully with gold on arm32
@@ -53,7 +53,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.32
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
