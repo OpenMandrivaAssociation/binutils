@@ -41,7 +41,7 @@
 %{expand: %{?cross: %%global build_cross 1}}
 
 # List of targets where gold can be enabled
-%define gold_arches %(echo %{ix86} %{x86_64} ppc ppc64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
+%define gold_arches %(echo %{ix86} %{x86_64} ppc ppc64 riscv64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
 
 %define gold_default 1
 
