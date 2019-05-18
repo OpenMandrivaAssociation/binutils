@@ -1,0 +1,988 @@
+From d004c09f45d55712b8f3b5540c1ce4446ac52551 Mon Sep 17 00:00:00 2001
+From: Sudakshina Das <sudi.das@arm.com>
+Date: Thu, 11 Apr 2019 10:19:37 +0100
+Subject: [PATCH 093/128] [BINUTILS, AArch64, 2/2] Update Store Allocation Tag
+ instructions
+
+This patch updates the Store allocation tags instructions in
+Armv8.5-A Memory Tagging Extension. This is part of the changes
+that have been introduced recently in the 00bet10 release
+
+All of these instructions have an updated register operand (Xt -> <Xt|SP>)
+
+- STG <Xt|SP>, [<Xn|SP>, #<simm>]
+- STG <Xt|SP>, [<Xn|SP>, #<simm>]!
+- STG <Xt|SP>, [<Xn|SP>], #<simm>
+- STZG <Xt|SP>, [<Xn|SP>, #<simm>]
+- STZG <Xt|SP>, [<Xn|SP>, #<simm>]!
+- STZG <Xt|SP>, [<Xn|SP>], #<simm>
+- ST2G <Xt|SP>, [<Xn|SP>, #<simm>]
+- ST2G <Xt|SP>, [<Xn|SP>, #<simm>]!
+- ST2G <Xt|SP>, [<Xn|SP>], #<simm>
+- STZ2G <Xt|SP>, [<Xn|SP>, #<simm>]
+- STZ2G <Xt|SP>, [<Xn|SP>, #<simm>]!
+- STZ2G <Xt|SP>, [<Xn|SP>], #<simm>
+
+In order to accept <Rt|SP> a new operand type Rt_SP is introduced which has
+the same field as FLD_Rt but follows other semantics of Rn_SP.
+
+*** gas/ChangeLog ***
+
+2019-04-16  Sudakshina Das  <sudi.das@arm.com>
+
+	Backported from mainline
+	2019-04-11  Sudakshina Das  <sudi.das@arm.com>
+
+	* config/tc-aarch64.c (process_omitted_operand): Add case for
+	AARCH64_OPND_Rt_SP.
+	(parse_operands): Likewise.
+	* testsuite/gas/aarch64/armv8_5-a-memtag.d: Update tests.
+	* testsuite/gas/aarch64/armv8_5-a-memtag.s: Likewise.
+	* testsuite/gas/aarch64/illegal-memtag.l: Likewise.
+	* testsuite/gas/aarch64/illegal-memtag.s: Likewise.
+
+*** include/ChangeLog ***
+
+2019-04-16  Sudakshina Das  <sudi.das@arm.com>
+
+	Backported from mainline
+	2019-04-11  Sudakshina Das  <sudi.das@arm.com>
+
+	* opcode/aarch64.h (enum aarch64_opnd): Add AARCH64_OPND_Rt_SP.
+
+*** opcodes/ChangeLog ***
+
+2019-04-16  Sudakshina Das  <sudi.das@arm.com>
+
+	Backported from mainline
+	2019-04-11  Sudakshina Das  <sudi.das@arm.com>
+
+	* aarch64-opc.c (aarch64_print_operand): Add case for
+	AARCH64_OPND_Rt_SP.
+	(verify_constraints): Likewise.
+	* aarch64-tbl.h (QL_LDST_AT): Update to add SP qualifier.
+	(struct aarch64_opcode): Update stg, stzg, st2g, stz2g instructions
+	to accept Rt|SP as first operand.
+	(AARCH64_OPERANDS): Add new Rt_SP.
+	* aarch64-asm-2.c: Regenerated.
+	* aarch64-dis-2.c: Regenerated.
+	* aarch64-opc-2.c: Regenerated.
+
+(cherry picked from commit bd7ceb8d26e011ff3fd23402ec2587d7c374f090)
+---
+ gas/ChangeLog                                |  13 ++
+ gas/config/tc-aarch64.c                      |   2 +
+ gas/testsuite/gas/aarch64/armv8_5-a-memtag.d |  40 ++---
+ gas/testsuite/gas/aarch64/armv8_5-a-memtag.s |  10 +-
+ gas/testsuite/gas/aarch64/illegal-memtag.l   |   8 +-
+ gas/testsuite/gas/aarch64/illegal-memtag.s   |   8 +-
+ include/ChangeLog                            |   7 +
+ include/opcode/aarch64.h                     |   1 +
+ opcodes/ChangeLog                            |  16 ++
+ opcodes/aarch64-asm-2.c                      | 153 +++++++++---------
+ opcodes/aarch64-dis-2.c                      | 161 ++++++++++---------
+ opcodes/aarch64-opc-2.c                      |   1 +
+ opcodes/aarch64-opc.c                        |   2 +
+ opcodes/aarch64-tbl.h                        |  21 +--
+ 14 files changed, 245 insertions(+), 198 deletions(-)
+
+diff --git a/gas/config/tc-aarch64.c b/gas/config/tc-aarch64.c
+index 1acf6f671b..3f75f93008 100644
+--- a/gas/config/tc-aarch64.c
++++ b/gas/config/tc-aarch64.c
+@@ -5135,6 +5135,7 @@ process_omitted_operand (enum aarch64_opnd type, const aarch64_opcode *opcode,
+     case AARCH64_OPND_Rm:
+     case AARCH64_OPND_Rt:
+     case AARCH64_OPND_Rt2:
++    case AARCH64_OPND_Rt_SP:
+     case AARCH64_OPND_Rs:
+     case AARCH64_OPND_Ra:
+     case AARCH64_OPND_Rt_SYS:
+@@ -5511,6 +5512,7 @@ parse_operands (char *str, const aarch64_opcode *opcode)
+ 
+ 	case AARCH64_OPND_Rd_SP:
+ 	case AARCH64_OPND_Rn_SP:
++	case AARCH64_OPND_Rt_SP:
+ 	case AARCH64_OPND_SVE_Rn_SP:
+ 	case AARCH64_OPND_Rm_SP:
+ 	  po_int_reg_or_fail (REG_TYPE_R_SP);
+diff --git a/gas/testsuite/gas/aarch64/armv8_5-a-memtag.d b/gas/testsuite/gas/aarch64/armv8_5-a-memtag.d
+index 1075a12f14..37981bc14d 100644
+--- a/gas/testsuite/gas/aarch64/armv8_5-a-memtag.d
++++ b/gas/testsuite/gas/aarch64/armv8_5-a-memtag.d
+@@ -57,64 +57,64 @@ Disassembly of section \.text:
+ .*:	badf001f 	cmpp	x0, sp
+ .*:	d9200800 	stg	x0, \[x0\]
+ .*:	d9200b60 	stg	x0, \[x27\]
+-.*:	d920081f 	stg	xzr, \[x0\]
++.*:	d920081f 	stg	sp, \[x0\]
+ .*:	d93fb81b 	stg	x27, \[x0, #-80\]
+ .*:	d9200c00 	stg	x0, \[x0, #0\]!
+-.*:	d9200c1f 	stg	xzr, \[x0, #0\]!
++.*:	d9200c1f 	stg	sp, \[x0, #0\]!
+ .*:	d920ac1b 	stg	x27, \[x0, #160\]!
+ .*:	d9200400 	stg	x0, \[x0\], #0
+-.*:	d920041f 	stg	xzr, \[x0\], #0
++.*:	d920041f 	stg	sp, \[x0\], #0
+ .*:	d93a641b 	stg	x27, \[x0\], #-1440
+ .*:	d92ffbe0 	stg	x0, \[sp, #4080\]
+-.*:	d92ffbff 	stg	xzr, \[sp, #4080\]
++.*:	d92ffbff 	stg	sp, \[sp, #4080\]
+ .*:	d9300bfb 	stg	x27, \[sp, #-4096\]
+ .*:	d92fffe0 	stg	x0, \[sp, #4080\]!
+-.*:	d93007ff 	stg	xzr, \[sp\], #-4096
++.*:	d93007ff 	stg	sp, \[sp\], #-4096
+ .*:	d9600800 	stzg	x0, \[x0\]
+ .*:	d9600b60 	stzg	x0, \[x27\]
+-.*:	d960081f 	stzg	xzr, \[x0\]
++.*:	d960081f 	stzg	sp, \[x0\]
+ .*:	d97fb81b 	stzg	x27, \[x0, #-80\]
+ .*:	d9600c00 	stzg	x0, \[x0, #0\]!
+-.*:	d9600c1f 	stzg	xzr, \[x0, #0\]!
++.*:	d9600c1f 	stzg	sp, \[x0, #0\]!
+ .*:	d960ac1b 	stzg	x27, \[x0, #160\]!
+ .*:	d9600400 	stzg	x0, \[x0\], #0
+-.*:	d960041f 	stzg	xzr, \[x0\], #0
++.*:	d960041f 	stzg	sp, \[x0\], #0
+ .*:	d97a641b 	stzg	x27, \[x0\], #-1440
+ .*:	d96ffbe0 	stzg	x0, \[sp, #4080\]
+-.*:	d96ffbff 	stzg	xzr, \[sp, #4080\]
++.*:	d96ffbff 	stzg	sp, \[sp, #4080\]
+ .*:	d9700bfb 	stzg	x27, \[sp, #-4096\]
+ .*:	d96fffe0 	stzg	x0, \[sp, #4080\]!
+-.*:	d97007ff 	stzg	xzr, \[sp\], #-4096
++.*:	d97007ff 	stzg	sp, \[sp\], #-4096
+ .*:	d9a00800 	st2g	x0, \[x0\]
+ .*:	d9a00b60 	st2g	x0, \[x27\]
+-.*:	d9a0081f 	st2g	xzr, \[x0\]
++.*:	d9a0081f 	st2g	sp, \[x0\]
+ .*:	d9bfb81b 	st2g	x27, \[x0, #-80\]
+ .*:	d9a00c00 	st2g	x0, \[x0, #0\]!
+-.*:	d9a00c1f 	st2g	xzr, \[x0, #0\]!
++.*:	d9a00c1f 	st2g	sp, \[x0, #0\]!
+ .*:	d9a0ac1b 	st2g	x27, \[x0, #160\]!
+ .*:	d9a00400 	st2g	x0, \[x0\], #0
+-.*:	d9a0041f 	st2g	xzr, \[x0\], #0
++.*:	d9a0041f 	st2g	sp, \[x0\], #0
+ .*:	d9ba641b 	st2g	x27, \[x0\], #-1440
+ .*:	d9affbe0 	st2g	x0, \[sp, #4080\]
+-.*:	d9affbff 	st2g	xzr, \[sp, #4080\]
++.*:	d9affbff 	st2g	sp, \[sp, #4080\]
+ .*:	d9b00bfb 	st2g	x27, \[sp, #-4096\]
+ .*:	d9afffe0 	st2g	x0, \[sp, #4080\]!
+-.*:	d9b007ff 	st2g	xzr, \[sp\], #-4096
++.*:	d9b007ff 	st2g	sp, \[sp\], #-4096
+ .*:	d9e00800 	stz2g	x0, \[x0\]
+ .*:	d9e00b60 	stz2g	x0, \[x27\]
+-.*:	d9e0081f 	stz2g	xzr, \[x0\]
++.*:	d9e0081f 	stz2g	sp, \[x0\]
+ .*:	d9ffb81b 	stz2g	x27, \[x0, #-80\]
+ .*:	d9e00c00 	stz2g	x0, \[x0, #0\]!
+-.*:	d9e00c1f 	stz2g	xzr, \[x0, #0\]!
++.*:	d9e00c1f 	stz2g	sp, \[x0, #0\]!
+ .*:	d9e0ac1b 	stz2g	x27, \[x0, #160\]!
+ .*:	d9e00400 	stz2g	x0, \[x0\], #0
+-.*:	d9e0041f 	stz2g	xzr, \[x0\], #0
++.*:	d9e0041f 	stz2g	sp, \[x0\], #0
+ .*:	d9fa641b 	stz2g	x27, \[x0\], #-1440
+ .*:	d9effbe0 	stz2g	x0, \[sp, #4080\]
+-.*:	d9effbff 	stz2g	xzr, \[sp, #4080\]
++.*:	d9effbff 	stz2g	sp, \[sp, #4080\]
+ .*:	d9f00bfb 	stz2g	x27, \[sp, #-4096\]
+ .*:	d9efffe0 	stz2g	x0, \[sp, #4080\]!
+-.*:	d9f007ff 	stz2g	xzr, \[sp\], #-4096
++.*:	d9f007ff 	stz2g	sp, \[sp\], #-4096
+ .*:	69000000 	stgp	x0, x0, \[x0\]
+ .*:	69006c00 	stgp	x0, x27, \[x0\]
+ .*:	6900001b 	stgp	x27, x0, \[x0\]
+diff --git a/gas/testsuite/gas/aarch64/armv8_5-a-memtag.s b/gas/testsuite/gas/aarch64/armv8_5-a-memtag.s
+index 50c9962a40..bd01d73b00 100644
+--- a/gas/testsuite/gas/aarch64/armv8_5-a-memtag.s
++++ b/gas/testsuite/gas/aarch64/armv8_5-a-memtag.s
+@@ -19,19 +19,19 @@ func:
+ 	.macro expand_stg op
+ 	\op x0, [x0, #0]
+ 	\op x0, [x27, #0]
+-	\op xzr, [x0, #0]
++	\op sp, [x0, #0]
+ 	\op x27, [x0, #-80]
+ 	\op x0, [x0, #0]!
+-	\op xzr, [x0, #0]!
++	\op sp, [x0, #0]!
+ 	\op x27, [x0, #160]!
+ 	\op x0, [x0], #0
+-	\op xzr, [x0], #0
++	\op sp, [x0], #0
+ 	\op x27, [x0], #-1440
+ 	\op x0, [sp, #4080]
+-	\op xzr, [sp, #4080]
++	\op sp, [sp, #4080]
+ 	\op x27, [sp, #-4096]
+ 	\op x0, [sp, #4080]!
+-	\op xzr, [sp], #-4096
++	\op sp, [sp], #-4096
+ 	.endm
+ 
+ 	.macro expand_ldg_bulk op
+diff --git a/gas/testsuite/gas/aarch64/illegal-memtag.l b/gas/testsuite/gas/aarch64/illegal-memtag.l
+index 693410be64..67ec2831a5 100644
+--- a/gas/testsuite/gas/aarch64/illegal-memtag.l
++++ b/gas/testsuite/gas/aarch64/illegal-memtag.l
+@@ -38,10 +38,10 @@
+ [^:]*:[0-9]+: Error: 64-bit integer or SP register expected at operand 2 -- `st2g x2,\[xzr,#0\]!'
+ [^:]*:[0-9]+: Error: 64-bit integer or SP register expected at operand 2 -- `stzg x2,\[xzr\],#0'
+ [^:]*:[0-9]+: Error: 64-bit integer or SP register expected at operand 2 -- `stz2g x2,\[xzr,#0\]'
+-[^:]*:[0-9]+: Error: operand 1 must be an integer register -- `stg sp,\[x2,#0\]'
+-[^:]*:[0-9]+: Error: operand 1 must be an integer register -- `st2g sp,\[x2,#0\]!'
+-[^:]*:[0-9]+: Error: operand 1 must be an integer register -- `stzg sp,\[x2\],#0'
+-[^:]*:[0-9]+: Error: operand 1 must be an integer register -- `stz2g sp,\[x2,#0\]'
++[^:]*:[0-9]+: Error: operand 1 must be an integer or stack pointer register -- `stg xzr,\[x2,#0\]'
++[^:]*:[0-9]+: Error: operand 1 must be an integer or stack pointer register -- `st2g xzr,\[x2,#0\]!'
++[^:]*:[0-9]+: Error: operand 1 must be an integer or stack pointer register -- `stzg xzr,\[x2\],#0'
++[^:]*:[0-9]+: Error: operand 1 must be an integer or stack pointer register -- `stz2g xzr,\[x2,#0\]'
+ [^:]*:[0-9]+: Error: operand 1 must be an integer register -- `stgp sp,x2,\[x3\]'
+ [^:]*:[0-9]+: Error: operand 2 must be an integer register -- `stgp x1,sp,\[x3\]'
+ [^:]*:[0-9]+: Error: 64-bit integer or SP register expected at operand 3 -- `stgp x0,x0,\[xzr\]'
+diff --git a/gas/testsuite/gas/aarch64/illegal-memtag.s b/gas/testsuite/gas/aarch64/illegal-memtag.s
+index 2aaabc19a1..aa574f40f4 100644
+--- a/gas/testsuite/gas/aarch64/illegal-memtag.s
++++ b/gas/testsuite/gas/aarch64/illegal-memtag.s
+@@ -51,10 +51,10 @@ func:
+ 	st2g x2, [xzr, #0]!
+ 	stzg x2, [xzr], #0
+ 	stz2g x2, [xzr, #0]
+-	stg sp, [x2, #0]
+-	st2g sp, [x2, #0]!
+-	stzg sp, [x2], #0
+-	stz2g sp, [x2, #0]
++	stg xzr, [x2, #0]
++	st2g xzr, [x2, #0]!
++	stzg xzr, [x2], #0
++	stz2g xzr, [x2, #0]
+ 	stgp sp, x2, [x3]
+ 	stgp x1, sp, [x3]
+ 	stgp x0, x0, [xzr]
+diff --git a/include/opcode/aarch64.h b/include/opcode/aarch64.h
+index 0c0234ab20..5dc5fb750a 100644
+--- a/include/opcode/aarch64.h
++++ b/include/opcode/aarch64.h
+@@ -184,6 +184,7 @@ enum aarch64_opnd
+   AARCH64_OPND_Rm,	/* Integer register as source.  */
+   AARCH64_OPND_Rt,	/* Integer register used in ld/st instructions.  */
+   AARCH64_OPND_Rt2,	/* Integer register used in ld/st pair instructions.  */
++  AARCH64_OPND_Rt_SP,	/* Integer Rt or SP used in STG instructions.  */
+   AARCH64_OPND_Rs,	/* Integer register used in ld/st exclusive.  */
+   AARCH64_OPND_Ra,	/* Integer register used in ddp_3src instructions.  */
+   AARCH64_OPND_Rt_SYS,	/* Integer register used in system instructions.  */
+diff --git a/opcodes/aarch64-asm-2.c b/opcodes/aarch64-asm-2.c
+index b4e019a575..f361556cb6 100644
+--- a/opcodes/aarch64-asm-2.c
++++ b/opcodes/aarch64-asm-2.c
+@@ -613,11 +613,11 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 9:
+     case 10:
+     case 11:
+-    case 15:
++    case 12:
+     case 16:
+     case 17:
+     case 18:
+-    case 20:
++    case 19:
+     case 21:
+     case 22:
+     case 23:
+@@ -627,7 +627,7 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 27:
+     case 28:
+     case 29:
+-    case 159:
++    case 30:
+     case 160:
+     case 161:
+     case 162:
+@@ -637,7 +637,7 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 166:
+     case 167:
+     case 168:
+-    case 181:
++    case 169:
+     case 182:
+     case 183:
+     case 184:
+@@ -646,34 +646,34 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 187:
+     case 188:
+     case 189:
+-    case 193:
+-    case 196:
++    case 190:
++    case 194:
++    case 197:
+       return aarch64_ins_regno (self, info, code, inst, errors);
+-    case 13:
+-      return aarch64_ins_reg_extended (self, info, code, inst, errors);
+     case 14:
++      return aarch64_ins_reg_extended (self, info, code, inst, errors);
++    case 15:
+       return aarch64_ins_reg_shifted (self, info, code, inst, errors);
+-    case 19:
++    case 20:
+       return aarch64_ins_ft (self, info, code, inst, errors);
+-    case 30:
+     case 31:
+     case 32:
+     case 33:
+-    case 198:
+-      return aarch64_ins_reglane (self, info, code, inst, errors);
+     case 34:
+-      return aarch64_ins_reglist (self, info, code, inst, errors);
++    case 199:
++      return aarch64_ins_reglane (self, info, code, inst, errors);
+     case 35:
+-      return aarch64_ins_ldst_reglist (self, info, code, inst, errors);
++      return aarch64_ins_reglist (self, info, code, inst, errors);
+     case 36:
+-      return aarch64_ins_ldst_reglist_r (self, info, code, inst, errors);
++      return aarch64_ins_ldst_reglist (self, info, code, inst, errors);
+     case 37:
+-      return aarch64_ins_ldst_elemlist (self, info, code, inst, errors);
++      return aarch64_ins_ldst_reglist_r (self, info, code, inst, errors);
+     case 38:
++      return aarch64_ins_ldst_elemlist (self, info, code, inst, errors);
+     case 39:
+     case 40:
+     case 41:
+-    case 51:
++    case 42:
+     case 52:
+     case 53:
+     case 54:
+@@ -689,13 +689,13 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 64:
+     case 65:
+     case 66:
+-    case 78:
++    case 67:
+     case 79:
+     case 80:
+     case 81:
+-    case 156:
+-    case 158:
+-    case 173:
++    case 82:
++    case 157:
++    case 159:
+     case 174:
+     case 175:
+     case 176:
+@@ -703,90 +703,90 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 178:
+     case 179:
+     case 180:
++    case 181:
+       return aarch64_ins_imm (self, info, code, inst, errors);
+-    case 42:
+     case 43:
+-      return aarch64_ins_advsimd_imm_shift (self, info, code, inst, errors);
+     case 44:
++      return aarch64_ins_advsimd_imm_shift (self, info, code, inst, errors);
+     case 45:
+     case 46:
++    case 47:
+       return aarch64_ins_advsimd_imm_modified (self, info, code, inst, errors);
+-    case 50:
+-    case 147:
++    case 51:
++    case 148:
+       return aarch64_ins_fpimm (self, info, code, inst, errors);
+-    case 67:
+-    case 154:
+-      return aarch64_ins_limm (self, info, code, inst, errors);
+     case 68:
+-      return aarch64_ins_aimm (self, info, code, inst, errors);
++    case 155:
++      return aarch64_ins_limm (self, info, code, inst, errors);
+     case 69:
+-      return aarch64_ins_imm_half (self, info, code, inst, errors);
++      return aarch64_ins_aimm (self, info, code, inst, errors);
+     case 70:
++      return aarch64_ins_imm_half (self, info, code, inst, errors);
++    case 71:
+       return aarch64_ins_fbits (self, info, code, inst, errors);
+-    case 72:
+     case 73:
+-    case 152:
+-      return aarch64_ins_imm_rotate2 (self, info, code, inst, errors);
+     case 74:
+-    case 151:
+-      return aarch64_ins_imm_rotate1 (self, info, code, inst, errors);
++    case 153:
++      return aarch64_ins_imm_rotate2 (self, info, code, inst, errors);
+     case 75:
++    case 152:
++      return aarch64_ins_imm_rotate1 (self, info, code, inst, errors);
+     case 76:
++    case 77:
+       return aarch64_ins_cond (self, info, code, inst, errors);
+-    case 82:
+-    case 91:
+-      return aarch64_ins_addr_simple (self, info, code, inst, errors);
+     case 83:
+-      return aarch64_ins_addr_regoff (self, info, code, inst, errors);
++    case 92:
++      return aarch64_ins_addr_simple (self, info, code, inst, errors);
+     case 84:
++      return aarch64_ins_addr_regoff (self, info, code, inst, errors);
+     case 85:
+     case 86:
+-    case 88:
+-    case 90:
+-      return aarch64_ins_addr_simm (self, info, code, inst, errors);
+     case 87:
+-      return aarch64_ins_addr_simm10 (self, info, code, inst, errors);
+     case 89:
++    case 91:
++      return aarch64_ins_addr_simm (self, info, code, inst, errors);
++    case 88:
++      return aarch64_ins_addr_simm10 (self, info, code, inst, errors);
++    case 90:
+       return aarch64_ins_addr_uimm12 (self, info, code, inst, errors);
+-    case 92:
+-      return aarch64_ins_addr_offset (self, info, code, inst, errors);
+     case 93:
+-      return aarch64_ins_simd_addr_post (self, info, code, inst, errors);
++      return aarch64_ins_addr_offset (self, info, code, inst, errors);
+     case 94:
+-      return aarch64_ins_sysreg (self, info, code, inst, errors);
++      return aarch64_ins_simd_addr_post (self, info, code, inst, errors);
+     case 95:
+-      return aarch64_ins_pstatefield (self, info, code, inst, errors);
++      return aarch64_ins_sysreg (self, info, code, inst, errors);
+     case 96:
++      return aarch64_ins_pstatefield (self, info, code, inst, errors);
+     case 97:
+     case 98:
+     case 99:
+     case 100:
+-      return aarch64_ins_sysins_op (self, info, code, inst, errors);
+     case 101:
++      return aarch64_ins_sysins_op (self, info, code, inst, errors);
+     case 102:
+-      return aarch64_ins_barrier (self, info, code, inst, errors);
+     case 103:
+-      return aarch64_ins_prfop (self, info, code, inst, errors);
++      return aarch64_ins_barrier (self, info, code, inst, errors);
+     case 104:
++      return aarch64_ins_prfop (self, info, code, inst, errors);
+     case 105:
+-      return aarch64_ins_hint (self, info, code, inst, errors);
+     case 106:
+-      return aarch64_ins_sve_addr_ri_s4 (self, info, code, inst, errors);
++      return aarch64_ins_hint (self, info, code, inst, errors);
+     case 107:
++      return aarch64_ins_sve_addr_ri_s4 (self, info, code, inst, errors);
+     case 108:
+     case 109:
+     case 110:
+-      return aarch64_ins_sve_addr_ri_s4xvl (self, info, code, inst, errors);
+     case 111:
+-      return aarch64_ins_sve_addr_ri_s6xvl (self, info, code, inst, errors);
++      return aarch64_ins_sve_addr_ri_s4xvl (self, info, code, inst, errors);
+     case 112:
+-      return aarch64_ins_sve_addr_ri_s9xvl (self, info, code, inst, errors);
++      return aarch64_ins_sve_addr_ri_s6xvl (self, info, code, inst, errors);
+     case 113:
++      return aarch64_ins_sve_addr_ri_s9xvl (self, info, code, inst, errors);
+     case 114:
+     case 115:
+     case 116:
+-      return aarch64_ins_sve_addr_ri_u6 (self, info, code, inst, errors);
+     case 117:
++      return aarch64_ins_sve_addr_ri_u6 (self, info, code, inst, errors);
+     case 118:
+     case 119:
+     case 120:
+@@ -799,8 +799,8 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 127:
+     case 128:
+     case 129:
+-      return aarch64_ins_sve_addr_rr_lsl (self, info, code, inst, errors);
+     case 130:
++      return aarch64_ins_sve_addr_rr_lsl (self, info, code, inst, errors);
+     case 131:
+     case 132:
+     case 133:
+@@ -808,48 +808,49 @@ aarch64_insert_operand (const aarch64_operand *self,
+     case 135:
+     case 136:
+     case 137:
+-      return aarch64_ins_sve_addr_rz_xtw (self, info, code, inst, errors);
+     case 138:
++      return aarch64_ins_sve_addr_rz_xtw (self, info, code, inst, errors);
+     case 139:
+     case 140:
+     case 141:
+-      return aarch64_ins_sve_addr_zi_u5 (self, info, code, inst, errors);
+     case 142:
+-      return aarch64_ins_sve_addr_zz_lsl (self, info, code, inst, errors);
++      return aarch64_ins_sve_addr_zi_u5 (self, info, code, inst, errors);
+     case 143:
+-      return aarch64_ins_sve_addr_zz_sxtw (self, info, code, inst, errors);
++      return aarch64_ins_sve_addr_zz_lsl (self, info, code, inst, errors);
+     case 144:
+-      return aarch64_ins_sve_addr_zz_uxtw (self, info, code, inst, errors);
++      return aarch64_ins_sve_addr_zz_sxtw (self, info, code, inst, errors);
+     case 145:
+-      return aarch64_ins_sve_aimm (self, info, code, inst, errors);
++      return aarch64_ins_sve_addr_zz_uxtw (self, info, code, inst, errors);
+     case 146:
++      return aarch64_ins_sve_aimm (self, info, code, inst, errors);
++    case 147:
+       return aarch64_ins_sve_asimm (self, info, code, inst, errors);
+-    case 148:
+-      return aarch64_ins_sve_float_half_one (self, info, code, inst, errors);
+     case 149:
+-      return aarch64_ins_sve_float_half_two (self, info, code, inst, errors);
++      return aarch64_ins_sve_float_half_one (self, info, code, inst, errors);
+     case 150:
++      return aarch64_ins_sve_float_half_two (self, info, code, inst, errors);
++    case 151:
+       return aarch64_ins_sve_float_zero_one (self, info, code, inst, errors);
+-    case 153:
++    case 154:
+       return aarch64_ins_inv_limm (self, info, code, inst, errors);
+-    case 155:
++    case 156:
+       return aarch64_ins_sve_limm_mov (self, info, code, inst, errors);
+-    case 157:
++    case 158:
+       return aarch64_ins_sve_scale (self, info, code, inst, errors);
+-    case 169:
+     case 170:
+-      return aarch64_ins_sve_shlimm (self, info, code, inst, errors);
+     case 171:
++      return aarch64_ins_sve_shlimm (self, info, code, inst, errors);
+     case 172:
++    case 173:
+       return aarch64_ins_sve_shrimm (self, info, code, inst, errors);
+-    case 190:
+     case 191:
+     case 192:
++    case 193:
+       return aarch64_ins_sve_quad_index (self, info, code, inst, errors);
+-    case 194:
+-      return aarch64_ins_sve_index (self, info, code, inst, errors);
+     case 195:
+-    case 197:
++      return aarch64_ins_sve_index (self, info, code, inst, errors);
++    case 196:
++    case 198:
+       return aarch64_ins_sve_reglist (self, info, code, inst, errors);
+     default: assert (0); abort ();
+     }
+diff --git a/opcodes/aarch64-dis-2.c b/opcodes/aarch64-dis-2.c
+index 63e6f9264e..b47473de00 100644
+--- a/opcodes/aarch64-dis-2.c
++++ b/opcodes/aarch64-dis-2.c
+@@ -20027,14 +20027,14 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 5:
+     case 6:
+     case 7:
+-    case 9:
++    case 8:
+     case 10:
+     case 11:
+-    case 15:
++    case 12:
+     case 16:
+     case 17:
+     case 18:
+-    case 20:
++    case 19:
+     case 21:
+     case 22:
+     case 23:
+@@ -20044,7 +20044,7 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 27:
+     case 28:
+     case 29:
+-    case 159:
++    case 30:
+     case 160:
+     case 161:
+     case 162:
+@@ -20054,7 +20054,7 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 166:
+     case 167:
+     case 168:
+-    case 181:
++    case 169:
+     case 182:
+     case 183:
+     case 184:
+@@ -20063,38 +20063,38 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 187:
+     case 188:
+     case 189:
+-    case 193:
+-    case 196:
++    case 190:
++    case 194:
++    case 197:
+       return aarch64_ext_regno (self, info, code, inst, errors);
+-    case 8:
++    case 9:
+       return aarch64_ext_regrt_sysins (self, info, code, inst, errors);
+-    case 12:
+-      return aarch64_ext_regno_pair (self, info, code, inst, errors);
+     case 13:
+-      return aarch64_ext_reg_extended (self, info, code, inst, errors);
++      return aarch64_ext_regno_pair (self, info, code, inst, errors);
+     case 14:
++      return aarch64_ext_reg_extended (self, info, code, inst, errors);
++    case 15:
+       return aarch64_ext_reg_shifted (self, info, code, inst, errors);
+-    case 19:
++    case 20:
+       return aarch64_ext_ft (self, info, code, inst, errors);
+-    case 30:
+     case 31:
+     case 32:
+     case 33:
+-    case 198:
+-      return aarch64_ext_reglane (self, info, code, inst, errors);
+     case 34:
+-      return aarch64_ext_reglist (self, info, code, inst, errors);
++    case 199:
++      return aarch64_ext_reglane (self, info, code, inst, errors);
+     case 35:
+-      return aarch64_ext_ldst_reglist (self, info, code, inst, errors);
++      return aarch64_ext_reglist (self, info, code, inst, errors);
+     case 36:
+-      return aarch64_ext_ldst_reglist_r (self, info, code, inst, errors);
++      return aarch64_ext_ldst_reglist (self, info, code, inst, errors);
+     case 37:
+-      return aarch64_ext_ldst_elemlist (self, info, code, inst, errors);
++      return aarch64_ext_ldst_reglist_r (self, info, code, inst, errors);
+     case 38:
++      return aarch64_ext_ldst_elemlist (self, info, code, inst, errors);
+     case 39:
+     case 40:
+     case 41:
+-    case 51:
++    case 42:
+     case 52:
+     case 53:
+     case 54:
+@@ -20110,14 +20110,14 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 64:
+     case 65:
+     case 66:
+-    case 77:
++    case 67:
+     case 78:
+     case 79:
+     case 80:
+     case 81:
+-    case 156:
+-    case 158:
+-    case 173:
++    case 82:
++    case 157:
++    case 159:
+     case 174:
+     case 175:
+     case 176:
+@@ -20125,92 +20125,92 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 178:
+     case 179:
+     case 180:
++    case 181:
+       return aarch64_ext_imm (self, info, code, inst, errors);
+-    case 42:
+     case 43:
+-      return aarch64_ext_advsimd_imm_shift (self, info, code, inst, errors);
+     case 44:
++      return aarch64_ext_advsimd_imm_shift (self, info, code, inst, errors);
+     case 45:
+     case 46:
+-      return aarch64_ext_advsimd_imm_modified (self, info, code, inst, errors);
+     case 47:
++      return aarch64_ext_advsimd_imm_modified (self, info, code, inst, errors);
++    case 48:
+       return aarch64_ext_shll_imm (self, info, code, inst, errors);
+-    case 50:
+-    case 147:
++    case 51:
++    case 148:
+       return aarch64_ext_fpimm (self, info, code, inst, errors);
+-    case 67:
+-    case 154:
+-      return aarch64_ext_limm (self, info, code, inst, errors);
+     case 68:
+-      return aarch64_ext_aimm (self, info, code, inst, errors);
++    case 155:
++      return aarch64_ext_limm (self, info, code, inst, errors);
+     case 69:
+-      return aarch64_ext_imm_half (self, info, code, inst, errors);
++      return aarch64_ext_aimm (self, info, code, inst, errors);
+     case 70:
++      return aarch64_ext_imm_half (self, info, code, inst, errors);
++    case 71:
+       return aarch64_ext_fbits (self, info, code, inst, errors);
+-    case 72:
+     case 73:
+-    case 152:
+-      return aarch64_ext_imm_rotate2 (self, info, code, inst, errors);
+     case 74:
+-    case 151:
+-      return aarch64_ext_imm_rotate1 (self, info, code, inst, errors);
++    case 153:
++      return aarch64_ext_imm_rotate2 (self, info, code, inst, errors);
+     case 75:
++    case 152:
++      return aarch64_ext_imm_rotate1 (self, info, code, inst, errors);
+     case 76:
++    case 77:
+       return aarch64_ext_cond (self, info, code, inst, errors);
+-    case 82:
+-    case 91:
+-      return aarch64_ext_addr_simple (self, info, code, inst, errors);
+     case 83:
+-      return aarch64_ext_addr_regoff (self, info, code, inst, errors);
++    case 92:
++      return aarch64_ext_addr_simple (self, info, code, inst, errors);
+     case 84:
++      return aarch64_ext_addr_regoff (self, info, code, inst, errors);
+     case 85:
+     case 86:
+-    case 88:
+-    case 90:
+-      return aarch64_ext_addr_simm (self, info, code, inst, errors);
+     case 87:
+-      return aarch64_ext_addr_simm10 (self, info, code, inst, errors);
+     case 89:
++    case 91:
++      return aarch64_ext_addr_simm (self, info, code, inst, errors);
++    case 88:
++      return aarch64_ext_addr_simm10 (self, info, code, inst, errors);
++    case 90:
+       return aarch64_ext_addr_uimm12 (self, info, code, inst, errors);
+-    case 92:
+-      return aarch64_ext_addr_offset (self, info, code, inst, errors);
+     case 93:
+-      return aarch64_ext_simd_addr_post (self, info, code, inst, errors);
++      return aarch64_ext_addr_offset (self, info, code, inst, errors);
+     case 94:
+-      return aarch64_ext_sysreg (self, info, code, inst, errors);
++      return aarch64_ext_simd_addr_post (self, info, code, inst, errors);
+     case 95:
+-      return aarch64_ext_pstatefield (self, info, code, inst, errors);
++      return aarch64_ext_sysreg (self, info, code, inst, errors);
+     case 96:
++      return aarch64_ext_pstatefield (self, info, code, inst, errors);
+     case 97:
+     case 98:
+     case 99:
+     case 100:
+-      return aarch64_ext_sysins_op (self, info, code, inst, errors);
+     case 101:
++      return aarch64_ext_sysins_op (self, info, code, inst, errors);
+     case 102:
+-      return aarch64_ext_barrier (self, info, code, inst, errors);
+     case 103:
+-      return aarch64_ext_prfop (self, info, code, inst, errors);
++      return aarch64_ext_barrier (self, info, code, inst, errors);
+     case 104:
++      return aarch64_ext_prfop (self, info, code, inst, errors);
+     case 105:
+-      return aarch64_ext_hint (self, info, code, inst, errors);
+     case 106:
+-      return aarch64_ext_sve_addr_ri_s4 (self, info, code, inst, errors);
++      return aarch64_ext_hint (self, info, code, inst, errors);
+     case 107:
++      return aarch64_ext_sve_addr_ri_s4 (self, info, code, inst, errors);
+     case 108:
+     case 109:
+     case 110:
+-      return aarch64_ext_sve_addr_ri_s4xvl (self, info, code, inst, errors);
+     case 111:
+-      return aarch64_ext_sve_addr_ri_s6xvl (self, info, code, inst, errors);
++      return aarch64_ext_sve_addr_ri_s4xvl (self, info, code, inst, errors);
+     case 112:
+-      return aarch64_ext_sve_addr_ri_s9xvl (self, info, code, inst, errors);
++      return aarch64_ext_sve_addr_ri_s6xvl (self, info, code, inst, errors);
+     case 113:
++      return aarch64_ext_sve_addr_ri_s9xvl (self, info, code, inst, errors);
+     case 114:
+     case 115:
+     case 116:
+-      return aarch64_ext_sve_addr_ri_u6 (self, info, code, inst, errors);
+     case 117:
++      return aarch64_ext_sve_addr_ri_u6 (self, info, code, inst, errors);
+     case 118:
+     case 119:
+     case 120:
+@@ -20223,8 +20223,8 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 127:
+     case 128:
+     case 129:
+-      return aarch64_ext_sve_addr_rr_lsl (self, info, code, inst, errors);
+     case 130:
++      return aarch64_ext_sve_addr_rr_lsl (self, info, code, inst, errors);
+     case 131:
+     case 132:
+     case 133:
+@@ -20232,48 +20232,49 @@ aarch64_extract_operand (const aarch64_operand *self,
+     case 135:
+     case 136:
+     case 137:
+-      return aarch64_ext_sve_addr_rz_xtw (self, info, code, inst, errors);
+     case 138:
++      return aarch64_ext_sve_addr_rz_xtw (self, info, code, inst, errors);
+     case 139:
+     case 140:
+     case 141:
+-      return aarch64_ext_sve_addr_zi_u5 (self, info, code, inst, errors);
+     case 142:
+-      return aarch64_ext_sve_addr_zz_lsl (self, info, code, inst, errors);
++      return aarch64_ext_sve_addr_zi_u5 (self, info, code, inst, errors);
+     case 143:
+-      return aarch64_ext_sve_addr_zz_sxtw (self, info, code, inst, errors);
++      return aarch64_ext_sve_addr_zz_lsl (self, info, code, inst, errors);
+     case 144:
+-      return aarch64_ext_sve_addr_zz_uxtw (self, info, code, inst, errors);
++      return aarch64_ext_sve_addr_zz_sxtw (self, info, code, inst, errors);
+     case 145:
+-      return aarch64_ext_sve_aimm (self, info, code, inst, errors);
++      return aarch64_ext_sve_addr_zz_uxtw (self, info, code, inst, errors);
+     case 146:
++      return aarch64_ext_sve_aimm (self, info, code, inst, errors);
++    case 147:
+       return aarch64_ext_sve_asimm (self, info, code, inst, errors);
+-    case 148:
+-      return aarch64_ext_sve_float_half_one (self, info, code, inst, errors);
+     case 149:
+-      return aarch64_ext_sve_float_half_two (self, info, code, inst, errors);
++      return aarch64_ext_sve_float_half_one (self, info, code, inst, errors);
+     case 150:
++      return aarch64_ext_sve_float_half_two (self, info, code, inst, errors);
++    case 151:
+       return aarch64_ext_sve_float_zero_one (self, info, code, inst, errors);
+-    case 153:
++    case 154:
+       return aarch64_ext_inv_limm (self, info, code, inst, errors);
+-    case 155:
++    case 156:
+       return aarch64_ext_sve_limm_mov (self, info, code, inst, errors);
+-    case 157:
++    case 158:
+       return aarch64_ext_sve_scale (self, info, code, inst, errors);
+-    case 169:
+     case 170:
+-      return aarch64_ext_sve_shlimm (self, info, code, inst, errors);
+     case 171:
++      return aarch64_ext_sve_shlimm (self, info, code, inst, errors);
+     case 172:
++    case 173:
+       return aarch64_ext_sve_shrimm (self, info, code, inst, errors);
+-    case 190:
+     case 191:
+     case 192:
++    case 193:
+       return aarch64_ext_sve_quad_index (self, info, code, inst, errors);
+-    case 194:
+-      return aarch64_ext_sve_index (self, info, code, inst, errors);
+     case 195:
+-    case 197:
++      return aarch64_ext_sve_index (self, info, code, inst, errors);
++    case 196:
++    case 198:
+       return aarch64_ext_sve_reglist (self, info, code, inst, errors);
+     default: assert (0); abort ();
+     }
+diff --git a/opcodes/aarch64-opc-2.c b/opcodes/aarch64-opc-2.c
+index 29eb2b7528..6902136e14 100644
+--- a/opcodes/aarch64-opc-2.c
++++ b/opcodes/aarch64-opc-2.c
+@@ -30,6 +30,7 @@ const struct aarch64_operand aarch64_operands[] =
+   {AARCH64_OPND_CLASS_INT_REG, "Rm", OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Rm}, "an integer register"},
+   {AARCH64_OPND_CLASS_INT_REG, "Rt", OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Rt}, "an integer register"},
+   {AARCH64_OPND_CLASS_INT_REG, "Rt2", OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Rt2}, "an integer register"},
++  {AARCH64_OPND_CLASS_INT_REG, "Rt_SP", OPD_F_MAYBE_SP | OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Rt}, "an integer or stack pointer register"},
+   {AARCH64_OPND_CLASS_INT_REG, "Rs", OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Rs}, "an integer register"},
+   {AARCH64_OPND_CLASS_INT_REG, "Ra", OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Ra}, "an integer register"},
+   {AARCH64_OPND_CLASS_INT_REG, "Rt_SYS", OPD_F_HAS_INSERTER | OPD_F_HAS_EXTRACTOR, {FLD_Rt}, "an integer register"},
+diff --git a/opcodes/aarch64-opc.c b/opcodes/aarch64-opc.c
+index 22839ca724..519bcb0596 100644
+--- a/opcodes/aarch64-opc.c
++++ b/opcodes/aarch64-opc.c
+@@ -3155,6 +3155,7 @@ aarch64_print_operand (char *buf, size_t size, bfd_vma pc,
+ 
+     case AARCH64_OPND_Rd_SP:
+     case AARCH64_OPND_Rn_SP:
++    case AARCH64_OPND_Rt_SP:
+     case AARCH64_OPND_SVE_Rn_SP:
+     case AARCH64_OPND_Rm_SP:
+       assert (opnd->qualifier == AARCH64_OPND_QLF_W
+@@ -4904,6 +4905,7 @@ verify_constraints (const struct aarch64_inst *inst,
+ 		  case AARCH64_OPND_Rn:
+ 		  case AARCH64_OPND_Rm:
+ 		  case AARCH64_OPND_Rn_SP:
++		  case AARCH64_OPND_Rt_SP:
+ 		  case AARCH64_OPND_Rm_SP:
+ 		    if (inst_op.reg.regno == blk_dest.reg.regno)
+ 		      {
+diff --git a/opcodes/aarch64-tbl.h b/opcodes/aarch64-tbl.h
+index c95fc0b563..253c1fddb2 100644
+--- a/opcodes/aarch64-tbl.h
++++ b/opcodes/aarch64-tbl.h
+@@ -125,10 +125,11 @@
+   QLF1(X),			\
+ }
+ 
+-/* e.g. STG Xt, [<Xn|SP>, #<imm9>].  */
++/* e.g. STG <Xt|SP>, [<Xn|SP>, #<imm9>].  */
+ #define QL_LDST_AT		\
+ {				\
+   QLF2(X, imm_tag),		\
++  QLF2(SP, imm_tag),		\
+ }
+ 
+ /* e.g. RBIT <Wd>, <Wn>.  */
+@@ -3237,14 +3238,14 @@ struct aarch64_opcode aarch64_opcode_table[] =
+   CORE_INSN ("ldr", 0xb8400400, 0xbfe00400, ldst_imm9, 0, OP2 (Rt, ADDR_SIMM9), QL_LDST_R, F_GPRSIZE_IN_Q),
+   CORE_INSN ("ldrsw", 0xb8800400, 0xffe00400, ldst_imm9, 0, OP2 (Rt, ADDR_SIMM9), QL_LDST_X32, 0),
+   /* Load/store Allocation Tag instructions.  */
+-  MEMTAG_INSN ("stg",  0xd9200800, 0xffe00c00, ldst_unscaled, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("stzg", 0xd9600800, 0xffe00c00, ldst_unscaled, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("st2g", 0xd9a00800, 0xffe00c00, ldst_unscaled, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("stz2g",0xd9e00800, 0xffe00c00, ldst_unscaled, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("stg",  0xd9200400, 0xffe00400, ldst_imm9, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("stzg", 0xd9600400, 0xffe00400, ldst_imm9, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("st2g", 0xd9a00400, 0xffe00400, ldst_imm9, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
+-  MEMTAG_INSN ("stz2g",0xd9e00400, 0xffe00400, ldst_imm9, OP2 (Rt, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("stg",  0xd9200800, 0xffe00c00, ldst_unscaled, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("stzg", 0xd9600800, 0xffe00c00, ldst_unscaled, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("st2g", 0xd9a00800, 0xffe00c00, ldst_unscaled, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("stz2g",0xd9e00800, 0xffe00c00, ldst_unscaled, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("stg",  0xd9200400, 0xffe00400, ldst_imm9, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("stzg", 0xd9600400, 0xffe00400, ldst_imm9, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("st2g", 0xd9a00400, 0xffe00400, ldst_imm9, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
++  MEMTAG_INSN ("stz2g",0xd9e00400, 0xffe00400, ldst_imm9, OP2 (Rt_SP, ADDR_SIMM13), QL_LDST_AT, 0),
+   /* Load/store register (unsigned immediate).  */
+   CORE_INSN ("strb", 0x39000000, 0xffc00000, ldst_pos, OP_STRB_POS, OP2 (Rt, ADDR_UIMM12), QL_LDST_W8, 0),
+   CORE_INSN ("ldrb", 0x39400000, 0xffc00000, ldst_pos, OP_LDRB_POS, OP2 (Rt, ADDR_UIMM12), QL_LDST_W8, 0),
+@@ -4518,6 +4519,8 @@ struct aarch64_opcode aarch64_opcode_table[] =
+     Y(INT_REG, regno, "Rm", 0, F(FLD_Rm), "an integer register")	\
+     Y(INT_REG, regno, "Rt", 0, F(FLD_Rt), "an integer register")	\
+     Y(INT_REG, regno, "Rt2", 0, F(FLD_Rt2), "an integer register")	\
++    Y(INT_REG, regno, "Rt_SP", OPD_F_MAYBE_SP, F(FLD_Rt),		\
++      "an integer or stack pointer register")				\
+     Y(INT_REG, regno, "Rs", 0, F(FLD_Rs), "an integer register")	\
+     Y(INT_REG, regno, "Ra", 0, F(FLD_Ra), "an integer register")	\
+     X(INT_REG, ins_regno, ext_regrt_sysins, "Rt_SYS", 0, F(FLD_Rt),	\
+-- 
+2.21.0
+

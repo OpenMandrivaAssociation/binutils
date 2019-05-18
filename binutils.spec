@@ -137,6 +137,21 @@ Patch135:	binutils-2.25.51-lto.patch
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch138:	binutils-2.31-clang7.patch
 
+# From upstream git
+Patch205:	0012-Arm-Backport-hlt-to-all-architectures.patch
+Patch206:	0014-Make-inline-plt-reloc-unsupported-for-bss-plt-an-err.patch
+Patch207:	0017-x86-64-Restore-PIC-check-for-PCREL-reloc-against-pro.patch
+Patch208:	0018-gas-Pass-max_bytes-to-TC_FRAG_INIT.patch
+Patch209:	0022-Updated-French-translation-for-ld-and-gold-subdirect.patch
+Patch213:	0060-PR24355-segmentation-fault-in-function-called-from-p.patch
+Patch215:	0076-AArch64-Fix-disassembler-bug-with-out-of-order-secti.patch
+Patch216:	0092-BINUTILS-AArch64-1-2-Add-new-LDGM-STGM-instruction.patch
+Patch217:	0093-BINUTILS-AArch64-2-2-Update-Store-Allocation-Tag-ins.patch
+Patch218:	0095-x86-Also-check-x86-linker_def-for-non-shared-definit.patch
+Patch219:	0097-AArch64-When-DF_BIND_NOW-don-t-use-TLSDESC-GOT-value.patch
+Patch220:	0122-Work-around-gcc9-warning-bug.patch
+Patch221:	0128-PR24567-assertion-failure-in-ldlang.c-6868-when-comp.patch
+
 %if %{with default_lld}
 Requires:	lld
 %endif
