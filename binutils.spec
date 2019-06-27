@@ -43,7 +43,7 @@
 # List of targets where gold can be enabled
 %define gold_arches %(echo %{ix86} %{x86_64} ppc ppc64 riscv64 %{sparc} %{armx}|sed 's/[ ]/\|/g')
 
-%define gold_default 1
+%define gold_default 0
 
 %bcond_with default_lld
 
@@ -53,7 +53,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.32
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
