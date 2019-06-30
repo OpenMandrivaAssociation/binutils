@@ -45,7 +45,7 @@
 
 %define gold_default 0
 
-%bcond_with default_lld
+%bcond_without default_lld
 
 %bcond_without gold
 
@@ -53,7 +53,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.32
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
