@@ -31,9 +31,12 @@
 # (tpg) optimize it a bit
 %global optflags %{optflags} -fstack-protector-strong
 
-%ifarch %{arm}
-# FIXME remove when binutils links successfully with gold on arm32
+%ifarch %{riscv}
+# Make sure we don't use lld on risc-v yet
 %global optflags %{optflags} -fuse-ld=bfd
+%bcond_with default_lld
+%else
+%bcond_without default_lld
 %endif
 
 # Define if building a cross-binutils
@@ -45,7 +48,6 @@
 
 %define gold_default 0
 
-%bcond_without default_lld
 
 %bcond_without gold
 
@@ -53,7 +55,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.32
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	4
+Release:	5
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
