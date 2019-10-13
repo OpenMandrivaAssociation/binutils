@@ -53,9 +53,9 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.32
+Version:	2.33.1
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	5
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
