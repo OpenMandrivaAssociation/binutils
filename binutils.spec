@@ -97,19 +97,19 @@ Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.
 Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.31-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
-Patch05:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.26-lto.patch
 Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-filename-in-error-messages.patch
 # FIXME this one serves a purpose (fix ltrace, LD_AUDIT) but reduces optimizations.
 # This should be an option instead of a hardcode in the longer term!
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
 Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
+Patch16:       https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
-Patch121:	binutils-2.25.51-linux32.patch
+# (tpg) 2019-10-17 do we really need this ?
+#Patch121:	binutils-2.25.51-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch127:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
@@ -133,26 +133,12 @@ Patch132:	binutils-2015.01-accept-musl-libintl.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch131:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
 # from upstream
-Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch138:	binutils-2.31-clang7.patch
 
 # From upstream git
-Patch205:	0012-Arm-Backport-hlt-to-all-architectures.patch
-Patch206:	0014-Make-inline-plt-reloc-unsupported-for-bss-plt-an-err.patch
-Patch207:	0017-x86-64-Restore-PIC-check-for-PCREL-reloc-against-pro.patch
-Patch208:	0018-gas-Pass-max_bytes-to-TC_FRAG_INIT.patch
-Patch209:	0022-Updated-French-translation-for-ld-and-gold-subdirect.patch
-Patch213:	0060-PR24355-segmentation-fault-in-function-called-from-p.patch
-Patch215:	0076-AArch64-Fix-disassembler-bug-with-out-of-order-secti.patch
-Patch216:	0092-BINUTILS-AArch64-1-2-Add-new-LDGM-STGM-instruction.patch
-Patch217:	0093-BINUTILS-AArch64-2-2-Update-Store-Allocation-Tag-ins.patch
-Patch218:	0095-x86-Also-check-x86-linker_def-for-non-shared-definit.patch
-Patch219:	0097-AArch64-When-DF_BIND_NOW-don-t-use-TLSDESC-GOT-value.patch
-Patch220:	0122-Work-around-gcc9-warning-bug.patch
-Patch221:	0128-PR24567-assertion-failure-in-ldlang.c-6868-when-comp.patch
 
 %if %{with default_lld}
 Requires:	lld
