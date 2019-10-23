@@ -67,26 +67,6 @@ Source10:	binutils.rpmlintrc
 Source100:	ar
 Source101:	ranlib
 Source102:	nm
-%rename		%{lib_name}
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	bison
-BuildRequires:	flex
-BuildRequires:	gcc
-BuildRequires:	gettext
-BuildRequires:	texinfo
-BuildRequires:	dejagnu
-BuildRequires:	pkgconfig(zlib)
-# make check'ing requires libdl.a
-BuildRequires:	glibc-static-devel >= 6:2.14.90-8
-# gold make check'ing requires libstdc++.a & bc
-BuildRequires:	libstdc++-static-devel
-BuildRequires:	bc
-BuildRequires:	pkgconfig(isl)
-BuildRequires:	pkgconfig(cloog-isl)
-BuildRequires:	gmp-devel
-BuildRequires:	pkgconfig(mpfr)
-BuildRequires:	libmpc-devel
 
 # Fedora patches:
 Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.51.0.2-libtool-lib64.patch
@@ -103,13 +83,13 @@ Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
 Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch16:       https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
+Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
-# (tpg) 2019-10-17 do we really need this ?
-#Patch121:	binutils-2.25.51-linux32.patch
+# (tpg) this is needed for 32-bit chroots running on x86_64 host
+Patch121:	binutils-2.25.51-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch127:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
@@ -140,6 +120,26 @@ Patch138:	binutils-2.31-clang7.patch
 
 # From upstream git
 
+%rename %{lib_name}
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	bison
+BuildRequires:	flex
+BuildRequires:	gcc
+BuildRequires:	gettext
+BuildRequires:	texinfo
+BuildRequires:	dejagnu
+BuildRequires:	pkgconfig(zlib)
+# make check'ing requires libdl.a
+BuildRequires:	glibc-static-devel >= 6:2.14.90-8
+# gold make check'ing requires libstdc++.a & bc
+BuildRequires:	libstdc++-static-devel
+BuildRequires:	bc
+BuildRequires:	pkgconfig(isl)
+BuildRequires:	pkgconfig(cloog-isl)
+BuildRequires:	gmp-devel
+BuildRequires:	pkgconfig(mpfr)
+BuildRequires:	libmpc-devel
 %if %{with default_lld}
 Requires:	lld
 %endif
@@ -178,6 +178,7 @@ to consider using libelf instead of BFD.
 %prep
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
 %autopatch -p1
+
 cp -f %{_datadir}/libtool/config/config.{guess,sub} .
 
 # Need to regenerate lex files
@@ -193,13 +194,13 @@ sed -i -e '/pagesize/s/0x1000,/0x10000,/' gold/aarch64.cc
 sed -i -e 's/^libbfd_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' bfd/Makefile.{am,in}
 sed -i -e 's/^libopcodes_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' opcodes/Makefile.{am,in}
 
-%ifarch %{arm}
+#ifarch %{arm}
 # This should be fixed with patches 138 and 139, but leaving it here for now
 # so we can restore the temporary fix if more problems occur.
 # --icf=safe is unstable on 32-bit ARM
 # https://sourceware.org/bugzilla/show_bug.cgi?id=23046
-#ed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
-%endif
+# sed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
+#endif
 
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
