@@ -67,26 +67,6 @@ Source10:	binutils.rpmlintrc
 Source100:	ar
 Source101:	ranlib
 Source102:	nm
-%rename		%{lib_name}
-BuildRequires:	autoconf
-BuildRequires:	automake
-BuildRequires:	bison
-BuildRequires:	flex
-BuildRequires:	gcc
-BuildRequires:	gettext
-BuildRequires:	texinfo
-BuildRequires:	dejagnu
-BuildRequires:	pkgconfig(zlib)
-# make check'ing requires libdl.a
-BuildRequires:	glibc-static-devel >= 6:2.14.90-8
-# gold make check'ing requires libstdc++.a & bc
-BuildRequires:	libstdc++-static-devel
-BuildRequires:	bc
-BuildRequires:	pkgconfig(isl)
-BuildRequires:	pkgconfig(cloog-isl)
-BuildRequires:	gmp-devel
-BuildRequires:	pkgconfig(mpfr)
-BuildRequires:	libmpc-devel
 
 # Fedora patches:
 Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.51.0.2-libtool-lib64.patch
@@ -97,7 +77,6 @@ Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.
 Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.31-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
-Patch05:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.26-lto.patch
 Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-filename-in-error-messages.patch
 # FIXME this one serves a purpose (fix ltrace, LD_AUDIT) but reduces optimizations.
 # This should be an option instead of a hardcode in the longer term!
@@ -109,6 +88,7 @@ Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
+# (tpg) this is needed for 32-bit chroots running on x86_64 host
 Patch121:	binutils-2.25.51-linux32.patch
 # (proyvind): skip gold tests that fails
 Patch127:	binutils-2.21.51.0.8-skip-gold-check.patch
@@ -133,27 +113,33 @@ Patch132:	binutils-2015.01-accept-musl-libintl.patch
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch131:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
 # from upstream
-Patch134:	binutils-2.21.53.0.3-opcodes-missing-ifdef-enable-nls.patch
 Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch138:	binutils-2.31-clang7.patch
 
 # From upstream git
-Patch205:	0012-Arm-Backport-hlt-to-all-architectures.patch
-Patch206:	0014-Make-inline-plt-reloc-unsupported-for-bss-plt-an-err.patch
-Patch207:	0017-x86-64-Restore-PIC-check-for-PCREL-reloc-against-pro.patch
-Patch208:	0018-gas-Pass-max_bytes-to-TC_FRAG_INIT.patch
-Patch209:	0022-Updated-French-translation-for-ld-and-gold-subdirect.patch
-Patch213:	0060-PR24355-segmentation-fault-in-function-called-from-p.patch
-Patch215:	0076-AArch64-Fix-disassembler-bug-with-out-of-order-secti.patch
-Patch216:	0092-BINUTILS-AArch64-1-2-Add-new-LDGM-STGM-instruction.patch
-Patch217:	0093-BINUTILS-AArch64-2-2-Update-Store-Allocation-Tag-ins.patch
-Patch218:	0095-x86-Also-check-x86-linker_def-for-non-shared-definit.patch
-Patch219:	0097-AArch64-When-DF_BIND_NOW-don-t-use-TLSDESC-GOT-value.patch
-Patch220:	0122-Work-around-gcc9-warning-bug.patch
-Patch221:	0128-PR24567-assertion-failure-in-ldlang.c-6868-when-comp.patch
 
+%rename %{lib_name}
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	bison
+BuildRequires:	flex
+BuildRequires:	gcc
+BuildRequires:	gettext
+BuildRequires:	texinfo
+BuildRequires:	dejagnu
+BuildRequires:	pkgconfig(zlib)
+# make check'ing requires libdl.a
+BuildRequires:	glibc-static-devel >= 6:2.14.90-8
+# gold make check'ing requires libstdc++.a & bc
+BuildRequires:	libstdc++-static-devel
+BuildRequires:	bc
+BuildRequires:	pkgconfig(isl)
+BuildRequires:	pkgconfig(cloog-isl)
+BuildRequires:	gmp-devel
+BuildRequires:	pkgconfig(mpfr)
+BuildRequires:	libmpc-devel
 %if %{with default_lld}
 Requires:	lld
 %endif
@@ -192,6 +178,7 @@ to consider using libelf instead of BFD.
 %prep
 %setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
 %autopatch -p1
+
 cp -f %{_datadir}/libtool/config/config.{guess,sub} .
 
 # Need to regenerate lex files
@@ -207,13 +194,13 @@ sed -i -e '/pagesize/s/0x1000,/0x10000,/' gold/aarch64.cc
 sed -i -e 's/^libbfd_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' bfd/Makefile.{am,in}
 sed -i -e 's/^libopcodes_la_LDFLAGS = /&-Wl,-Bsymbolic-functions /' opcodes/Makefile.{am,in}
 
-%ifarch %{arm}
+#ifarch %{arm}
 # This should be fixed with patches 138 and 139, but leaving it here for now
 # so we can restore the temporary fix if more problems occur.
 # --icf=safe is unstable on 32-bit ARM
 # https://sourceware.org/bugzilla/show_bug.cgi?id=23046
-#ed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
-%endif
+# sed -i -e '/^[^/-]*icf/ s/"safe"/"none"/' gold/options.h
+#endif
 
 find -name \*.h -o -name \*.c -o -name \*.cc | xargs chmod 644
 
