@@ -8,16 +8,16 @@
 # (tpg) temporary disable build debuginfo for ix86
 %ifarch %{ix86}
 #error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
-%define _enable_debug_packages %{nil}
-%define debug_package          %{nil}
+%define _enable_debug_packages	%{nil}
+%define debug_package		%{nil}
 %endif
 %endif
 %global long_targets %(
-    for i in %{targets}; do
-	CPU=$(echo $i |cut -d- -f1)
-	OS=$(echo $i |cut -d- -f2)
-	echo -n "$(rpm --target=${CPU}-${OS} -E %%{_target_platform}) "
-    done
+	for i in %{targets}; do
+		CPU=$(echo $i |cut -d- -f1)
+		OS=$(echo $i |cut -d- -f2)
+		echo -n "$(rpm --target=${CPU}-${OS} -E %%{_target_platform}) "
+	done
 )
 
 
@@ -48,14 +48,13 @@
 
 %define gold_default 0
 
-
 %bcond_without gold
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.33.1
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -214,32 +213,51 @@ export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1 -std=gnu++14"
 
 for i in %{long_targets}; do
-    mkdir -p BUILD-$i
-    cd BUILD-$i
-    if [ "%{_target_platform}" = "$i" ]; then
-# Native build -- we want shared libs here...
-	EXTRA_CONFIG="--enable-shared --with-pic"
-    else
-# Cross build -- need to set program_prefix and friends...
-	EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
-    fi
+	mkdir -p BUILD-$i
+	cd BUILD-$i
+	if [ "%{_target_platform}" = "$i" ]; then
+		# Native build -- we want shared libs here...
+		EXTRA_CONFIG="--enable-shared --with-pic"
+		if echo $i |grep -q x32; then
+			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=/libx32:%{_prefix}/libx32:%{_prefix}/local/libx32:%{_prefix}/$i/libx32:/lib64:%{_prefix}/lib64:%{_prefix}/local/lib64:%{_prefix}/$i/lib64:/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib"
+		else
+%if "%{_lib}" == "lib64"
+			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=/%{_lib}:%{_libdir}:%{_prefix}/local/%{_lib}:/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib"
+%else
+			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib"
+%endif
+		fi
+	else
+		# Cross build -- need to set program_prefix and friends...
+		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
+		if echo $i |grep -q x32; then
+			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=%{_prefix}/$i/libx32:%{_prefix}/$i/lib64:%{_prefix}/$i/lib"
+		elif echo $i |grep -q 64; then
+			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=%{_prefix}/$i/lib64:%{_prefix}/$i/lib"
+		else
+			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=%{_prefix}/$i/lib"
+		fi
+	fi
 
-    case $i in
-	i*86|athlon|znver1_32)
-	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=x86_64-$(echo $i |cut -d- -f2-)"
-	    ;;
-	aarch64)
-	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
-	    ;;
+	case $i in
+	*x32)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,x86_64-$(echo $i |cut -d- -f2- |sed -e 's,x32,,'),i686-$(echo $i |cut -d- -f2- |sed -e 's,x32,,') --with-abi=x32"
+		;;
+	i*86*|athlon*|znver1_32*)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,x86_64-$(echo $i |cut -d- -f2-) --with-abi=32"
+		;;
+	aarch64*)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
+		;;
 	armv7*)
-	    EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
-	    ;;
-	x86_64|znver1)
-	    EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-)"
-	    ;;
-    esac
+		EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
+		;;
+	x86_64*|znver1*)
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,${i}x32,i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-) --with-abi=64"
+		;;
+	esac
 
-    CONFIGURE_TOP=.. %configure \
+	CONFIGURE_TOP=.. %configure \
 		--enable-64-bit-bfd \
 		--with-bugurl=%{bugurl} \
 %if %{with gold}
@@ -257,11 +275,6 @@ for i in %{long_targets}; do
 		$EXTRA_CONFIG \
 		--enable-plugins \
 		--enable-threads \
-%if "%{_lib}" == "lib64"
-		--with-lib-path=/%{_lib}:%{_libdir}:%{_prefix}/local/%{_lib}:/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib \
-%else
-		--with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib \
-%endif
 %ifarch %{mips}
 		--enable-default-hash-style=sysv \
 %else
@@ -281,14 +294,14 @@ for i in %{long_targets}; do
 		--with-gmp=%{_libdir} \
 		--with-isl=%{_libdir} \
 		--with-system-zlib
-    cd -
+	cd -
 done
 
 %build
 for i in %{long_targets}; do
-    cd BUILD-$i
-    %make_build
-    cd -
+	cd BUILD-$i
+	%make_build
+	cd -
 done
 
 %make_build -C BUILD-%{_target_platform}/bfd/doc html
@@ -309,11 +322,11 @@ rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
 
 %install
 for i in %{long_targets}; do
-    [ "$i" = "%{_target_platform}" ] && continue
-    cd BUILD-$i
-    %make_install
-    cd -
-    mkdir -p %{buildroot}%{_prefix}/"$i"/include
+	[ "$i" = "%{_target_platform}" ] && continue
+	cd BUILD-$i
+	%make_install
+	cd -
+	mkdir -p %{buildroot}%{_prefix}/"$i"/include
 done
 # We install the native version last to make sure we get all
 # the man pages etc. for the native version rather than a random
@@ -332,15 +345,15 @@ rm -f %{buildroot}%{_infodir}/dir
 grep '^#define BFD_ARCH_SIZE 64$' %{buildroot}%{_prefix}/include/bfd.h
 # Fix multilib conflicts of generated values by __WORDSIZE-based expressions.
 sed -i -e '/^#include "ansidecl.h"/{p;s~^.*$~#include <bits/wordsize.h>~;}' \
-    -e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
-    -e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
-    -e 's/^#define BFD_HOST_64_BIT \(long \)\?long *$/#if __WORDSIZE == 32\
+	-e 's/^#define BFD_DEFAULT_TARGET_SIZE \(32\|64\) *$/#define BFD_DEFAULT_TARGET_SIZE __WORDSIZE/' \
+	-e 's/^#define BFD_HOST_64BIT_LONG [01] *$/#define BFD_HOST_64BIT_LONG (__WORDSIZE == 64)/' \
+	-e 's/^#define BFD_HOST_64_BIT \(long \)\?long *$/#if __WORDSIZE == 32\
 #define BFD_HOST_64_BIT long long\
 #else\
 #define BFD_HOST_64_BIT long\
 #endif/' \
-    -e 's/^#define BFD_HOST_U_64_BIT unsigned \(long \)\?long *$/#define BFD_HOST_U_64_BIT unsigned BFD_HOST_64_BIT/' \
-    %{buildroot}%{_prefix}/include/bfd.h
+	-e 's/^#define BFD_HOST_U_64_BIT unsigned \(long \)\?long *$/#define BFD_HOST_U_64_BIT unsigned BFD_HOST_64_BIT/' \
+	%{buildroot}%{_prefix}/include/bfd.h
 touch -r bfd/bfd-in2.h %{buildroot}%{_prefix}/include/bfd.h
 
 # Generate .so linker scripts for dependencies; imported from glibc/Makerules:
@@ -372,13 +385,13 @@ EOH
 cd %{buildroot}%{_bindir}
 # Symlinks for native tools compatibility with crosscompilers
 for i in *; do
-    echo $i |grep -q -- - && continue
-    [ -e %{_target_platform}-$i ] || ln -s $i %{_target_platform}-$i
+	echo $i |grep -q -- - && continue
+	[ -e %{_target_platform}-$i ] || ln -s $i %{_target_platform}-$i
 done
 
 # Default ld, if one is missing...
 for i in *-ld.bfd; do
-    [ -e ${i/.bfd/} ] || ln -s $i ${i/.bfd}
+	[ -e ${i/.bfd/} ] || ln -s $i ${i/.bfd}
 done
 cd -
 
@@ -399,33 +412,33 @@ cd -
 mkdir -p %{buildroot}%{_libdir}/bfd-plugins
 
 for i in %{long_targets}; do
-    # aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
-    longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
-    if [ -n "$(echo $i |cut -d- -f4-)" ]; then
+	# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
+	longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
+	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
 	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
 	cd %{buildroot}%{_bindir}
 	for j in $longplatform-*; do
-	    [ -e $(echo $j |sed -e "s,$longplatform,$shortplatform,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
+		[ -e $(echo $j |sed -e "s,$longplatform,$shortplatform,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
 	done
 	cd -
-    fi
-    if [ "$longplatform" != "$i" ]; then
+	fi
+	if [ "$longplatform" != "$i" ]; then
 	cd %{buildroot}%{_bindir}
 	for j in $longplatform-*; do
-	    [ -e $(echo $j |sed -e "s,$longplatform,$i,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
+		[ -e $(echo $j |sed -e "s,$longplatform,$i,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
 	done
 	cd -
-    fi
+	fi
 done
 
 cd %{buildroot}%{_bindir}
 # Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
 for i in *-openmandriva-*; do
-    ln -s $i ${i/-openmandriva-/-mandriva-}
+	ln -s $i ${i/-openmandriva-/-mandriva-}
 done
 # And for armv7hl (as opposed to armv7hnl) -- it's the same binutils-wise
 for i in armv7hnl-*; do
-    ln -s $i ${i/armv7hnl-/armv7hl-}
+	ln -s $i ${i/armv7hnl-/armv7hl-}
 done
 cd -
 
@@ -489,10 +502,10 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_prefix}/%{_target_platform}
 %(
 if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
-    echo "%{_bindir}/$(echo %{_target_platform} |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
-    if echo %{_target_platform} |grep -q armv7hnl-; then
-        echo "%{_bindir}/$(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,g' |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
-    fi
+	echo "%{_bindir}/$(echo %{_target_platform} |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
+	if echo %{_target_platform} |grep -q armv7hnl-; then
+		echo "%{_bindir}/$(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,g' |cut -d- -f1)-$(echo %{_target_platform} |cut -d- -f3-)-*"
+	fi
 fi
 )
 
@@ -507,19 +520,19 @@ fi
 
 %(
 for i in %{long_targets}; do
-    [ "$i" = "%{_target_platform}" ] && continue
-    cat <<EOF
+	[ "$i" = "%{_target_platform}" ] && continue
+	cat <<EOF
 %package -n cross-${i}-binutils
 Summary:	Binutils for crosscompiling to ${i}
 Group:	Development/Other
 EOF
 
-    if echo $i |grep -q -- -openmandriva-; then
-        echo "Obsoletes: cross-${i/-openmandriva-/-mandriva-}-binutils < %{EVRD}"
-        echo "Provides: cross-${i/-openmandriva-/-mandriva-}-binutils = %{EVRD}"
-    fi
+	if echo $i |grep -q -- -openmandriva-; then
+		echo "Obsoletes: cross-${i/-openmandriva-/-mandriva-}-binutils < %{EVRD}"
+		echo "Provides: cross-${i/-openmandriva-/-mandriva-}-binutils = %{EVRD}"
+	fi
 
-    cat <<EOF
+	cat <<EOF
 %description -n cross-${i}-binutils
 Binutils for crosscompiling to ${i}.
 
@@ -528,23 +541,23 @@ Binutils for crosscompiling to ${i}.
 %{_bindir}/${i}-*
 EOF
 
-    if [ -n "$(echo $i |cut -d- -f4-)" ]; then
+	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
 	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
 	echo "%{_bindir}/${shortplatform}-*"
-        if echo $shortplatform |grep -q armv7hnl-; then
-	    echo "%{_bindir}/${shortplatform/armv7hnl-/armv7hl-}-*"
-        fi
-    fi
-    if echo $i |grep -q -- -openmandriva-; then
-        f=${i/-openmandriva-/-mandriva-}
-        echo "%{_bindir}/${f}-*"
-        if echo $i |grep -q armv7hnl-; then
-            echo "%{_bindir}/${f/armv7hnl-/armv7hl-}-*"
-        fi
-    fi
-    if echo $i |grep -q armv7hnl-; then
-        echo "%{_bindir}/${i/armv7hnl-/armv7hl-}-*"
-    fi
-    echo
+		if echo $shortplatform |grep -q armv7hnl-; then
+		echo "%{_bindir}/${shortplatform/armv7hnl-/armv7hl-}-*"
+		fi
+	fi
+	if echo $i |grep -q -- -openmandriva-; then
+		f=${i/-openmandriva-/-mandriva-}
+		echo "%{_bindir}/${f}-*"
+		if echo $i |grep -q armv7hnl-; then
+			echo "%{_bindir}/${f/armv7hnl-/armv7hl-}-*"
+		fi
+	fi
+	if echo $i |grep -q armv7hnl-; then
+		echo "%{_bindir}/${i/armv7hnl-/armv7hl-}-*"
+	fi
+	echo
 done
 )
