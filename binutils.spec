@@ -52,9 +52,9 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.33.1
+Version:	2.34
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -498,6 +498,8 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_mandir}/man1/*
 %{_infodir}/*info*
 %{_libdir}/libbfd-*.so
+%{_libdir}/libctf.so.*
+%{_libdir}/libctf-nobfd.so.*
 %{_libdir}/libopcodes-*.so
 %{_prefix}/%{_target_platform}
 %(
@@ -514,6 +516,10 @@ fi
 %{_includedir}/*.h
 %{_libdir}/libbfd.a
 %{_libdir}/libbfd.so
+%{_libdir}/libctf.a
+%{_libdir}/libctf.so
+%{_libdir}/libctf-nobfd.a
+%{_libdir}/libctf-nobfd.so
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
 %{_libdir}/libiberty.a

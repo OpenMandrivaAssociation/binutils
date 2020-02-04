@@ -1,29 +1,30 @@
-diff -up binutils-2.31/ld/emultempl/elf32.em.0128~ binutils-2.31/ld/emultempl/elf32.em
---- binutils-2.31/ld/emultempl/elf32.em.0128~	2018-07-18 22:15:00.159257178 +0200
-+++ binutils-2.31/ld/emultempl/elf32.em	2018-07-18 22:15:00.205255988 +0200
-@@ -191,7 +191,7 @@ static char *audit; /* colon (typically)
- static char *depaudit; /* colon (typically) separated list of libs */
+diff -up binutils-2.34/ld/emultempl/elf.em.11~ binutils-2.34/ld/emultempl/elf.em
+diff -up binutils-2.34/ld/ldelf.c.11~ binutils-2.34/ld/ldelf.c
+--- binutils-2.34/ld/ldelf.c.11~	2020-02-04 02:22:18.582746943 +0100
++++ binutils-2.34/ld/ldelf.c	2020-02-04 02:25:42.767755946 +0100
+@@ -47,7 +47,7 @@ struct dt_needed
+ };
  
  /* Style of .note.gnu.build-id section.  */
--static const char *emit_note_gnu_build_id;
-+static const char *emit_note_gnu_build_id = NULL;
+-const char *ldelf_emit_note_gnu_build_id;
++const char *ldelf_emit_note_gnu_build_id = NULL;
  
- /* On Linux, it's possible to have different versions of the same
-    shared library linked against different versions of libc.  The
-@@ -806,6 +806,9 @@ gld${EMULATION_NAME}_check_ld_elf_hints
+ /* These variables are required to pass information back and forth
+    between after_open and check_needed and stat_needed and vercheck.  */
+@@ -695,6 +695,9 @@ ldelf_check_ld_elf_hints (const struct b
        FILE *f;
        char *tmppath;
  
-+      if (!emit_note_gnu_build_id)
-+        emit_note_gnu_build_id = xstrdup("sha1");
++      if (!ldelf_emit_note_gnu_build_id)
++        ldelf_emit_note_gnu_build_id = xstrdup("sha1");
 +
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
-diff -up binutils-2.31/ld/ldmain.c.0128~ binutils-2.31/ld/ldmain.c
---- binutils-2.31/ld/ldmain.c.0128~	2018-07-18 22:15:00.205255988 +0200
-+++ binutils-2.31/ld/ldmain.c	2018-07-18 22:16:06.428555216 +0200
-@@ -281,7 +281,10 @@ main (int argc, char **argv)
+diff -up binutils-2.34/ld/ldmain.c.11~ binutils-2.34/ld/ldmain.c
+--- binutils-2.34/ld/ldmain.c.11~	2020-01-18 14:55:48.000000000 +0100
++++ binutils-2.34/ld/ldmain.c	2020-02-04 02:19:41.014739995 +0100
+@@ -283,7 +283,10 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = TRUE;
    link_info.keep_memory = TRUE;
