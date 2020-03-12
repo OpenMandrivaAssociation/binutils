@@ -54,7 +54,7 @@ Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.34
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -73,7 +73,7 @@ Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.
 # on other distros
 #Patch02:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.25-version.patch
 # Export demangle.h with the binutils-devel rpm.
-Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.31-export-demangle.h.patch
+Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
 Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-filename-in-error-messages.patch
@@ -84,6 +84,9 @@ Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-reade
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
 Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
+Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
+Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
+Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-nm-lto-plugin.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
