@@ -52,9 +52,10 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.34
+Version:	2.34.0
+# actually taken from binutils-2_34-branch on 2020/05/07
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -86,7 +87,6 @@ Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-t
 Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
-Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-nm-lto-plugin.patch
 
 # Mandriva patches
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
