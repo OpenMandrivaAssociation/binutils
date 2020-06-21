@@ -1,16 +1,11 @@
 # Listed targets are short form and will be expanded by rpm
 # gnueabihf variants etc. are inserted by rpm into long_targets
-%if %mdvver <= 3000000
-%global targets aarch64-linux armv7hl-linux i586-linux i686-linux x86_64-linux
-%else
-# (tpg) set cross targets here for cooker
-%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-android armv7l-android armv8l-android i686-mingw32 x86_64-mingw32
+%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-linuxuclibc armv7hnl-linuxuclibc i686-linuxuclibc x86_64-linuxuclibc x32-linuxuclibc riscv32-linuxuclibc riscv64-linuxuclibc aarch64-android armv7l-android armv8l-android i686-mingw32 x86_64-mingw32
 # (tpg) temporary disable build debuginfo for ix86
 %ifarch %{ix86}
 #error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
 %define _enable_debug_packages	%{nil}
 %define debug_package		%{nil}
-%endif
 %endif
 %global long_targets %(
 	for i in %{targets}; do
@@ -53,9 +48,10 @@
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.34.0
-# actually taken from binutils-2_34-branch on 2020/05/07
+# actually taken from binutils-2_34-branch on 2020/06/21
+# with "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
