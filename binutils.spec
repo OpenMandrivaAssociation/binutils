@@ -85,6 +85,11 @@ Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-speci
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
 
 # Mandriva patches
+# For some reason, HAVE_READV isn't detected correctly on armv7hnl
+# It's safe to just remove the condition because we don't support any
+# prehistoric systems.
+# https://file-store.openmandriva.org/api/v1/file_stores/e0633c259e3155d913aaa1a1227dda4c5a188992.log?show=true
+Patch100:	binutils-2.34.0-arm32-build-workaround.patch
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 # (tpg) this is needed for 32-bit chroots running on x86_64 host
 Patch121:	binutils-2.25.51-linux32.patch
