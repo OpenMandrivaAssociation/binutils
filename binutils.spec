@@ -47,11 +47,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.34.0
-# actually taken from binutils-2_34-branch on 2020/06/21
+Version:	2.34.90
+# actually taken from binutils-2_35-branch on 2020/07/16
 # with "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	3
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -73,14 +73,10 @@ Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.
 Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
 Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
-Patch06:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-filename-in-error-messages.patch
 # FIXME this one serves a purpose (fix ltrace, LD_AUDIT) but reduces optimizations.
 # This should be an option instead of a hardcode in the longer term!
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
-Patch08:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-readelf-other-sym-info.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch16:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-fix-testsuite-failures.patch
-Patch18:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-ignore-discarded-note-relocs.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
 

@@ -1,7 +1,6 @@
-diff -up binutils-2.34/ld/emultempl/elf.em.11~ binutils-2.34/ld/emultempl/elf.em
-diff -up binutils-2.34/ld/ldelf.c.11~ binutils-2.34/ld/ldelf.c
---- binutils-2.34/ld/ldelf.c.11~	2020-02-04 02:22:18.582746943 +0100
-+++ binutils-2.34/ld/ldelf.c	2020-02-04 02:25:42.767755946 +0100
+diff -up binutils-2.34.90/ld/ldelf.c.10~ binutils-2.34.90/ld/ldelf.c
+--- binutils-2.34.90/ld/ldelf.c.10~	2020-07-16 04:28:48.000000000 +0200
++++ binutils-2.34.90/ld/ldelf.c	2020-07-16 04:44:49.616141952 +0200
 @@ -47,7 +47,7 @@ struct dt_needed
  };
  
@@ -11,7 +10,7 @@ diff -up binutils-2.34/ld/ldelf.c.11~ binutils-2.34/ld/ldelf.c
  
  /* These variables are required to pass information back and forth
     between after_open and check_needed and stat_needed and vercheck.  */
-@@ -695,6 +695,9 @@ ldelf_check_ld_elf_hints (const struct b
+@@ -700,6 +700,9 @@ ldelf_check_ld_elf_hints (const struct b
        FILE *f;
        char *tmppath;
  
@@ -21,10 +20,10 @@ diff -up binutils-2.34/ld/ldelf.c.11~ binutils-2.34/ld/ldelf.c
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
-diff -up binutils-2.34/ld/ldmain.c.11~ binutils-2.34/ld/ldmain.c
---- binutils-2.34/ld/ldmain.c.11~	2020-01-18 14:55:48.000000000 +0100
-+++ binutils-2.34/ld/ldmain.c	2020-02-04 02:19:41.014739995 +0100
-@@ -283,7 +283,10 @@ main (int argc, char **argv)
+diff -up binutils-2.34.90/ld/ldmain.c.10~ binutils-2.34.90/ld/ldmain.c
+--- binutils-2.34.90/ld/ldmain.c.10~	2020-07-16 04:44:49.616141952 +0200
++++ binutils-2.34.90/ld/ldmain.c	2020-07-16 04:45:42.418701923 +0200
+@@ -331,7 +331,10 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = TRUE;
    link_info.keep_memory = TRUE;
@@ -34,4 +33,4 @@ diff -up binutils-2.34/ld/ldmain.c.11~ binutils-2.34/ld/ldmain.c
 +  link_info.relro = TRUE;
    link_info.strip_discarded = TRUE;
    link_info.prohibit_multiple_definition_absolute = FALSE;
-   link_info.emit_hash = DEFAULT_EMIT_SYSV_HASH;
+   link_info.textrel_check = DEFAULT_LD_TEXTREL_CHECK;
