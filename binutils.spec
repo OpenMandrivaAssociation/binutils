@@ -15,9 +15,6 @@
 	done
 )
 
-
-%define _disable_lto 1
-
 %define lib_major 2
 %define lib_name_orig %mklibname binutils
 %define lib_name %{lib_name_orig}%{lib_major}
@@ -51,7 +48,7 @@ Version:	2.35
 # actually taken from binutils-2_35-branch on 2020/07/16
 # with "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -79,6 +76,9 @@ Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
+Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-config.patch
+Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-add-sym-cache-to-elf-link-hash.patch
+Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-elf-add-objects.patch
 
 # Mandriva patches
 # For some reason, HAVE_READV isn't detected correctly on armv7hnl
@@ -124,7 +124,6 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	bison
 BuildRequires:	flex
-BuildRequires:	gcc
 BuildRequires:	gettext
 BuildRequires:	texinfo
 BuildRequires:	dejagnu
@@ -363,7 +362,7 @@ rm -f %{buildroot}%{_libdir}/libbfd.so %{buildroot}%{_libdir}/libopcodes.so
 OUTPUT_FORMAT="\
 /* Ensure this .so library will not be used by a link for a different format
    on a multi-architecture system.  */
-$(gcc $CFLAGS $LDFLAGS -shared -x c /dev/null -o /dev/null -Wl,--verbose -v 2>&1 | sed -n -f "%{SOURCE5}")"
+$(%{_cc} $CFLAGS $LDFLAGS -shared -x c /dev/null -o /dev/null -Wl,--verbose -v 2>&1 | sed -n -f "%{SOURCE5}")"
 
 tee %{buildroot}%{_libdir}/libbfd.so <<EOH
 /* GNU ld script */
