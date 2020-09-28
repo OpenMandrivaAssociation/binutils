@@ -9,29 +9,29 @@ if [ -z "$PARENT" ]; then
     WRAPPED=true
 # If we're being called by gcc-ar or llvm-ar, we're already
 # wrapped (and need to make sure we don't call ourselves recursively)
-elif printf "%s\n" "$PARENT" |grep -qE -- '-ar$'; then
+elif echo "$PARENT" |grep -qE -- '-ar$'; then
     WRAPPED=true
 # Fun... We're running inside qemu binfmt_misc emulation,
 # so we have to determine our parent the evil and less
 # reliable way...
-elif printf "%s\n" "$PARENT" |grep -qE -- 'qemu'; then
+elif echo "$PARENT" |grep -qE -- 'qemu'; then
     if grep -qE -- '-ar' /proc/$PPID/cmdline; then
 	WRAPPED=true
     fi
 fi
 if ! "$WRAPPED"; then
 
-	command llvm-ar &>/dev/null && IS_LLVM_AR=true
-	command gcc-ar &>/dev/null && IS_GCC_AR=true
+	which llvm-ar &>/dev/null && IS_LLVM_AR=true
+	which gcc-ar &>/dev/null && IS_GCC_AR=true
 	for i in "$@"; do
-		[ "$(printf "%s\n" $i |cut -b1)" = '-' ] && continue
-		if printf "%s\n" "$i" | grep -qE '\.o$' && [ -e "$i" ]; then
+		[ "$(echo $i |cut -b1)" = '-' ] && continue
+		if echo "$i" | grep -qE '\.o$' && [ -e "$i" ]; then
 			if LANG=C file "$i" |grep -q "LLVM IR bitcode"; then
-				if [ -n "$IS_LLVM_AR" ]; then
+				if [[ -n "$IS_LLVM_AR" ]]; then
 					REAL_AR=llvm-ar
 					break
 				else
-					printf "%s\n" "${0}-wrapper ERROR: LLVM-LTO code but missing llvm-ar, cannot continue!"
+					echo "${0}-wrapper ERROR: LLVM-LTO code but missing llvm-ar, cannot continue!"
 					exit 1
 				fi
 			fi
@@ -41,7 +41,7 @@ if ! "$WRAPPED"; then
 					REAL_AR=gcc-ar
 					break
 				else
-					printf "%s\n" "${0}-wrapper ERROR: GCC-LTO code but missing gcc-ar, cannot continue!"
+					echo "${0}-wrapper ERROR: GCC-LTO code but missing gcc-ar, cannot continue!"
 					exit 1
 				fi
 			fi
