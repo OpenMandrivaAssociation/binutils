@@ -208,8 +208,14 @@ sed -i -e 's,/lib/,/%{_lib}/,g' bfd/plugin.c
 sed -i -e 's,tooldir)/lib,tooldir)/%{_lib},g' gold/Makefile.*
 %endif
 
+%ifarch %{riscv64}
+# Until clang 11 is built
+export CC="gcc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
+export CXX="g++ -D_GNU_SOURCE=1 -std=gnu++14"
+%else
 export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1 -std=gnu++14"
+%endif
 
 for i in %{long_targets}; do
 	mkdir -p BUILD-$i
