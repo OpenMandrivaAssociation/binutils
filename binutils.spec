@@ -44,11 +44,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.35.1
+Version:	2.36
 # actually taken from binutils-2_35-branch on 2020/07/16
 # with "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	4
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -79,13 +79,7 @@ Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-speci
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
 Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-config.patch
 Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warnings.patch
-Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
-Patch24:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-add-sym-cache-to-elf-link-hash.patch
-Patch25:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-elf-add-objects.patch
-Patch26:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-aarch64-condbranch-relocs.patch
-Patch27:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-strip-merge.patch
-Patch28:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-plugin-as-needed.patch
-Patch29:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-recursive-debuglink-following.patch
+#Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
 
 # Mandriva patches
 # For some reason, HAVE_READV isn't detected correctly on armv7hnl
