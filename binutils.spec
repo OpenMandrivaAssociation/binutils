@@ -48,7 +48,7 @@ Version:	2.36.1
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -117,6 +117,8 @@ Patch135:	binutils-2.25.51-lto.patch
 
 Patch136:	binutils-2.27.90-fix-warnings.patch
 Patch138:	binutils-2.31-clang7.patch
+# https://sourceware.org/bugzilla/show_bug.cgi?id=26378
+Patch139:	binutils-gdb.git-326adec374dd43086dbf9bb2b8f18d547389e678.patch
 
 # From upstream git
 

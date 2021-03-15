@@ -1,0 +1,53 @@
+From 326adec374dd43086dbf9bb2b8f18d547389e678 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Sat, 12 Sep 2020 10:49:13 +0930
+Subject: [PATCH 1/1] PR26378, sections initialised only by linker scripts are
+ always read/write
+
+This changes the initialisation of output sections so that it is
+possible to create read-only sections fed only from linker script
+BYTE, SHORT, LONG or QUAD.  That currently isn't possible even for one
+of the well-known ELF sections like .rodata, because once a section is
+marked read/write that sticks.  On the other hand if we start
+read-only, well-known ELF sections end up read/write as appropriate.
+For example .tdata will still be SHF_ALLOC + SHF_WRITE + SHF_TLS.
+
+	PR 26378
+	* ldlang.c (map_input_to_output_sections): Start with a read-only
+	section for data statements.
+	* testsuite/ld-elf/size-2.d: Adjust to suit.
+---
+ ld/ChangeLog                 | 7 +++++++
+ ld/ldlang.c                  | 2 +-
+ ld/testsuite/ld-elf/size-2.d | 2 +-
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/ld/ldlang.c b/ld/ldlang.c
+index 4ae9cec8853..8014e7a6eef 100644
+--- a/ld/ldlang.c
++++ b/ld/ldlang.c
+@@ -4225,7 +4225,7 @@ map_input_to_output_sections
+ 	      break;
+ 	    }
+ 	  if (os->bfd_section == NULL)
+-	    init_os (os, flags);
++	    init_os (os, flags | SEC_READONLY);
+ 	  else
+ 	    os->bfd_section->flags |= flags;
+ 	  break;
+diff --git a/ld/testsuite/ld-elf/size-2.d b/ld/testsuite/ld-elf/size-2.d
+index 14202245e6c..9f1a9cf48fa 100644
+--- a/ld/testsuite/ld-elf/size-2.d
++++ b/ld/testsuite/ld-elf/size-2.d
+@@ -11,7 +11,7 @@
+ .* \.text +PROGBITS +0+100 [0-9a-f]+ 0+10 00  AX .*
+ .* \.tdata +PROGBITS +0+110 [0-9a-f]+ 0+20 00 WAT .*
+ .* \.tbss +NOBITS +0+130 [0-9a-f]+ 0+30 00 WAT .*
+-.* \.map +PROGBITS +0+130 [0-9a-f]+ 0+c 00 +WA .*
++.* \.map +PROGBITS +0+130 [0-9a-f]+ 0+c 00 +A .*
+ #...
+  +PHDR +(0x0+40 0x0+40 0x0+40 0x0+a8 0x0+a8|0x0+34 0x0+34 0x0+34 0x0+60 0x0+60|0x0+34 0x0+a0 0x0+a0 0x0+60 0x0+60) R .*
+  +LOAD +(0x0+40 0x0+40 0x0+40 0x0+fc 0x0+fc|0x0+34 0x0+34 0x0+34 0x0+1(08|10) 0x0+1(08|10)|0x0+34 0x0+a0 0x0+a0 0x0+9c 0x0+9c) R E .*
+-- 
+2.27.0
+
