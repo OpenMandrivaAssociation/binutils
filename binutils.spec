@@ -149,8 +149,6 @@ Patch1038:	binutils-2.31-clang7.patch
 # https://sourceware.org/bugzilla/show_bug.cgi?id=26378
 Patch1039:	binutils-gdb.git-326adec374dd43086dbf9bb2b8f18d547389e678.patch
 
-# From upstream git
-
 %rename %{lib_name}
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -160,6 +158,8 @@ BuildRequires:	gettext
 BuildRequires:	texinfo
 BuildRequires:	dejagnu
 BuildRequires:	pkgconfig(zlib)
+# For git apply
+BuildRequires:	git-core
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel >= 6:2.14.90-8
 # gold make check'ing requires libstdc++.a & bc
