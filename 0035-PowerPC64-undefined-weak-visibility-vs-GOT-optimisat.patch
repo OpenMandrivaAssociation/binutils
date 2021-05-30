@@ -1,0 +1,242 @@
+From e748f8e407692a59efe65bfe67240d1f773e7d61 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Tue, 2 Mar 2021 21:22:31 +1030
+Subject: [PATCH 035/135] PowerPC64 undefined weak visibility vs GOT
+ optimisation
+
+Undefined weak symbols with non-default visibility are seen as local
+by SYMBOL_REFERENCES_LOCAL.  This stops a got indirect to relative
+optimisation for them, so that pies and dlls don't get non-zero values
+when loading somewhere other than the address they are linked at
+(which always happens).  The optimisation could be allowed for pdes,
+but I thought it best not to allow it there too.
+
+bfd/
+	* elf64-ppc.c (ppc64_elf_relocate_section): Don't optimise got
+	indirect to pc-relative or toc-relative for undefined symbols.
+ld/
+	* testsuite/ld-powerpc/weak1.d,
+	* testsuite/ld-powerpc/weak1.r,
+	* testsuite/ld-powerpc/weak1.s,
+	* testsuite/ld-powerpc/weak1so.d,
+	* testsuite/ld-powerpc/weak1so.r: New tests.
+	* testsuite/ld-powerpc/powerpc.exp: Run them.
+
+(cherry picked from commit f5b9c288a3057f0f04e74f00fdb0e79d171d54a8)
+---
+ bfd/ChangeLog                       |  5 +++++
+ bfd/elf64-ppc.c                     |  9 +++++++++
+ ld/ChangeLog                        |  9 +++++++++
+ ld/testsuite/ld-powerpc/powerpc.exp |  6 ++++++
+ ld/testsuite/ld-powerpc/weak1.d     | 26 ++++++++++++++++++++++++++
+ ld/testsuite/ld-powerpc/weak1.r     |  5 +++++
+ ld/testsuite/ld-powerpc/weak1.s     | 22 ++++++++++++++++++++++
+ ld/testsuite/ld-powerpc/weak1so.d   | 26 ++++++++++++++++++++++++++
+ ld/testsuite/ld-powerpc/weak1so.r   |  7 +++++++
+ 9 files changed, 115 insertions(+)
+ create mode 100644 ld/testsuite/ld-powerpc/weak1.d
+ create mode 100644 ld/testsuite/ld-powerpc/weak1.r
+ create mode 100644 ld/testsuite/ld-powerpc/weak1.s
+ create mode 100644 ld/testsuite/ld-powerpc/weak1so.d
+ create mode 100644 ld/testsuite/ld-powerpc/weak1so.r
+
+diff --git a/bfd/ChangeLog b/bfd/ChangeLog
+index d49efdb618a..6b399753762 100644
+--- a/bfd/ChangeLog
++++ b/bfd/ChangeLog
+@@ -1,3 +1,8 @@
++2021-03-02  Alan Modra  <amodra@gmail.com>
++
++	* elf64-ppc.c (ppc64_elf_relocate_section): Don't optimise got
++	indirect to pc-relative or toc-relative for undefined symbols.
++
+ 2021-03-01  Alan Modra  <amodra@gmail.com>
+ 
+ 	Apply from mainline
+diff --git a/bfd/elf64-ppc.c b/bfd/elf64-ppc.c
+index 3119aaca84c..77f2c855864 100644
+--- a/bfd/elf64-ppc.c
++++ b/bfd/elf64-ppc.c
+@@ -16071,6 +16071,9 @@ ppc64_elf_relocate_section (bfd *output_bfd,
+ 	    break;
+ 	  from = TOCstart + htab->sec_info[input_section->id].toc_off;
+ 	  if (relocation + addend - from + 0x8000 < 0x10000
++	      && sec != NULL
++	      && sec->output_section != NULL
++	      && !discarded_section (sec)
+ 	      && (h == NULL || SYMBOL_REFERENCES_LOCAL (info, &h->elf)))
+ 	    {
+ 	      insn = bfd_get_32 (input_bfd, contents + (rel->r_offset & ~3));
+@@ -16091,6 +16094,9 @@ ppc64_elf_relocate_section (bfd *output_bfd,
+ 	    break;
+ 	  from = TOCstart + htab->sec_info[input_section->id].toc_off;
+ 	  if (relocation + addend - from + 0x80008000ULL < 0x100000000ULL
++	      && sec != NULL
++	      && sec->output_section != NULL
++	      && !discarded_section (sec)
+ 	      && (h == NULL || SYMBOL_REFERENCES_LOCAL (info, &h->elf)))
+ 	    {
+ 	      insn = bfd_get_32 (input_bfd, contents + (rel->r_offset & ~3));
+@@ -16119,6 +16125,9 @@ ppc64_elf_relocate_section (bfd *output_bfd,
+ 		  + input_section->output_section->vma
+ 		  + input_section->output_offset);
+ 	  if (!(relocation - from + (1ULL << 33) < 1ULL << 34
++		&& sec != NULL
++		&& sec->output_section != NULL
++		&& !discarded_section (sec)
+ 		&& (h == NULL || SYMBOL_REFERENCES_LOCAL (info, &h->elf))))
+ 	    break;
+ 
+diff --git a/ld/ChangeLog b/ld/ChangeLog
+index bb21b1b8ee6..094ca70ad0c 100644
+--- a/ld/ChangeLog
++++ b/ld/ChangeLog
+@@ -1,3 +1,12 @@
++2021-03-02  Alan Modra  <amodra@gmail.com>
++
++	* testsuite/ld-powerpc/weak1.d,
++	* testsuite/ld-powerpc/weak1.r,
++	* testsuite/ld-powerpc/weak1.s,
++	* testsuite/ld-powerpc/weak1so.d,
++	* testsuite/ld-powerpc/weak1so.r: New tests.
++	* testsuite/ld-powerpc/powerpc.exp: Run them.
++
+ 2021-02-07  H.J. Lu  <hongjiu.lu@intel.com>
+ 
+ 	PR ld/27358
+diff --git a/ld/testsuite/ld-powerpc/powerpc.exp b/ld/testsuite/ld-powerpc/powerpc.exp
+index 45485e6c5d1..8aa0eccfa0e 100644
+--- a/ld/testsuite/ld-powerpc/powerpc.exp
++++ b/ld/testsuite/ld-powerpc/powerpc.exp
+@@ -344,6 +344,12 @@ set ppc64elftests {
+     {"group3" "-melf64ppc -e foo" "" "-a64" {group3.s group2.s group1.s}
+ 	{{objdump {-d} group2.d}
+ 	 {readelf {-s} group3.sym}} "group3"}
++    {"weak1" "-melf64ppc --hash-style=both" ""
++	"-a64 -mpower10" {weak1.s}
++	{{objdump -d weak1.d} {readelf {-srW} weak1.r}} "weak1"}
++    {"weak1.so" "-shared -melf64ppc --hash-style=both" ""
++	"-a64 -mpower10" {weak1.s}
++	{{objdump -d weak1so.d} {readelf {-srW} weak1so.r}} "weak1.so"}
+ }
+ 
+ set ppceabitests {
+diff --git a/ld/testsuite/ld-powerpc/weak1.d b/ld/testsuite/ld-powerpc/weak1.d
+new file mode 100644
+index 00000000000..c0127539ddd
+--- /dev/null
++++ b/ld/testsuite/ld-powerpc/weak1.d
+@@ -0,0 +1,26 @@
++
++.*:     file format .*
++
++Disassembly of section \.text:
++
++.*0c0 <_start>:
++.*0c0:	(04 10 00 01|01 00 10 04) 	pld     r3,65888
++.*0c4:	(e4 60 01 60|60 01 60 e4) 
++.*0c8:	(04 10 00 01|01 00 10 04) 	pld     r3,65856
++.*0cc:	(e4 60 01 40|40 01 60 e4) 
++.*0d0:	(04 10 00 01|01 00 10 04) 	pld     r3,65864
++.*0d4:	(e4 60 01 48|48 01 60 e4) 
++.*0d8:	(04 10 00 01|01 00 10 04) 	pld     r3,65848
++.*0dc:	(e4 60 01 38|38 01 60 e4) 
++.*0e0:	(e8 62 80 20|20 80 62 e8) 	ld      r3,-32736\(r2\)
++.*0e4:	(e8 62 80 08|08 80 62 e8) 	ld      r3,-32760\(r2\)
++.*0e8:	(e8 62 80 18|18 80 62 e8) 	ld      r3,-32744\(r2\)
++.*0ec:	(e8 62 80 10|10 80 62 e8) 	ld      r3,-32752\(r2\)
++.*0f0:	(60 00 00 00|00 00 00 60) 	nop
++.*0f4:	(e8 62 80 20|20 80 62 e8) 	ld      r3,-32736\(r2\)
++.*0f8:	(60 00 00 00|00 00 00 60) 	nop
++.*0fc:	(e8 62 80 08|08 80 62 e8) 	ld      r3,-32760\(r2\)
++.*100:	(60 00 00 00|00 00 00 60) 	nop
++.*104:	(e8 62 80 18|18 80 62 e8) 	ld      r3,-32744\(r2\)
++.*108:	(60 00 00 00|00 00 00 60) 	nop
++.*10c:	(e8 62 80 10|10 80 62 e8) 	ld      r3,-32752\(r2\)
+diff --git a/ld/testsuite/ld-powerpc/weak1.r b/ld/testsuite/ld-powerpc/weak1.r
+new file mode 100644
+index 00000000000..7d73f38cbb3
+--- /dev/null
++++ b/ld/testsuite/ld-powerpc/weak1.r
+@@ -0,0 +1,5 @@
++
++There are no relocations in this file.
++
++Symbol table '\.symtab' .*
++#pass
+diff --git a/ld/testsuite/ld-powerpc/weak1.s b/ld/testsuite/ld-powerpc/weak1.s
+new file mode 100644
+index 00000000000..0f370d974ba
+--- /dev/null
++++ b/ld/testsuite/ld-powerpc/weak1.s
+@@ -0,0 +1,22 @@
++ .weak x1, x2, x3, x4
++ .protected x2
++ .hidden x3
++ .internal x4
++ .global _start
++_start:
++ pld 3,x1@got@pcrel
++ pld 3,x2@got@pcrel
++ pld 3,x3@got@pcrel
++ pld 3,x4@got@pcrel
++ ld 3,x1@got(2)
++ ld 3,x2@got(2)
++ ld 3,x3@got(2)
++ ld 3,x4@got(2)
++ addis 9,2,x1@got@ha
++ ld 3,x1@got@l(9)
++ addis 9,2,x2@got@ha
++ ld 3,x2@got@l(9)
++ addis 9,2,x3@got@ha
++ ld 3,x3@got@l(9)
++ addis 9,2,x4@got@ha
++ ld 3,x4@got@l(9)
+diff --git a/ld/testsuite/ld-powerpc/weak1so.d b/ld/testsuite/ld-powerpc/weak1so.d
+new file mode 100644
+index 00000000000..0d34b3b4840
+--- /dev/null
++++ b/ld/testsuite/ld-powerpc/weak1so.d
+@@ -0,0 +1,26 @@
++
++.*:     file format .*
++
++Disassembly of section \.text:
++
++0+1c0 <_start>:
++ 1c0:	(04 10 00 01|01 00 10 04) 	pld     r3,66144
++ 1c4:	(e4 60 02 60|60 02 60 e4) 
++ 1c8:	(04 10 00 01|01 00 10 04) 	pld     r3,66112
++ 1cc:	(e4 60 02 40|40 02 60 e4) 
++ 1d0:	(04 10 00 01|01 00 10 04) 	pld     r3,66120
++ 1d4:	(e4 60 02 48|48 02 60 e4) 
++ 1d8:	(04 10 00 01|01 00 10 04) 	pld     r3,66104
++ 1dc:	(e4 60 02 38|38 02 60 e4) 
++ 1e0:	(e8 62 80 20|20 80 62 e8) 	ld      r3,-32736\(r2\)
++ 1e4:	(e8 62 80 08|08 80 62 e8) 	ld      r3,-32760\(r2\)
++ 1e8:	(e8 62 80 18|18 80 62 e8) 	ld      r3,-32744\(r2\)
++ 1ec:	(e8 62 80 10|10 80 62 e8) 	ld      r3,-32752\(r2\)
++ 1f0:	(60 00 00 00|00 00 00 60) 	nop
++ 1f4:	(e8 62 80 20|20 80 62 e8) 	ld      r3,-32736\(r2\)
++ 1f8:	(60 00 00 00|00 00 00 60) 	nop
++ 1fc:	(e8 62 80 08|08 80 62 e8) 	ld      r3,-32760\(r2\)
++ 200:	(60 00 00 00|00 00 00 60) 	nop
++ 204:	(e8 62 80 18|18 80 62 e8) 	ld      r3,-32744\(r2\)
++ 208:	(60 00 00 00|00 00 00 60) 	nop
++ 20c:	(e8 62 80 10|10 80 62 e8) 	ld      r3,-32752\(r2\)
+diff --git a/ld/testsuite/ld-powerpc/weak1so.r b/ld/testsuite/ld-powerpc/weak1so.r
+new file mode 100644
+index 00000000000..dcc91f1879a
+--- /dev/null
++++ b/ld/testsuite/ld-powerpc/weak1so.r
+@@ -0,0 +1,7 @@
++#...
++.* R_PPC64_GLOB_DAT +0+ x1 \+ 0
++#...
++.* 0+ +0 NOTYPE +WEAK +DEFAULT +UND x1
++#...
++.* 0+ +0 NOTYPE +WEAK +DEFAULT +UND x1
++#pass
+-- 
+2.31.1
+

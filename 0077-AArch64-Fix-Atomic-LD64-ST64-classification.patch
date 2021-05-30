@@ -1,0 +1,141 @@
+From c1d97fe5456e4ee8bf6c9f04e6c73347bacae12c Mon Sep 17 00:00:00 2001
+From: Tejas Belagod <tejas.belagod@arm.com>
+Date: Fri, 9 Apr 2021 12:21:38 +0100
+Subject: [PATCH 077/135] AArch64: Fix Atomic LD64/ST64 classification.
+
+Patch 1: Fix diagnostics for exclusive load/stores and reclassify
+	 Armv8.7-A ST/LD64 Atomics.
+
+Following upstream pointing out some inconsistencies in diagnostics,
+
+https://sourceware.org/pipermail/binutils/2021-February/115356.html
+
+attached is a patch set that fixes the issues. I believe a combination
+of two patches mainly contributed to these bugs:
+
+https://sourceware.org/pipermail/binutils/2020-November/113961.html
+https://sourceware.org/pipermail/binutils/2018-June/103322.html
+
+A summary of what this patch set fixes:
+
+For instructions
+
+	STXR w0,x2,[x0]
+	STLXR w0,x2,[x0]
+
+The warning we emit currently is misleading:
+
+Warning: unpredictable: identical transfer and status registers --`stlxr w0,x2,[x0]'
+Warning: unpredictable: identical transfer and status registers --`stxr w0,x2,[x0]'
+
+it ought to be:
+
+Warning: unpredictable: identical base and status registers --`stlxr w0,x2,[x0]'
+Warning: unpredictable: identical base and status registers --`stxr w0,x2,[x0]'
+
+For instructions:
+
+	ldaxp x0,x0,[x0]
+	ldxp x0,x0,[x0]
+
+The warning we emit is incorrect
+
+Warning: unpredictable: identical transfer and status registers --`ldaxp x0,x0,[x0]'
+Warning: unpredictable: identical transfer and status registers --`ldxp x0,x0,[x0]'
+
+it ought to be:
+
+Warning: unpredictable load of register pair -- `ldaxp x0,x0,[x0]'
+Warning: unpredictable load of register pair -- `ldxp x0,x0,[x0]'
+
+For instructions
+
+	stlxp   w0, x2, x2, [x0]
+	stxp    w0, x2, x2, [x0]
+
+We don't emit any warning when it ought to be:
+
+Warning: unpredictable: identical base and status registers --`stlxp w0,x2,x2,[x0]'
+Warning: unpredictable: identical base and status registers --`stxp w0,x2,x2,[x0]'
+
+For instructions:
+
+	st64bv  x0, x2, [x0]
+	st64bv  x2, x0, [x0]
+
+We incorrectly warn when its not necessary. This is because we classify them
+incorrectly as ldstexcl when it should be lse_atomics in the opcode table.
+The incorrect classification makes it pick up the warnings from warning on
+exclusive load/stores.
+
+Patch 2: Reclassify Armv8.7-A ST/LD64 Atomics.
+
+This patch reclassifies ST64B{V,V0}, LD64B as lse_atomics rather than ldstexcl
+according to their encoding class as specified in the architecture. This also
+has the fortunate side-effect of spurious unpredictable warnings getting
+eliminated.
+
+For eg. For instruction:
+
+	st64bv  x0, x2, [x0]
+
+We incorrectly warn when its not necessary:
+
+Warning: unpredictable: identical transfer and status registers --`st64bv x0,x2,[x0]'
+
+This is because we classify them incorrectly as ldstexcl when it should be
+lse_atomics in the opcode table. The incorrect classification makes it pick
+up the warnings from warning on exclusive load/stores. This patch fixes it
+by reclassifying it and no warnings are issued for this instruction.
+
+opcodes/ChangeLog:
+
+2021-04-09  Tejas Belagod  <tejas.belagod@arm.com>
+
+	* aarch64-tbl.h (struct aarch64_opcode aarch64_opcode_table): Reclassify
+	LD64/ST64 instructions to lse_atomic instead of ldstexcl.
+
+(cherry picked from commit 52efda8266cb1f8ade0193f45801fdd6e42165ac)
+---
+ opcodes/ChangeLog     | 8 ++++++++
+ opcodes/aarch64-tbl.h | 8 ++++----
+ 2 files changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/opcodes/ChangeLog b/opcodes/ChangeLog
+index 162fd742369..ca9dff38798 100644
+--- a/opcodes/ChangeLog
++++ b/opcodes/ChangeLog
+@@ -1,3 +1,11 @@
++2021-04-09  Tejas Belagod  <tejas.belagod@arm.com>
++
++	Backported from mainline.
++	021-04-09  Tejas Belagod  <tejas.belagod@arm.com>
++
++	* aarch64-tbl.h (struct aarch64_opcode aarch64_opcode_table): Reclassify
++	LD64/ST64 instructions to lse_atomic instead of ldstexcl.
++
+ 2021-02-19  Andreas Krebbel  <krebbel@linux.ibm.com>
+ 
+ 	* s390-mkopc.c (main): Accept arch14 as cpu string.
+diff --git a/opcodes/aarch64-tbl.h b/opcodes/aarch64-tbl.h
+index f5c313138ea..4192e54d188 100644
+--- a/opcodes/aarch64-tbl.h
++++ b/opcodes/aarch64-tbl.h
+@@ -3646,10 +3646,10 @@ struct aarch64_opcode aarch64_opcode_table[] =
+   CORE_INSN ("ldrsw", 0x98000000, 0xff000000, loadlit, OP_LDRSW_LIT, OP2 (Rt, ADDR_PCREL19),    QL_X_PCREL, 0),
+   CORE_INSN ("prfm",  0xd8000000, 0xff000000, loadlit, OP_PRFM_LIT,  OP2 (PRFOP, ADDR_PCREL19), QL_PRFM_PCREL, 0),
+   /* Atomic 64-byte load/store in Armv8.7.  */
+-  _LS64_INSN ("ld64b",   0xf83fd000, 0xfffffc00, ldstexcl, OP2 (Rt_LS64, ADDR_SIMPLE), QL_X1NIL, 0),
+-  _LS64_INSN ("st64b",   0xf83f9000, 0xfffffc00, ldstexcl, OP2 (Rt_LS64, ADDR_SIMPLE), QL_X1NIL, 0),
+-  _LS64_INSN ("st64bv",  0xf820b000, 0xffe0fc00, ldstexcl, OP3 (Rs, Rt_LS64, ADDR_SIMPLE), QL_X2NIL, 0),
+-  _LS64_INSN ("st64bv0", 0xf820a000, 0xffe0fc00, ldstexcl, OP3 (Rs, Rt_LS64, ADDR_SIMPLE), QL_X2NIL, 0),
++  _LS64_INSN ("ld64b",   0xf83fd000, 0xfffffc00, lse_atomic, OP2 (Rt_LS64, ADDR_SIMPLE), QL_X1NIL, 0),
++  _LS64_INSN ("st64b",   0xf83f9000, 0xfffffc00, lse_atomic, OP2 (Rt_LS64, ADDR_SIMPLE), QL_X1NIL, 0),
++  _LS64_INSN ("st64bv",  0xf820b000, 0xffe0fc00, lse_atomic, OP3 (Rs, Rt_LS64, ADDR_SIMPLE), QL_X2NIL, 0),
++  _LS64_INSN ("st64bv0", 0xf820a000, 0xffe0fc00, lse_atomic, OP3 (Rs, Rt_LS64, ADDR_SIMPLE), QL_X2NIL, 0),
+   /* Logical (immediate).  */
+   CORE_INSN ("and", 0x12000000, 0x7f800000, log_imm, 0, OP3 (Rd_SP, Rn, LIMM), QL_R2NIL, F_HAS_ALIAS | F_SF),
+   CORE_INSN ("bic", 0x12000000, 0x7f800000, log_imm, OP_BIC, OP3 (Rd_SP, Rn, LIMM), QL_R2NIL, F_ALIAS | F_PSEUDO | F_SF),
+-- 
+2.31.1
+

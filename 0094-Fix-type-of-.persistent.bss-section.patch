@@ -1,0 +1,122 @@
+From 602ed821f597705848e3862b04445c86eb4e7d37 Mon Sep 17 00:00:00 2001
+From: Eric Botcazou <ebotcazou@gcc.gnu.org>
+Date: Fri, 23 Apr 2021 19:07:59 +0200
+Subject: [PATCH 094/135] Fix type of .persistent.bss section
+
+The change implementing the .persistent family of sections broke the
+existing support for the .persistent.bss section in the compiler:
+
+int a __attribute__ ((section (".persistent.bss")));
+
+t.s: Assembler messages:
+t.s:4: Warning: setting incorrect section type for .persistent.bss
+
+The compiler encodes it as @nobits but the assembler expects @progbits.
+The assembler is incorrect and should treat the section like the compiler.
+
+bfd/
+	* elf.c (special_sections_p): Add .persistent.bss.
+gas/
+	* testsuite/gas/elf/section25.d: Run it everywhere.
+	* testsuite/gas/elf/section26.d: Likewise.
+	* testsuite/gas/elf/section26.s: Add test for .persistent.bss.
+---
+ bfd/ChangeLog                     | 4 ++++
+ bfd/elf.c                         | 1 +
+ gas/ChangeLog                     | 6 ++++++
+ gas/testsuite/gas/elf/section25.d | 4 +++-
+ gas/testsuite/gas/elf/section26.d | 6 +++++-
+ gas/testsuite/gas/elf/section26.s | 3 +++
+ 6 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/bfd/ChangeLog b/bfd/ChangeLog
+index ea9d22e13bb..e97150b6202 100644
+--- a/bfd/ChangeLog
++++ b/bfd/ChangeLog
+@@ -1,3 +1,7 @@
++2021-04-23  Eric Botcazou  <ebotcazou@adacore.com>
++
++	* elf.c (special_sections_p): Add .persistent.bss.
++
+ 2021-04-01  Tamar Christina  <tamar.christina@arm.com>
+ 
+ 	Backported from mainline.
+diff --git a/bfd/elf.c b/bfd/elf.c
+index 84a5d942817..36733e080dd 100644
+--- a/bfd/elf.c
++++ b/bfd/elf.c
+@@ -2712,6 +2712,7 @@ static const struct bfd_elf_special_section special_sections_n[] =
+ 
+ static const struct bfd_elf_special_section special_sections_p[] =
+ {
++  { STRING_COMMA_LEN (".persistent.bss"), 0, SHT_NOBITS,	SHF_ALLOC + SHF_WRITE },
+   { STRING_COMMA_LEN (".persistent"),	 -2, SHT_PROGBITS,	SHF_ALLOC + SHF_WRITE },
+   { STRING_COMMA_LEN (".preinit_array"), -2, SHT_PREINIT_ARRAY, SHF_ALLOC + SHF_WRITE },
+   { STRING_COMMA_LEN (".plt"),		  0, SHT_PROGBITS,	SHF_ALLOC + SHF_EXECINSTR },
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 057943ce68d..bd87aca2525 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,9 @@
++2021-04-23  Eric Botcazou<ebotcazou@adacore.com>
++
++	* testsuite/gas/elf/section25.d: Run it everywhere.
++	* testsuite/gas/elf/section26.d: Likewise.
++	* testsuite/gas/elf/section26.s: Add test for .persistent.bss.
++
+ 2021-04-09  Tejas Belagod  <tejas.belagod@arm.com>
+ 
+ 	Backported from mainline.
+diff --git a/gas/testsuite/gas/elf/section25.d b/gas/testsuite/gas/elf/section25.d
+index 09353849e5b..fa09b85074f 100644
+--- a/gas/testsuite/gas/elf/section25.d
++++ b/gas/testsuite/gas/elf/section25.d
+@@ -1,7 +1,9 @@
+ #name: sections 25 (.noinit)
+-#target: [supports_noinit_section]
+ #source: section25.s
+ #readelf: -S --wide
++# The h8300 port issues a warning message for
++# new sections created without atrributes.
++#xfail: h8300-*
+ 
+ #...
+   \[..\] .noinit[ 	]+NOBITS[ 	]+[0-9a-f]+ [0-9a-f]+ [0-9a-f]+ 00  WA .*
+diff --git a/gas/testsuite/gas/elf/section26.d b/gas/testsuite/gas/elf/section26.d
+index 15d85bdca9d..f08f444e9c9 100644
+--- a/gas/testsuite/gas/elf/section26.d
++++ b/gas/testsuite/gas/elf/section26.d
+@@ -1,12 +1,16 @@
+ #name: sections 26 (.persistent)
+-#target: [supports_persistent_section]
+ #source: section26.s
+ #readelf: -S --wide
++# The h8300 port issues a warning message for
++# new sections created without atrributes.
++#xfail: h8300-*
+ 
+ #...
+   \[..\] .persistent[ 	]+PROGBITS[ 	]+[0-9a-f]+ [0-9a-f]+ [0-9a-f]+ 00  WA .*
+ #...
+   \[..\] .persistent.foo[ 	]+PROGBITS[ 	]+[0-9a-f]+ [0-9a-f]+ [0-9a-f]+ 00  WA .*
++#...
++  \[..\] .persistent.bss[ 	]+NOBITS[ 	]+[0-9a-f]+ [0-9a-f]+ [0-9a-f]+ 00  WA .*
+ #...
+   \[..\] .gnu.linkonce.p.bar[ 	]+PROGBITS[ 	]+[0-9a-f]+ [0-9a-f]+ [0-9a-f]+ 00  WA .*
+ #pass
+diff --git a/gas/testsuite/gas/elf/section26.s b/gas/testsuite/gas/elf/section26.s
+index 7f986454229..aefe15d4c2c 100644
+--- a/gas/testsuite/gas/elf/section26.s
++++ b/gas/testsuite/gas/elf/section26.s
+@@ -4,5 +4,8 @@
+ .section .persistent.foo
+ .word 0
+ 
++.section .persistent.bss
++.word 0
++
+ .section .gnu.linkonce.p.bar
+ .word 0
+-- 
+2.31.1
+

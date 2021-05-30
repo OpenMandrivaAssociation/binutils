@@ -9,12 +9,6 @@
 # Listed targets are short form and will be expanded by rpm
 # gnueabihf variants etc. are inserted by rpm into long_targets
 %global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-linuxuclibc armv7hnl-linuxuclibc i686-linuxuclibc x86_64-linuxuclibc x32-linuxuclibc riscv32-linuxuclibc riscv64-linuxuclibc aarch64-android armv7l-android armv8l-android x86_64-android i686-mingw32 x86_64-mingw32 ppc64le-linux ppc64le-linuxmusl ppc64le-linuxuclibc ppc64-linux ppc64-linuxmusl ppc64-linuxuclibc
-# (tpg) temporary disable build debuginfo for ix86
-%ifarch %{ix86}
-#error: create archive failed on file /builddir/build/BUILDROOT/mesa-17.3.6-1-omv2015.0.i586-buildroot/usr/lib/debug/usr/lib/gallium-pipe/pipe_radeonsi.so.debug: cpio: Bad magic
-%define _enable_debug_packages	%{nil}
-%define debug_package		%{nil}
-%endif
 %global long_targets %(
 	for i in %{targets}; do
 		CPU=$(echo $i |cut -d- -f1)
@@ -50,13 +44,17 @@
 
 %bcond_without gold
 
+# Make sure we can apply patches from upstream even
+# if they contain git binary diffs
+%define __scm git
+
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
 Version:	2.36.1
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -89,18 +87,41 @@ Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-confi
 Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warnings.patch
 #Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
 
+# From upstream
+Patch100:	0003-ld-Remove-x86-ISA-level-run-time-tests.patch
+Patch101:	0006-PR27382-build-failure-if-fileno-is-a-macro.patch
+Patch102:	0017-IBM-Z-Implement-instruction-set-extensions.patch
+Patch103:	0021-binutils-Avoid-renaming-over-existing-files.patch
+Patch104:	0026-Reinstate-various-pieces-backed-out-from-smart_renam.patch
+Patch105:	0027-PR27456-lstat-in-rename.c-on-MinGW.patch
+Patch106:	0028-Use-make_tempname-file-descriptor-in-smart_rename.patch
+Patch107:	0029-Re-Use-make_tempname-file-descriptor-in-smart_rename.patch
+Patch108:	0033-PR27441-inconsistency-in-weak-definitions.patch
+Patch109:	0035-PowerPC64-undefined-weak-visibility-vs-GOT-optimisat.patch
+Patch110:	0053-Add-install-dependencies-for-ld-bfd-and-libctf-bfd.patch
+Patch111:	0057-DWARF-Check-version-3-for-DW_FORM_ref_addr.patch
+Patch112:	0068-PE-Windows-x86_64-Fix-weak-undef-symbols-after-image.patch
+Patch113:	0077-AArch64-Fix-Atomic-LD64-ST64-classification.patch
+Patch114:	0078-AArch64-Fix-Diagnostic-messaging-for-LD-ST-Exclusive.patch
+Patch115:	0085-Make-objcopy-p-work-when-an-output-file-is-specified.patch
+Patch116:	0094-Fix-type-of-.persistent.bss-section.patch
+Patch117:	0105-PR27755-powerpc-ld-infinite-loop.patch
+Patch118:	0122-arm-Fix-bugs-with-MVE-vmov-from-two-GPRs-to-vector-l.patch
+Patch119:	0129-Arm-Fix-forward-thumb-references-PR-gas-25235.patch
+Patch120:	0130-Gas-Forgot-to-commit-changelog.patch
+
 # Mandriva patches
 # For some reason, HAVE_READV isn't detected correctly on armv7hnl
 # It's safe to just remove the condition because we don't support any
 # prehistoric systems.
 # https://file-store.openmandriva.org/api/v1/file_stores/e0633c259e3155d913aaa1a1227dda4c5a188992.log?show=true
-Patch100:	binutils-2.34.0-arm32-build-workaround.patch
+Patch1000:	binutils-2.34.0-arm32-build-workaround.patch
 # (from gb, proyvind): defaults to i386 on x86_64 or ppc on ppc64 if 32 bit personality is set
 # (tpg) this is needed for 32-bit chroots running on x86_64 host
-Patch121:	binutils-2.25.51-linux32.patch
+Patch1021:	binutils-2.25.51-linux32.patch
 # (proyvind): skip gold tests that fails
-Patch127:	binutils-2.21.51.0.8-skip-gold-check.patch
-Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
+Patch1027:	binutils-2.21.51.0.8-skip-gold-check.patch
+Patch1028:	binutils-2.24.51.0.3.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
 # --hash-style=gnu
@@ -114,19 +135,19 @@ Patch128:	binutils-2.24.51.0.3.ld-default.settings.patch
 # --warn-unresolved-symbols
 # --build-id=sha1
 # --icf=safe
-Patch129:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
+Patch1029:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
 # musl's libintl is good enough, we don't need the internal copy
-Patch132:	binutils-2015.01-accept-musl-libintl.patch
+Patch1032:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
-Patch131:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
+Patch1031:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
 # from upstream
-Patch135:	binutils-2.25.51-lto.patch
+Patch1035:	binutils-2.25.51-lto.patch
 
-Patch136:	binutils-2.27.90-fix-warnings.patch
-Patch138:	binutils-2.31-clang7.patch
+Patch1036:	binutils-2.27.90-fix-warnings.patch
+Patch1038:	binutils-2.31-clang7.patch
 # https://sourceware.org/bugzilla/show_bug.cgi?id=26378
-Patch139:	binutils-gdb.git-326adec374dd43086dbf9bb2b8f18d547389e678.patch
+Patch1039:	binutils-gdb.git-326adec374dd43086dbf9bb2b8f18d547389e678.patch
 
 # From upstream git
 
@@ -185,8 +206,7 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%setup -q -n binutils-%{version}%{?DATE:-%{DATE}}
-%autopatch -p1
+%autosetup -p1 -n binutils-%{version}%{?DATE:-%{DATE}}
 
 cp -f %{_datadir}/libtool/config/config.{guess,sub} .
 
@@ -343,6 +363,8 @@ for i in %{long_targets}; do
 	%make_install
 	cd -
 	mkdir -p %{buildroot}%{_prefix}/"$i"/include
+	ln -s . %{buildroot}%{_prefix}/"$i"/usr
+	ln -s . %{buildroot}%{_prefix}/"$i"/"$i"
 done
 # We install the native version last to make sure we get all
 # the man pages etc. for the native version rather than a random
@@ -431,19 +453,19 @@ for i in %{long_targets}; do
 	# aarch64-mandriva-linux-gnu and aarch64-linux-gnu are similar enough...
 	longplatform=$(grep ^target_alias= BUILD-$i/Makefile |cut -d= -f2-)
 	if [ -n "$(echo $i |cut -d- -f4-)" ]; then
-	shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
-	cd %{buildroot}%{_bindir}
-	for j in $longplatform-*; do
-		[ -e $(echo $j |sed -e "s,$longplatform,$shortplatform,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
-	done
-	cd -
-	fi
-	if [ "$longplatform" != "$i" ]; then
-	cd %{buildroot}%{_bindir}
-	for j in $longplatform-*; do
-		[ -e $(echo $j |sed -e "s,$longplatform,$i,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
-	done
-	cd -
+		shortplatform="$(echo $i |cut -d- -f1)-$(echo $i |cut -d- -f3-)"
+		cd %{buildroot}%{_bindir}
+		for j in $longplatform-*; do
+			[ -e $(echo $j |sed -e "s,$longplatform,$shortplatform,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$shortplatform,")
+		done
+		cd -
+		fi
+		if [ "$longplatform" != "$i" ]; then
+		cd %{buildroot}%{_bindir}
+		for j in $longplatform-*; do
+			[ -e $(echo $j |sed -e "s,$longplatform,$i,") ] || ln -s $j $(echo $j |sed -e "s,$longplatform,$i,")
+		done
+		cd -
 	fi
 done
 

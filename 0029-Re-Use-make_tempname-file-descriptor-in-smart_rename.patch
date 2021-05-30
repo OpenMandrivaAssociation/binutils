@@ -1,0 +1,46 @@
+From 1aad0a424af288cbd7f70ad5f932664a1abd5a79 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Thu, 25 Feb 2021 09:46:02 +1030
+Subject: [PATCH 029/135] Re: Use make_tempname file descriptor in smart_rename
+
+	PR 27456
+	* rename.c (simple_copy): Mark target_stat ATTRIBUTE_UNUSED.
+
+(cherry picked from commit 40b02646ec5b197e63ba904f95ea101d95a50cf4)
+---
+ binutils/ChangeLog | 4 ++++
+ binutils/rename.c  | 3 ++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/binutils/ChangeLog b/binutils/ChangeLog
+index 3b9d95418b9..57ee4bc8ab2 100644
+--- a/binutils/ChangeLog
++++ b/binutils/ChangeLog
+@@ -1,6 +1,10 @@
+ 2021-02-26  Alan Modra  <amodra@gmail.com>
+ 
+ 	Backport from mainline
++	2021-02-25  Alan Modra  <amodra@gmail.com>
++	PR 27456
++	* rename.c (simple_copy): Mark target_stat ATTRIBUTE_UNUSED.
++
+ 	2021-02-24  Alan Modra  <amodra@gmail.com>
+ 		    Siddhesh Poyarekar  <siddhesh@gotplt.org>
+ 	PR 27456
+diff --git a/binutils/rename.c b/binutils/rename.c
+index f688f350d51..861c2b56d18 100644
+--- a/binutils/rename.c
++++ b/binutils/rename.c
+@@ -35,7 +35,8 @@
+    Return 0 if ok, -1 if error.  */
+ 
+ static int
+-simple_copy (int fromfd, const char *to, struct stat *target_stat)
++simple_copy (int fromfd, const char *to,
++	     struct stat *target_stat ATTRIBUTE_UNUSED)
+ {
+   int tofd, nread;
+   int saved;
+-- 
+2.31.1
+
