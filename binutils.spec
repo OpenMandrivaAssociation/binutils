@@ -263,6 +263,7 @@ for i in %{long_targets}; do
 			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib"
 %endif
 		fi
+		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=all"
 	else
 		# Cross build -- need to set program_prefix and friends...
 		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
@@ -273,23 +274,31 @@ for i in %{long_targets}; do
 		else
 			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=%{_prefix}/$i/lib"
 		fi
+		case $i in
+		*x32)
+			EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,x86_64-$(echo $i |cut -d- -f2- |sed -e 's,x32,,'),i686-$(echo $i |cut -d- -f2- |sed -e 's,x32,,')"
+			;;
+		i*86*|athlon*|znver1_32*)
+			EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,x86_64-$(echo $i |cut -d- -f2-)"
+			;;
+		aarch64*)
+			EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
+			;;
+		esac
 	fi
 
 	case $i in
 	*x32)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,x86_64-$(echo $i |cut -d- -f2- |sed -e 's,x32,,'),i686-$(echo $i |cut -d- -f2- |sed -e 's,x32,,') --with-abi=x32"
+		EXTRA_CONFIG="$EXTRA_CONFIG --with-abi=x32"
 		;;
 	i*86*|athlon*|znver1_32*)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,x86_64-$(echo $i |cut -d- -f2-) --with-abi=32"
-		;;
-	aarch64*)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,armv7hnl-$(echo $i |cut -d- -f2-)eabihf"
+		EXTRA_CONFIG="$EXTRA_CONFIG --with-abi=32"
 		;;
 	armv7*)
 		EXTRA_CONFIG="$EXTRA_CONFIG --with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a --with-mode=thumb --with-float=hard --with-fpu=neon --with-abi=aapcs-linux"
 		;;
 	x86_64*|znver1*)
-		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=$i,${i}x32,i586-$(echo $i |cut -d- -f2-),i686-$(echo $i |cut -d- -f2-) --with-abi=64"
+		EXTRA_CONFIG="$EXTRA_CONFIG --with-abi=64"
 		;;
 	esac
 
@@ -548,6 +557,22 @@ if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
 	fi
 fi
 )
+# All of the following are optional because they're
+# built only if we support a COFF/PE target
+%{_bindir}/coffdump
+%{_bindir}/dlltool
+%{_bindir}/dllwrap
+%{_bindir}/srconv
+%{_bindir}/sysdump
+%{_bindir}/windmc
+%{_bindir}/windres
+%{_bindir}/%{_target_platform}-coffdump
+%{_bindir}/%{_target_platform}-dlltool
+%{_bindir}/%{_target_platform}-dllwrap
+%{_bindir}/%{_target_platform}-srconv
+%{_bindir}/%{_target_platform}-sysdump
+%{_bindir}/%{_target_platform}-windmc
+%{_bindir}/%{_target_platform}-windres
 
 %files -n %{dev_name}
 %doc html
