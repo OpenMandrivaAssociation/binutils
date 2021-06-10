@@ -54,7 +54,7 @@ Version:	2.36.1
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	3
+Release:	4
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -109,6 +109,18 @@ Patch117:	0105-PR27755-powerpc-ld-infinite-loop.patch
 Patch118:	0122-arm-Fix-bugs-with-MVE-vmov-from-two-GPRs-to-vector-l.patch
 Patch119:	0129-Arm-Fix-forward-thumb-references-PR-gas-25235.patch
 Patch120:	0130-Gas-Forgot-to-commit-changelog.patch
+
+# From Yocto (note: SOME Yocto patches are important
+# and good for OM as well - others are very much Yocto
+# specific. Don't blindly add new Yocto
+# patches here without double-checking)
+Patch300:	0006-Only-generate-an-RPATH-entry-if-LD_RUN_PATH-is-not-e.patch
+Patch301:	0011-fix-the-incorrect-assembling-for-ppc-wait-mnemonic.patch
+Patch302:	0013-Use-libtool-2.4.patch
+Patch303:	0014-Fix-rpath-in-libtool-when-sysroot-is-enabled.patch
+Patch304:	0015-sync-with-OE-libtool-changes.patch
+Patch305:	0017-Add-support-for-the-DW_FORM_strx-forms-to-the-BFD-li.patch
+Patch306:	0018-Add-DWARF-5-support-in-gold.patch
 
 # Mandriva patches
 # For some reason, HAVE_READV isn't detected correctly on armv7hnl
