@@ -46,15 +46,15 @@
 
 # Make sure we can apply patches from upstream even
 # if they contain git binary diffs
-%define __scm git
+#define __scm git
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.36.1
+Version:	2.37
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	4
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -83,32 +83,10 @@ Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-
 Patch10:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-do-not-link-with-static-libstdc++.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
-Patch21:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-config.patch
 Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warnings.patch
 #Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
 
 # From upstream
-Patch100:	0003-ld-Remove-x86-ISA-level-run-time-tests.patch
-Patch101:	0006-PR27382-build-failure-if-fileno-is-a-macro.patch
-Patch102:	0017-IBM-Z-Implement-instruction-set-extensions.patch
-Patch103:	0021-binutils-Avoid-renaming-over-existing-files.patch
-Patch104:	0026-Reinstate-various-pieces-backed-out-from-smart_renam.patch
-Patch105:	0027-PR27456-lstat-in-rename.c-on-MinGW.patch
-Patch106:	0028-Use-make_tempname-file-descriptor-in-smart_rename.patch
-Patch107:	0029-Re-Use-make_tempname-file-descriptor-in-smart_rename.patch
-Patch108:	0033-PR27441-inconsistency-in-weak-definitions.patch
-Patch109:	0035-PowerPC64-undefined-weak-visibility-vs-GOT-optimisat.patch
-Patch110:	0053-Add-install-dependencies-for-ld-bfd-and-libctf-bfd.patch
-Patch111:	0057-DWARF-Check-version-3-for-DW_FORM_ref_addr.patch
-Patch112:	0068-PE-Windows-x86_64-Fix-weak-undef-symbols-after-image.patch
-Patch113:	0077-AArch64-Fix-Atomic-LD64-ST64-classification.patch
-Patch114:	0078-AArch64-Fix-Diagnostic-messaging-for-LD-ST-Exclusive.patch
-Patch115:	0085-Make-objcopy-p-work-when-an-output-file-is-specified.patch
-Patch116:	0094-Fix-type-of-.persistent.bss-section.patch
-Patch117:	0105-PR27755-powerpc-ld-infinite-loop.patch
-Patch118:	0122-arm-Fix-bugs-with-MVE-vmov-from-two-GPRs-to-vector-l.patch
-Patch119:	0129-Arm-Fix-forward-thumb-references-PR-gas-25235.patch
-Patch120:	0130-Gas-Forgot-to-commit-changelog.patch
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto
@@ -119,8 +97,6 @@ Patch301:	0011-fix-the-incorrect-assembling-for-ppc-wait-mnemonic.patch
 Patch302:	0013-Use-libtool-2.4.patch
 Patch303:	0014-Fix-rpath-in-libtool-when-sysroot-is-enabled.patch
 Patch304:	0015-sync-with-OE-libtool-changes.patch
-Patch305:	0017-Add-support-for-the-DW_FORM_strx-forms-to-the-BFD-li.patch
-Patch306:	0018-Add-DWARF-5-support-in-gold.patch
 
 # Mandriva patches
 # For some reason, HAVE_READV isn't detected correctly on armv7hnl
@@ -153,13 +129,9 @@ Patch1032:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch1031:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
-# from upstream
 Patch1035:	binutils-2.25.51-lto.patch
-
 Patch1036:	binutils-2.27.90-fix-warnings.patch
 Patch1038:	binutils-2.31-clang7.patch
-# https://sourceware.org/bugzilla/show_bug.cgi?id=26378
-Patch1039:	binutils-gdb.git-326adec374dd43086dbf9bb2b8f18d547389e678.patch
 
 %rename %{lib_name}
 BuildRequires:	autoconf
@@ -360,10 +332,6 @@ for i in %{long_targets}; do
 	%make_build
 	cd -
 done
-
-%make_build -C BUILD-%{_target_platform}/bfd/doc html
-mkdir -p html
-cp -f BUILD-%{_target_platform}/bfd/doc/bfd.html/* html
 
 %check
 # All Tests must pass
@@ -587,7 +555,6 @@ fi
 %{_bindir}/%{_target_platform}-windres
 
 %files -n %{dev_name}
-%doc html
 %{_includedir}/*.h
 %{_libdir}/libbfd.a
 %{_libdir}/libbfd.so

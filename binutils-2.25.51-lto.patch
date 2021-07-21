@@ -1,12 +1,12 @@
-diff -up binutils-2.36.1/ltmain.sh.omv~ binutils-2.36.1/ltmain.sh
---- binutils-2.36.1/ltmain.sh.omv~	2021-06-10 03:26:10.178463935 +0200
-+++ binutils-2.36.1/ltmain.sh	2021-06-10 03:26:42.166939706 +0200
+diff -up binutils-2.37/ltmain.sh.21~ binutils-2.37/ltmain.sh
+--- binutils-2.37/ltmain.sh.21~	2021-07-21 16:01:12.790977530 +0200
++++ binutils-2.37/ltmain.sh	2021-07-21 17:21:49.664060645 +0200
 @@ -5847,7 +5847,7 @@ func_mode_link ()
        # -O*, -flto*, -fwhopr*, -fuse-linker-plugin GCC link-time optimization
        -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
        -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
 -      -O*|-flto*|-fwhopr*|-fuse-linker-plugin)
-+      -O*|-f*|-stdlib=*|--stdlib=*)
++      -O*|-flto*|-fwhopr*|-fuse-linker-plugin|-f*|-stdlib=*|--stdlib=*)
          func_quote_for_eval "$arg"
  	arg="$func_quote_for_eval_result"
          func_append compile_command " $arg"

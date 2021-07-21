@@ -1,6 +1,6 @@
-diff -up binutils-2.34.90/ld/ldelf.c.10~ binutils-2.34.90/ld/ldelf.c
---- binutils-2.34.90/ld/ldelf.c.10~	2020-07-16 04:28:48.000000000 +0200
-+++ binutils-2.34.90/ld/ldelf.c	2020-07-16 04:44:49.616141952 +0200
+diff -up binutils-2.37/ld/ldelf.c.14~ binutils-2.37/ld/ldelf.c
+--- binutils-2.37/ld/ldelf.c.14~	2021-07-20 20:16:45.210321941 +0200
++++ binutils-2.37/ld/ldelf.c	2021-07-20 20:16:45.226322179 +0200
 @@ -47,7 +47,7 @@ struct dt_needed
  };
  
@@ -20,17 +20,17 @@ diff -up binutils-2.34.90/ld/ldelf.c.10~ binutils-2.34.90/ld/ldelf.c
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
-diff -up binutils-2.34.90/ld/ldmain.c.10~ binutils-2.34.90/ld/ldmain.c
---- binutils-2.34.90/ld/ldmain.c.10~	2020-07-16 04:44:49.616141952 +0200
-+++ binutils-2.34.90/ld/ldmain.c	2020-07-16 04:45:42.418701923 +0200
+diff -up binutils-2.37/ld/ldmain.c.14~ binutils-2.37/ld/ldmain.c
+--- binutils-2.37/ld/ldmain.c.14~	2021-07-20 20:16:45.226322179 +0200
++++ binutils-2.37/ld/ldmain.c	2021-07-20 20:17:49.414282064 +0200
 @@ -331,7 +331,10 @@ main (int argc, char **argv)
  
-   link_info.allow_undefined_version = TRUE;
-   link_info.keep_memory = TRUE;
-+  link_info.optimize = TRUE;
-+  link_info.new_dtags = TRUE;
-   link_info.combreloc = TRUE;
-+  link_info.relro = TRUE;
-   link_info.strip_discarded = TRUE;
-   link_info.prohibit_multiple_definition_absolute = FALSE;
+   link_info.allow_undefined_version = true;
+   link_info.keep_memory = true;
++  link_info.optimize = true;
++  link_info.new_dtags = true;
+   link_info.combreloc = true;
++  link_info.relro = true;
+   link_info.strip_discarded = true;
+   link_info.prohibit_multiple_definition_absolute = false;
    link_info.textrel_check = DEFAULT_LD_TEXTREL_CHECK;

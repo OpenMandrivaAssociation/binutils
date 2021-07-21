@@ -1,9 +1,9 @@
-diff -up binutils-2.34.90/gas/config/tc-i386.c.8~ binutils-2.34.90/gas/config/tc-i386.c
---- binutils-2.34.90/gas/config/tc-i386.c.8~	2020-07-16 04:28:47.000000000 +0200
-+++ binutils-2.34.90/gas/config/tc-i386.c	2020-07-16 04:44:27.090903559 +0200
-@@ -33,6 +33,15 @@
- #include "elf/x86-64.h"
+diff -up binutils-2.37/gas/config/tc-i386.c.12~ binutils-2.37/gas/config/tc-i386.c
+--- binutils-2.37/gas/config/tc-i386.c.12~	2021-07-08 13:37:19.000000000 +0200
++++ binutils-2.37/gas/config/tc-i386.c	2021-07-20 20:16:16.148889908 +0200
+@@ -34,6 +34,15 @@
  #include "opcodes/i386-init.h"
+ #include <limits.h>
  
 +#if defined(__linux__) && defined(__x86_64__)
 +#include <sys/syscall.h>
@@ -14,10 +14,10 @@ diff -up binutils-2.34.90/gas/config/tc-i386.c.8~ binutils-2.34.90/gas/config/tc
 +#define is_linux32() (0)
 +#endif
 +
- #ifdef HAVE_LIMITS_H
- #include <limits.h>
- #else
-@@ -2647,7 +2656,7 @@ update_code_flag (int value, int check)
+ #ifndef INFER_ADDR_PREFIX
+ #define INFER_ADDR_PREFIX 1
+ #endif
+@@ -2681,7 +2690,7 @@ update_code_flag (int value, int check)
        else
  	as_error = as_bad;
        (*as_error) (_("64bit mode not supported on `%s'."),
@@ -26,7 +26,7 @@ diff -up binutils-2.34.90/gas/config/tc-i386.c.8~ binutils-2.34.90/gas/config/tc
      }
    if (value == CODE_32BIT && !cpu_arch_flags.bitfield.cpui386)
      {
-@@ -2656,7 +2665,7 @@ update_code_flag (int value, int check)
+@@ -2690,7 +2699,7 @@ update_code_flag (int value, int check)
        else
  	as_error = as_bad;
        (*as_error) (_("32bit mode not supported on `%s'."),
@@ -35,7 +35,7 @@ diff -up binutils-2.34.90/gas/config/tc-i386.c.8~ binutils-2.34.90/gas/config/tc
      }
    stackop_size = '\0';
  }
-@@ -2784,7 +2793,7 @@ check_cpu_arch_compatible (const char *n
+@@ -2818,7 +2827,7 @@ check_cpu_arch_compatible (const char *n
  	 use default_arch.  */
        arch = cpu_arch_name;
        if (!arch)
@@ -44,7 +44,7 @@ diff -up binutils-2.34.90/gas/config/tc-i386.c.8~ binutils-2.34.90/gas/config/tc
      }
  
    /* If we are targeting Intel MCU, we must enable it.  */
-@@ -5277,7 +5286,7 @@ parse_insn (char *line, char *mnemonic)
+@@ -5509,7 +5518,7 @@ parse_insn (char *line, char *mnemonic)
    else
      as_bad (_("`%s' is not supported on `%s%s'"),
  	    current_templates->start->name,
@@ -53,16 +53,16 @@ diff -up binutils-2.34.90/gas/config/tc-i386.c.8~ binutils-2.34.90/gas/config/tc
  	    cpu_sub_arch_name ? cpu_sub_arch_name : "");
  
    return NULL;
-@@ -13529,7 +13538,7 @@ md_show_usage (FILE *stream)
+@@ -13859,7 +13868,7 @@ md_show_usage (FILE *stream)
  const char *
  i386_target_format (void)
  {
--  if (!strncmp (default_arch, "x86_64", 6))
-+  if (!strncmp (default_arch, "x86_64", 6) && !is_linux32 ())
+-  if (startswith (default_arch, "x86_64"))
++  if (startswith (default_arch, "x86_64") && !is_linux32())
      {
        update_code_flag (CODE_64BIT, 1);
        if (default_arch[6] == '\0')
-@@ -13537,7 +13546,7 @@ i386_target_format (void)
+@@ -13867,7 +13876,7 @@ i386_target_format (void)
        else
  	x86_elf_abi = X86_64_X32_ABI;
      }
