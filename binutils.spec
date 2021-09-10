@@ -522,8 +522,8 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %(if echo %{_target_platform} |grep -q -- armv7hnl-; then echo "%{_bindir}/%(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,')-*"; fi)
 %(if echo %{_target_platform} |grep -q -- armv7hnl- && echo %{_target_platform} |grep -q -- -openmandriva-; then echo "%{_bindir}/%(echo %{_target_platform} |sed -e 's,armv7hnl-,armv7hl-,;s,-openmandriva-,-mandriva-,g')-*"; fi)
 %{_libdir}/bfd-plugins
-%{_mandir}/man1/*
-%{_infodir}/*info*
+%doc %{_mandir}/man1/*
+%doc %{_infodir}/*info*
 %{_libdir}/libbfd-*.so
 %{_libdir}/libctf.so.*
 %{_libdir}/libctf-nobfd.so.*
