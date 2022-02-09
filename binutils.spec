@@ -50,7 +50,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.37
+Version:	2.38
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
@@ -94,9 +94,9 @@ Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warni
 # patches here without double-checking)
 Patch300:	0006-Only-generate-an-RPATH-entry-if-LD_RUN_PATH-is-not-e.patch
 Patch301:	0011-fix-the-incorrect-assembling-for-ppc-wait-mnemonic.patch
-Patch302:	0013-Use-libtool-2.4.patch
-Patch303:	0014-Fix-rpath-in-libtool-when-sysroot-is-enabled.patch
-Patch304:	0015-sync-with-OE-libtool-changes.patch
+#Patch302:	0013-Use-libtool-2.4.patch
+#Patch303:	0014-Fix-rpath-in-libtool-when-sysroot-is-enabled.patch
+#Patch304:	0015-sync-with-OE-libtool-changes.patch
 
 # Mandriva patches
 # For some reason, HAVE_READV isn't detected correctly on armv7hnl
@@ -129,7 +129,7 @@ Patch1032:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch1031:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
-Patch1035:	binutils-2.25.51-lto.patch
+#Patch1035:	binutils-2.25.51-lto.patch
 Patch1036:	binutils-2.27.90-fix-warnings.patch
 Patch1038:	binutils-2.31-clang7.patch
 
