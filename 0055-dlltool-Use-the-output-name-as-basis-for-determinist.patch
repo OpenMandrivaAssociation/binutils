@@ -1,8 +1,8 @@
 From 99852365513266afdd793289813e8e565186c9e6 Mon Sep 17 00:00:00 2001
 From: Nick Clifton <nickc@redhat.com>
 Date: Wed, 23 Mar 2022 11:39:49 +0000
-Subject: [PATCH] dlltool: Use the output name as basis for deterministic temp
- prefixes
+Subject: [PATCH 55/91] dlltool: Use the output name as basis for deterministic
+ temp prefixes
 
 	PR 28885
 	* dlltool.c (main): use imp_name rather than dll_name when
@@ -32,5 +32,5 @@ index d95bf3f5470..89871510b45 100644
              if (!ISALNUM (tmp_prefix[i]))
                tmp_prefix[i] = '_';
 -- 
-2.27.0
+2.35.1
 

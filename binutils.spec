@@ -87,7 +87,21 @@ Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warni
 #Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
 
 # From upstream
-Patch100:	https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=99852365513266afdd793289813e8e565186c9e6#/binutils-wine-make-j.patch
+Patch100:	0004-x86-Disallow-invalid-relocation-against-protected-sy.patch
+Patch101:	0008-PR28882-build-failure-with-gcc-4.2-due-to-use-of-0b-.patch
+Patch102:	0010-i386-Update-I386_NEED_DYNAMIC_RELOC_TYPE_P-for-DT_TE.patch
+Patch103:	0012-ld-Keep-indirect-symbol-from-IR-if-referenced-from-s.patch
+Patch104:	0014-Updated-Serbian-translations-for-the-bfd-gold-ld-and.patch
+Patch105:	0021-binutils-2.38-vs.-ppc32-linux-kernel.patch
+Patch106:	0028-Revert-Check-thin-archive-element-file-size-against-.patch
+Patch107:	0041-Work-around-gcc-4-warnings-in-elf64-ppc.c.patch
+Patch108:	0042-PowerPC64-DT_RELR-relative-reloc-addresses.patch
+Patch109:	0043-PR28959-obdump-doesn-t-disassemble-mftb-instruction.patch
+Patch110:	0047-Updated-Serbian-for-binutils-and-Russian-for-gprof-t.patch
+Patch111:	0055-dlltool-Use-the-output-name-as-basis-for-determinist.patch
+Patch112:	0057-libctf-ld-diagnose-corrupted-CTF-header-cth_strlen.patch
+Patch113:	0072-IBM-zSystems-Add-support-for-z16-as-CPU-name.patch
+Patch114:	0079-LoongArch-Update-ABI-eflag-in-elf-header.patch
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto
