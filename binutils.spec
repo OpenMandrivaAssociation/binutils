@@ -54,7 +54,7 @@ Version:	2.38
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -87,6 +87,7 @@ Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warni
 #Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
 
 # From upstream
+Patch100:	https://sourceware.org/git/?p=binutils-gdb.git;a=patch;h=99852365513266afdd793289813e8e565186c9e6#/binutils-wine-make-j.patch
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto
