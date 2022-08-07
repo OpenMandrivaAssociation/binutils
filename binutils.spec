@@ -46,6 +46,7 @@
 %define gold_default 0
 
 %bcond_without gold
+%bcond_without gprofng
 
 # Make sure we can apply patches from upstream even
 # if they contain git binary diffs
@@ -161,6 +162,9 @@ BuildRequires:	libmpc-devel
 %if %{with default_lld}
 Requires:	lld
 %endif
+%if %{with gprofng}
+BuildRequires:	jdk-current
+%endif
 
 %description
 Binutils is a collection of binary utilities, including:
@@ -195,6 +199,10 @@ to consider using libelf instead of BFD.
 
 %prep
 %autosetup -p1 -n binutils-%{version}%{?DATE:-%{DATE}}
+
+%if %{with gprofng}
+. %{_sysconfdir}/profile.d/90java.sh
+%endif
 
 cp -f %{_datadir}/libtool/config/config.{guess,sub} .
 
