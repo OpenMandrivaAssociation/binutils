@@ -17,6 +17,9 @@
 	done
 )
 
+# gprofng uses snprintf and friends as struct members...
+%global _fortify_cflags %{nil}
+
 %define lib_major 2
 %define lib_name_orig %mklibname binutils
 %define lib_name %{lib_name_orig}%{lib_major}
@@ -50,11 +53,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.38
+Version:	2.39
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -87,21 +90,7 @@ Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warni
 #Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
 
 # From upstream
-Patch100:	0004-x86-Disallow-invalid-relocation-against-protected-sy.patch
-Patch101:	0008-PR28882-build-failure-with-gcc-4.2-due-to-use-of-0b-.patch
-Patch102:	0010-i386-Update-I386_NEED_DYNAMIC_RELOC_TYPE_P-for-DT_TE.patch
-Patch103:	0012-ld-Keep-indirect-symbol-from-IR-if-referenced-from-s.patch
-Patch104:	0014-Updated-Serbian-translations-for-the-bfd-gold-ld-and.patch
-Patch105:	0021-binutils-2.38-vs.-ppc32-linux-kernel.patch
-Patch106:	0028-Revert-Check-thin-archive-element-file-size-against-.patch
-Patch107:	0041-Work-around-gcc-4-warnings-in-elf64-ppc.c.patch
-Patch108:	0042-PowerPC64-DT_RELR-relative-reloc-addresses.patch
-Patch109:	0043-PR28959-obdump-doesn-t-disassemble-mftb-instruction.patch
-Patch110:	0047-Updated-Serbian-for-binutils-and-Russian-for-gprof-t.patch
-Patch111:	0055-dlltool-Use-the-output-name-as-basis-for-determinist.patch
-Patch112:	0057-libctf-ld-diagnose-corrupted-CTF-header-cth_strlen.patch
-Patch113:	0072-IBM-zSystems-Add-support-for-z16-as-CPU-name.patch
-Patch114:	0079-LoongArch-Update-ABI-eflag-in-elf-header.patch
+# [currently nothing]
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto
@@ -123,7 +112,7 @@ Patch1000:	binutils-2.34.0-arm32-build-workaround.patch
 # (tpg) this is needed for 32-bit chroots running on x86_64 host
 Patch1021:	binutils-2.25.51-linux32.patch
 # (proyvind): skip gold tests that fails
-Patch1027:	binutils-2.21.51.0.8-skip-gold-check.patch
+#Patch1027:	binutils-2.21.51.0.8-skip-gold-check.patch
 Patch1028:	binutils-2.24.51.0.3.ld-default.settings.patch
 # enables the following by default:
 # --as-needed
@@ -501,7 +490,15 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_bindir}/c++filt
 %optional %{_bindir}/dwp
 %{_bindir}/elfedit
+%config(noreplace) %{_sysconfdir}/gprofng.rc
 %{_bindir}/gprof
+%{_bindir}/gprofng
+%{_bindir}/%{_target_platform}-gprofng
+%{_bindir}/gp-archive
+%{_bindir}/gp-collect-app
+%{_bindir}/gp-display-html
+%{_bindir}/gp-display-src
+%{_bindir}/gp-display-text
 %{_bindir}/ld
 %{_bindir}/ld.bfd
 %optional %{_bindir}/ld.gold
@@ -543,6 +540,7 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_libdir}/libctf.so.*
 %{_libdir}/libctf-nobfd.so.*
 %{_libdir}/libopcodes-*.so
+%{_libdir}/gprofng
 %{_prefix}/%{_target_platform}
 %(
 if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then

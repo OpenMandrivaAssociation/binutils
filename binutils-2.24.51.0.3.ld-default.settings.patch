@@ -1,16 +1,16 @@
-diff -up binutils-2.37.90/ld/ldelf.c.14~ binutils-2.37.90/ld/ldelf.c
---- binutils-2.37.90/ld/ldelf.c.14~	2022-02-03 11:55:23.709625422 +0100
-+++ binutils-2.37.90/ld/ldelf.c	2022-02-03 11:55:23.731625518 +0100
-@@ -47,7 +47,7 @@ struct dt_needed
+diff -up binutils-2.39/ld/ldelf.c.13~ binutils-2.39/ld/ldelf.c
+--- binutils-2.39/ld/ldelf.c.13~	2022-08-06 15:25:32.911000275 +0200
++++ binutils-2.39/ld/ldelf.c	2022-08-06 15:26:05.032425993 +0200
+@@ -50,7 +50,7 @@ struct dt_needed
  };
  
  /* Style of .note.gnu.build-id section.  */
 -const char *ldelf_emit_note_gnu_build_id;
 +const char *ldelf_emit_note_gnu_build_id = NULL;
  
- /* These variables are required to pass information back and forth
-    between after_open and check_needed and stat_needed and vercheck.  */
-@@ -719,6 +719,9 @@ ldelf_check_ld_elf_hints (const struct b
+ /* Content of .note.package section.  */
+ const char *ldelf_emit_note_fdo_package_metadata;
+@@ -725,6 +725,9 @@ ldelf_check_ld_elf_hints (const struct b
        FILE *f;
        char *tmppath;
  
@@ -20,9 +20,9 @@ diff -up binutils-2.37.90/ld/ldelf.c.14~ binutils-2.37.90/ld/ldelf.c
        tmppath = concat (ld_sysroot, _PATH_ELF_HINTS, (const char *) NULL);
        f = fopen (tmppath, FOPEN_RB);
        free (tmppath);
-diff -up binutils-2.37.90/ld/ldmain.c.14~ binutils-2.37.90/ld/ldmain.c
---- binutils-2.37.90/ld/ldmain.c.14~	2022-02-03 11:55:23.731625518 +0100
-+++ binutils-2.37.90/ld/ldmain.c	2022-02-03 11:56:37.471946630 +0100
+diff -up binutils-2.39/ld/ldmain.c.13~ binutils-2.39/ld/ldmain.c
+--- binutils-2.39/ld/ldmain.c.13~	2022-07-08 11:46:48.000000000 +0200
++++ binutils-2.39/ld/ldmain.c	2022-08-06 15:25:32.994998773 +0200
 @@ -331,8 +331,11 @@ main (int argc, char **argv)
  
    link_info.allow_undefined_version = true;
