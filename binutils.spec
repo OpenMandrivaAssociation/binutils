@@ -54,11 +54,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.39
+Version:	2.40
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
-Source0:	ftp://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.xz
-Release:	2
+Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -84,7 +84,6 @@ Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.
 # This should be an option instead of a hardcode in the longer term!
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch10:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-do-not-link-with-static-libstdc++.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
 Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warnings.patch
@@ -299,6 +298,7 @@ for i in %{long_targets}; do
 	esac
 
 	CONFIGURE_TOP=.. %configure \
+		--without-static-standard-libraries \
 		--enable-64-bit-bfd \
 		--with-bugurl=%{bugurl} \
 %if %{with gold}
@@ -578,6 +578,7 @@ done
 %{_libdir}/libctf.so.*
 %{_libdir}/libctf-nobfd.so.*
 %{_libdir}/libopcodes-*.so
+%{_libdir}/libsframe.so.*
 %{_libdir}/gprofng
 %{_prefix}/%{_target_platform}
 %(
@@ -616,6 +617,8 @@ fi
 %{_libdir}/libopcodes.a
 %{_libdir}/libopcodes.so
 %{_libdir}/libiberty.a
+%{_libdir}/libsframe.a
+%{_libdir}/libsframe.so
 
 %(
 for i in %{long_targets}; do
