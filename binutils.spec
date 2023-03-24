@@ -45,7 +45,7 @@
 
 %define gold_default 0
 
-%bcond_without gold
+%bcond_with gold
 %bcond_without gprofng
 
 # Make sure we can apply patches from upstream even
@@ -150,9 +150,11 @@ BuildRequires:	pkgconfig(zlib)
 BuildRequires:	git-core
 # make check'ing requires libdl.a
 BuildRequires:	glibc-static-devel >= 6:2.14.90-8
+%if %{with gold}
 # gold make check'ing requires libstdc++.a & bc
 BuildRequires:	libstdc++-static-devel
 BuildRequires:	bc
+%endif
 BuildRequires:	pkgconfig(isl)
 BuildRequires:	pkgconfig(cloog-isl)
 BuildRequires:	gmp-devel
@@ -539,7 +541,10 @@ done
 %{_bindir}/gp-display-text
 %{_bindir}/ld
 %{_bindir}/ld.bfd
-%optional %{_bindir}/ld.gold
+%if %{with gold}
+%{_bindir}/ld.gold
+%{_bindir}/%{_target_platform}-ld.gold
+%endif
 %{_bindir}/nm
 %{_bindir}/binutils-nm
 %{_bindir}/objcopy
@@ -559,7 +564,6 @@ done
 %{_bindir}/%{_target_platform}-gprof
 %{_bindir}/%{_target_platform}-ld
 %{_bindir}/%{_target_platform}-ld.bfd
-%optional %{_bindir}/%{_target_platform}-ld.gold
 %{_bindir}/%{_target_platform}-nm
 %{_bindir}/%{_target_platform}-objcopy
 %{_bindir}/%{_target_platform}-objdump
