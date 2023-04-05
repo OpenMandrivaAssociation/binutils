@@ -6,9 +6,14 @@
 #
 
 
+%if %{cross_compiling}
+# We don't currently build Canadian Crosses
+%global targets %{arch}-linux
+%else
 # Listed targets are short form and will be expanded by rpm
 # gnueabihf variants etc. are inserted by rpm into long_targets
 %global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-linuxuclibc armv7hnl-linuxuclibc i686-linuxuclibc x86_64-linuxuclibc x32-linuxuclibc riscv32-linuxuclibc riscv64-linuxuclibc aarch64-android armv7l-android armv8l-android x86_64-android i686-mingw32 x86_64-mingw32 ppc64le-linux ppc64le-linuxmusl ppc64le-linuxuclibc ppc64-linux ppc64-linuxmusl ppc64-linuxuclibc
+%endif
 %global long_targets %(
 	for i in %{targets}; do
 		CPU=$(echo $i |cut -d- -f1)
@@ -236,14 +241,8 @@ sed -i -e 's,/lib/,/%{_lib}/,g' bfd/plugin.c
 sed -i -e 's,tooldir)/lib,tooldir)/%{_lib},g' gold/Makefile.*
 %endif
 
-%ifarch %{riscv64}
-# Until clang 11 is built
-export CC="gcc -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
-export CXX="g++ -D_GNU_SOURCE=1 -std=gnu++14"
-%else
 export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1 -std=gnu++14"
-%endif
 
 for i in %{long_targets}; do
 	mkdir -p BUILD-$i
@@ -347,6 +346,7 @@ for i in %{long_targets}; do
 	cd -
 done
 
+%if ! %{cross_compiling}
 %check
 # All Tests must pass
 echo ====================TESTING=========================
@@ -358,6 +358,7 @@ echo ====================TESTING END=====================
 
 logfile="%{name}-%{version}-%{release}.log"
 rm -f $logfile; find . -name "*.sum" | xargs cat >> $logfile
+%endif
 
 %install
 for i in %{long_targets}; do
@@ -475,10 +476,12 @@ done
 cd %{buildroot}%{_bindir}
 # Set compat symlinks for scripts expecting *-mandriva-linux-gnu toolchains
 for i in *-openmandriva-*; do
+	[ -e "$i" ] || continue
 	ln -s $i ${i/-openmandriva-/-mandriva-}
 done
 # And for armv7hl (as opposed to armv7hnl) -- it's the same binutils-wise
 for i in armv7hnl-*; do
+	[ -e "$i" ] || continue
 	ln -s $i ${i/armv7hnl-/armv7hl-}
 done
 cd -
@@ -530,8 +533,9 @@ done
 %{_bindir}/c++filt
 %optional %{_bindir}/dwp
 %{_bindir}/elfedit
-%config(noreplace) %{_sysconfdir}/gprofng.rc
 %{_bindir}/gprof
+%ifarch %{x86_64} %{aarch64}
+%config(noreplace) %{_sysconfdir}/gprofng.rc
 %{_bindir}/gprofng
 %{_bindir}/%{_target_platform}-gprofng
 %{_bindir}/gp-archive
@@ -539,6 +543,8 @@ done
 %{_bindir}/gp-display-html
 %{_bindir}/gp-display-src
 %{_bindir}/gp-display-text
+%{_libdir}/gprofng
+%endif
 %{_bindir}/ld
 %{_bindir}/ld.bfd
 %if %{with gold}
@@ -583,7 +589,6 @@ done
 %{_libdir}/libctf-nobfd.so.*
 %{_libdir}/libopcodes-*.so
 %{_libdir}/libsframe.so.*
-%{_libdir}/gprofng
 %{_prefix}/%{_target_platform}
 %(
 if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
