@@ -5,7 +5,6 @@
 # same goes for man and locale files as they are duplicated by triple 
 #
 
-
 %if %{cross_compiling}
 # We don't currently build Canadian Crosses
 %global targets %{arch}-linux
@@ -63,7 +62,7 @@ Version:	2.40
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sources.redhat.com/binutils/
@@ -77,22 +76,22 @@ Source101:	ranlib
 Source102:	nm
 
 # Fedora patches:
-Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.20.51.0.2-libtool-lib64.patch
+Patch01:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-libtool-lib64.patch
 # We don't want this one! Tends to break compatibility with scripts
 # on other distros
 #Patch02:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.25-version.patch
 # Export demangle.h with the binutils-devel rpm.
-Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-export-demangle.h.patch
+Patch03:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-export-demangle.h.patch
 # Disable checks that config.h has been included before system headers.  BZ #845084
-Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.22.52.0.4-no-config-h-check.patch
+Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-no-config-h-check.patch
 # FIXME this one serves a purpose (fix ltrace, LD_AUDIT) but reduces optimizations.
 # This should be an option instead of a hardcode in the longer term!
 #Patch07:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
-Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.27-aarch64-ifunc.patch
-Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-special-sections-in-groups.patch
-Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gold-mismatched-section-flags.patch
-Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-warnings.patch
-#Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-gcc-10-fixes.patch
+Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-2.27-aarch64-ifunc.patch
+Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-special-sections-in-groups.patch
+Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-gold-mismatched-section-flags.patch
+Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-objcopy-note-merge-speedup.patch
+Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-reloc-symtab.patch
 
 # From upstream
 # [currently nothing]
@@ -248,7 +247,7 @@ for i in %{long_targets}; do
 	mkdir -p BUILD-$i
 	cd BUILD-$i
 	if [ "%{_target_platform}" = "$i" ]; then
-		# Native build -- we want shared libs here...
+# Native build -- we want shared libs here...
 		EXTRA_CONFIG="--enable-shared --with-pic"
 		if echo $i |grep -q x32; then
 			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=/libx32:%{_prefix}/libx32:%{_prefix}/local/libx32:%{_prefix}/$i/libx32:/lib64:%{_prefix}/lib64:%{_prefix}/local/lib64:%{_prefix}/$i/lib64:/lib:%{_prefix}/lib:%{_prefix}/local/lib:%{_prefix}/$i/lib"
@@ -261,7 +260,7 @@ for i in %{long_targets}; do
 		fi
 		EXTRA_CONFIG="$EXTRA_CONFIG --enable-targets=all"
 	else
-		# Cross build -- need to set program_prefix and friends...
+# Cross build -- need to set program_prefix and friends...
 		EXTRA_CONFIG="--target=$i --program-prefix=$i- --disable-shared --enable-static --with-sysroot=%{_prefix}/${i} --with-native-system-header-dir=/include"
 		if echo $i |grep -q x32; then
 			EXTRA_CONFIG="$EXTRA_CONFIG --with-lib-path=%{_prefix}/$i/libx32:%{_prefix}/$i/lib64:%{_prefix}/$i/lib"
@@ -331,6 +330,7 @@ for i in %{long_targets}; do
 		--disable-isl-version-check \
 		--enable-generate-build-notes=no \
 		--enable-compressed-debug-sections=none \
+		--enable-separate-code=yes \
 		--with-mpc=%{_libdir} \
 		--with-mpfr=%{_libdir} \
 		--with-gmp=%{_libdir} \
