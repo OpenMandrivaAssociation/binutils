@@ -6,6 +6,8 @@
 #
 
 %if %{cross_compiling}
+# Workaround for libtool being a broken mess
+%define prefer_gcc 1
 # We don't currently build Canadian Crosses
 %global targets %{arch}-linux
 %else
