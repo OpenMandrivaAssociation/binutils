@@ -60,11 +60,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.40
+Version:	2.41
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sourceware.org/binutils/
@@ -92,8 +92,6 @@ Patch04:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-no-c
 Patch09:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-2.27-aarch64-ifunc.patch
 Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-special-sections-in-groups.patch
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-gold-mismatched-section-flags.patch
-Patch22:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-objcopy-note-merge-speedup.patch
-Patch23:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-reloc-symtab.patch
 
 # From upstream
 # [currently nothing]
