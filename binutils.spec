@@ -559,6 +559,9 @@ ln -s ld.lld %{buildroot}%{_bindir}/ld
 %{_libdir}/libctf-nobfd.so.*
 %{_libdir}/libopcodes-*.so
 %{_libdir}/libsframe.so.*
+%if %{with gprofng}
+%{_libdir}/libgprofng.so.*
+%endif
 %{_prefix}/%{_target_platform}
 %(
 if [ -n "$(echo %{_target_platform} |cut -d- -f4-)" ]; then
@@ -598,6 +601,10 @@ fi
 %{_libdir}/libiberty.a
 %{_libdir}/libsframe.a
 %{_libdir}/libsframe.so
+%if %{with gprofng}
+%{_libdir}/libgprofng.so
+%{_libdir}/libgprofng.a
+%endif
 
 %(
 for i in %{long_targets}; do
