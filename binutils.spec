@@ -52,7 +52,12 @@
 %define gold_default 0
 
 %bcond_with gold
+%ifarch %{riscv}
+# FIXME Not yet ported -- enable when it is
+%bcond_with gprofng
+%else
 %bcond_without gprofng
+%endif
 
 # Make sure we can apply patches from upstream even
 # if they contain git binary diffs
