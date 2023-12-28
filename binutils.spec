@@ -31,12 +31,11 @@
 %define lib_name %{lib_name_orig}%{lib_major}
 %define dev_name %mklibname binutils -d
 
-# (tpg) optimize it a bit
-%global optflags %{optflags} -fstack-protector-strong
+%global optflags %{optflags} -Wl,--undefined-version
 
 %ifarch %{riscv}
 # Make sure we don't use lld on risc-v yet
-%global optflags %{optflags} -fuse-ld=bfd
+%global optflags %{optflags} -fuse-ld=bfd -Wl,--undefined-version
 %bcond_with default_lld
 %else
 %bcond_without default_lld
