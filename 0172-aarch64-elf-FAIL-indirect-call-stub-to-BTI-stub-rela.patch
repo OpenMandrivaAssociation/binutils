@@ -1,0 +1,123 @@
+From 5f41ff2d2cddd6d477351b36353ba1cf89bdafe7 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Mon, 4 Dec 2023 08:48:34 +1030
+Subject: [PATCH 172/180] aarch64-elf: FAIL: indirect call stub to BTI stub
+ relaxation
+
+aarch64-elf fails the ld-aarch64/bfd-far-3.d test, due to the stubs
+being emitted in a different order to that of aarch64-linux.  They are
+emitted in a different order due to stub names for local symbols
+having the section id in the stub name.  aarch64-linux-ld generates
+one more section than aarch64-elf-ld.  That section is .gnu.hash.  So
+the stub names differ and are hashed to different slots in
+stub_hash_table.
+
+Fix this by running the test with --hash-style=sysv, and adjust
+expected output.  I've also changed the branch over stubs emitted at
+the start of a group of stubs to not care about the symbol, for all
+groups not just the one that needed changing.
+
+	* ld-aarch64/bti-far-3.d: Add --hash-style=sysv.  Adjust
+	expected output.
+
+(cherry picked from commit 21a2a3d567a2af583768b5f614403e65611c58a5)
+---
+ ld/testsuite/ld-aarch64/bti-far-3.d | 51 ++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 26 deletions(-)
+
+diff --git a/ld/testsuite/ld-aarch64/bti-far-3.d b/ld/testsuite/ld-aarch64/bti-far-3.d
+index b27d8b56548..f04ce94f0ac 100644
+--- a/ld/testsuite/ld-aarch64/bti-far-3.d
++++ b/ld/testsuite/ld-aarch64/bti-far-3.d
+@@ -2,7 +2,7 @@
+ #source: bti-far-3a.s
+ #source: bti-far-3b.s
+ #source: bti-far-3c.s
+-#ld: -shared -T bti-far-3.ld
++#ld: -shared --hash-style=sysv -T bti-far-3.ld
+ #objdump: -dr
+ 
+ [^:]*: *file format elf64-.*aarch64
+@@ -25,7 +25,7 @@ Disassembly of section \.plt:
+    20024:	f9401211 	ldr	x17, \[x16, #32\]
+    20028:	91008210 	add	x16, x16, #0x20
+    2002c:	d61f0220 	br	x17
+-   20030:	14000004 	b	20040 <__extern_func_bti_veneer\+0x8>
++   20030:	14000004 	b	20040 .*
+    20034:	d503201f 	nop
+ 
+ 0000000000020038 <__extern_func_bti_veneer>:
+@@ -38,12 +38,12 @@ Disassembly of section \.text:
+        30000:	15c00004 	b	7030010 <__b_func_veneer>
+        30004:	17ffc007 	b	20020 <extern_func@plt>
+ 	\.\.\.
+-     7030008:	1400000a 	b	7030030 <__a_func_bti_veneer\+0x8>
++     7030008:	1400000a 	b	7030030 .*
+      703000c:	d503201f 	nop
+ 
+ 0000000007030010 <__b_func_veneer>:
+      7030010:	90040010 	adrp	x16, f030000 <b_func\+0x6ffffd0>
+-     7030014:	9101e210 	add	x16, x16, #0x78
++     7030014:	91018210 	add	x16, x16, #0x60
+      7030018:	d61f0200 	br	x16
+ 	\.\.\.
+ 
+@@ -53,34 +53,33 @@ Disassembly of section \.text:
+ 	\.\.\.
+ 
+ 0000000008030030 <b_func>:
+-     8030030:	15c00004 	b	f030040 <__c_func_veneer>
+-     8030034:	15c00005 	b	f030048 <__a_func_veneer>
++     8030030:	15c0000a 	b	f030058 <__c_func_veneer>
++     8030034:	15c00003 	b	f030040 <__a_func_veneer>
+ 	\.\.\.
+-     f030038:	14000012 	b	f030080 <__b_func_bti_veneer\+0x8>
++     f030038:	14000012 	b	f030080 .*
+      f03003c:	d503201f 	nop
+ 
+-000000000f030040 <__c_func_veneer>:
+-     f030040:	d503245f 	bti	c
+-     f030044:	1440000f 	b	10030080 <c_func>
+-
+-000000000f030048 <__a_func_veneer>:
+-     f030048:	90fc0010 	adrp	x16, 7030000 <a_func\+0x7000000>
+-     f03004c:	9100a210 	add	x16, x16, #0x28
+-     f030050:	d61f0200 	br	x16
++000000000f030040 <__a_func_veneer>:
++     f030040:	90fc0010 	adrp	x16, 7030000 <a_func\+0x7000000>
++     f030044:	9100a210 	add	x16, x16, #0x28
++     f030048:	d61f0200 	br	x16
+ 	\.\.\.
+ 
+-000000000f030060 <__extern_func_veneer>:
+-     f030060:	90f87f90 	adrp	x16, 20000 <\.plt>
+-     f030064:	9100e210 	add	x16, x16, #0x38
+-     f030068:	d61f0200 	br	x16
+-	\.\.\.
++000000000f030058 <__c_func_veneer>:
++     f030058:	d503245f 	bti	c
++     f03005c:	14400009 	b	10030080 <c_func>
++
++000000000f030060 <__b_func_bti_veneer>:
++     f030060:	d503245f 	bti	c
++     f030064:	163ffff3 	b	8030030 <b_func>
+ 
+-000000000f030078 <__b_func_bti_veneer>:
+-     f030078:	d503245f 	bti	c
+-     f03007c:	163fffed 	b	8030030 <b_func>
++000000000f030068 <__extern_func_veneer>:
++     f030068:	90f87f90 	adrp	x16, 20000 <\.plt>
++     f03006c:	9100e210 	add	x16, x16, #0x38
++     f030070:	d61f0200 	br	x16
+ 	\.\.\.
+ 
+ 0000000010030080 <c_func>:
+-    10030080:	17bffff2 	b	f030048 <__a_func_veneer>
+-    10030084:	17bffffd 	b	f030078 <__b_func_bti_veneer>
+-    10030088:	17bffff6 	b	f030060 <__extern_func_veneer>
++    10030080:	17bffff0 	b	f030040 <__a_func_veneer>
++    10030084:	17bffff7 	b	f030060 <__b_func_bti_veneer>
++    10030088:	17bffff8 	b	f030068 <__extern_func_veneer>
+-- 
+2.43.0
+

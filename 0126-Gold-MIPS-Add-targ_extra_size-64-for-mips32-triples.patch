@@ -1,0 +1,46 @@
+From eb49941e7e16bfcd71bd76544c84bf347b03e64f Mon Sep 17 00:00:00 2001
+From: YunQiang Su <yunqiang.su@cipunited.com>
+Date: Tue, 21 Nov 2023 12:57:15 +0800
+Subject: [PATCH 126/180] Gold/MIPS: Add targ_extra_size=64 for mips32 triples
+
+Backport commit: 619a8a364d6cdc43d6677f86369aa2b5d1a1cc0f
+---
+ gold/ChangeLog     | 4 ++++
+ gold/configure.tgt | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/gold/ChangeLog b/gold/ChangeLog
+index 3b09989d32d..4288254a68c 100644
+--- a/gold/ChangeLog
++++ b/gold/ChangeLog
+@@ -1,3 +1,7 @@
++2023-11-21  YunQiang Su  <yunqiang.su@cipunited.com>
++
++	* configure.tgt (mips targets): Set targ_extra_size=64.
++
+ 2023-11-21  YunQiang Su  <yunqiang.su@cipunited.com>
+ 
+ 	* configure.tgt (mips targets): Set targ_machine to EM_MIPS for
+diff --git a/gold/configure.tgt b/gold/configure.tgt
+index 751c8fd06c6..836727f67de 100644
+--- a/gold/configure.tgt
++++ b/gold/configure.tgt
+@@ -157,6 +157,7 @@ mips*el*-*-*|mips*le*-*-*)
+  targ_obj=mips
+  targ_machine=EM_MIPS
+  targ_size=32
++ targ_extra_size=64
+  targ_big_endian=false
+  targ_extra_big_endian=true
+  ;;
+@@ -164,6 +165,7 @@ mips*-*-*)
+  targ_obj=mips
+  targ_machine=EM_MIPS
+  targ_size=32
++ targ_extra_size=64
+  targ_big_endian=true
+  targ_extra_big_endian=false
+  ;;
+-- 
+2.43.0
+

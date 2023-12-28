@@ -1,0 +1,32 @@
+From 6ffa5a420a0ce533feb6bc09f6f76bac9e3930bd Mon Sep 17 00:00:00 2001
+From: Richard Sandiford <richard.sandiford@arm.com>
+Date: Fri, 8 Sep 2023 17:20:56 +0100
+Subject: [PATCH 049/180] aarch64: Remove unused function
+
+set_expected_error is no longer used.  It has been replaced by
+more specific error messages.
+---
+ gas/config/tc-aarch64.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/gas/config/tc-aarch64.c b/gas/config/tc-aarch64.c
+index 99fb5de2679..85a4c2b3917 100644
+--- a/gas/config/tc-aarch64.c
++++ b/gas/config/tc-aarch64.c
+@@ -241,13 +241,6 @@ set_default_error (void)
+   inst.parsing_error.data[0].i = SEF_DEFAULT_ERROR;
+ }
+ 
+-static inline void
+-set_expected_error (unsigned int flags)
+-{
+-  set_error (AARCH64_OPDE_SYNTAX_ERROR, NULL);
+-  inst.parsing_error.data[0].i = flags;
+-}
+-
+ static inline void
+ set_syntax_error (const char *error)
+ {
+-- 
+2.43.0
+

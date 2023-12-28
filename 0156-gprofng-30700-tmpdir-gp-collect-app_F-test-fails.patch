@@ -1,0 +1,38 @@
+From 1ce656c66f1859d0f6066e0f9064033712e37aea Mon Sep 17 00:00:00 2001
+From: Vladimir Mezentsev <vladimir.mezentsev@oracle.com>
+Date: Thu, 3 Aug 2023 12:56:54 -0700
+Subject: [PATCH 156/180] gprofng: 30700 tmpdir/gp-collect-app_F test fails
+
+gprofng/ChangeLog
+2023-08-03  Vladimir Mezentsev  <vladimir.mezentsev@oracle.com>
+
+	PR gprofng/30700
+	* testsuite/gprofng.display/gp-collect-app_F.exp: Fix -name argument
+	for sub-experiment filtering.
+
+(cherry picked from commit e0282cf1284b4d358892427a6b4f60d6f4c0580b)
+---
+ gprofng/testsuite/gprofng.display/gp-collect-app_F.exp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gprofng/testsuite/gprofng.display/gp-collect-app_F.exp b/gprofng/testsuite/gprofng.display/gp-collect-app_F.exp
+index f791b0f7a95..02bcc8e5b49 100644
+--- a/gprofng/testsuite/gprofng.display/gp-collect-app_F.exp
++++ b/gprofng/testsuite/gprofng.display/gp-collect-app_F.exp
+@@ -46,11 +46,11 @@ proc run_gp_collect_app { subExpCnt F_opt } {
+     return -code break
+   }
+ 
+-  set output [run_native_host_cmd "find $tdir -name '*x1.er' | wc -l"]
++  set output [run_native_host_cmd "find $tdir -name '*_x?.er' | wc -l"]
+   set subExp [lindex $output 1]
+   if { $subExp != $subExpCnt } then {
+     set out [lindex $output 1]
+-    send_log "Test failed for -F $F_opt. subExp=$subExp. Shold be $subExpCnt\n"
++    send_log "Test failed for -F $F_opt. subExp=$subExp. Should be $subExpCnt\n"
+     fail $tdir
+     return -code break
+   }
+-- 
+2.43.0
+

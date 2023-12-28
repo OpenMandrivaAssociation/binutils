@@ -1,0 +1,46 @@
+From 31b78cc991781265d9404bd55151691bedd6d556 Mon Sep 17 00:00:00 2001
+From: Jan Beulich <jbeulich@suse.com>
+Date: Tue, 1 Aug 2023 12:39:44 +0200
+Subject: [PATCH 005/180] gas: rework timestamp preservation on
+ doc/asconfig.texi
+
+PR 28909
+
+Sadly "cp -p", doing more than just preserving the time stamp, can fail
+e.g. upon trying to preserve ownership (which we don't care about), as
+can be observed on e.g. Cygwin. Replace the use of -p by a use of touch,
+this way also only preserving modification time.
+---
+ gas/Makefile.in  | 2 +-
+ gas/doc/local.mk | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gas/Makefile.in b/gas/Makefile.in
+index 427f42dfa3a..b56cd9a29a9 100644
+--- a/gas/Makefile.in
++++ b/gas/Makefile.in
+@@ -2230,7 +2230,7 @@ de-stage3:
+ 
+ doc/asconfig.texi: doc/$(CONFIG).texi doc/$(am__dirstamp)
+ 	$(AM_V_at)rm -f doc/asconfig.texi
+-	$(AM_V_GEN)cp -p $(srcdir)/doc/$(CONFIG).texi doc/asconfig.texi
++	$(AM_V_GEN)cp $(srcdir)/doc/$(CONFIG).texi doc/asconfig.texi && touch -m -r $(srcdir)/doc/$(CONFIG).texi doc/asconfig.texi
+ 	$(AM_V_at)chmod u+w doc/asconfig.texi
+ 
+ # Maintenance
+diff --git a/gas/doc/local.mk b/gas/doc/local.mk
+index de13e3ca8b8..c48c71115be 100644
+--- a/gas/doc/local.mk
++++ b/gas/doc/local.mk
+@@ -41,7 +41,7 @@ TEXI2DVI = texi2dvi -I "$(srcdir)/%D%" -I %D% -I "$(srcdir)/../libiberty" \
+ 
+ %D%/asconfig.texi: %D%/$(CONFIG).texi %D%/$(am__dirstamp)
+ 	$(AM_V_at)rm -f %D%/asconfig.texi
+-	$(AM_V_GEN)cp -p $(srcdir)/%D%/$(CONFIG).texi %D%/asconfig.texi
++	$(AM_V_GEN)cp $(srcdir)/%D%/$(CONFIG).texi %D%/asconfig.texi && touch -m -r $(srcdir)/%D%/$(CONFIG).texi %D%/asconfig.texi
+ 	$(AM_V_at)chmod u+w %D%/asconfig.texi
+ 
+ CPU_DOCS = \
+-- 
+2.43.0
+

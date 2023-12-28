@@ -1,0 +1,129 @@
+From 64707a2e11d16bb2ddddcf3a90e486d89d96ea3d Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Fri, 1 Dec 2023 09:13:08 -0800
+Subject: [PATCH 164/180] Fix ld/x86: reduce testsuite dependency on system
+ object files
+
+commit eab996435fe65a421541f59557c5f1fd427573a3
+Author: Jan Beulich <jbeulich@suse.com>
+Date:   Tue Nov 7 13:58:32 2023 +0100
+
+    ld/x86: reduce testsuite dependency on system object files
+
+changed some C compiler tests to assembler/linker tests which introduced
+2 problems:
+
+1. It broke x32 binutils tests since --64 was passed to assembler, but
+-m elf_x86_64 wasn't passed to linker.
+2. -nostdlib was passed to C compiler driver to exclude standard run-time
+files which should be avoided with -r option for linker tests.
+
+Fix them by passing -m elf_x86_64 to linker and removing -nostdlib for
+linker tests with -r.
+
+	PR ld/30722
+	* testsuite/ld-x86-64/x86-64.exp: Pass -m elf_x86_64 to linker
+	for tests with --64.  Remove -nostdlib for tests with -r.
+
+(cherry picked from commit 260aa570edcf120332daefb4a102a08c90e4d9b4)
+---
+ ld/testsuite/ld-x86-64/x86-64.exp | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/ld/testsuite/ld-x86-64/x86-64.exp b/ld/testsuite/ld-x86-64/x86-64.exp
+index 123152df5b0..bc736696cd0 100644
+--- a/ld/testsuite/ld-x86-64/x86-64.exp
++++ b/ld/testsuite/ld-x86-64/x86-64.exp
+@@ -2100,7 +2100,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 3" \
+-	"" \
++	"-m elf_x86_64" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-stk.s property-x86-1.s} \
+@@ -2109,7 +2109,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 3 (.o)" \
+-	"-r -nostdlib" \
++	"-m elf_x86_64 -r" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-x86-1.s property-stk.s} \
+@@ -2118,7 +2118,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 3 (.so)" \
+-	"-shared" \
++	"-m elf_x86_64 -shared" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-x86-1.s property-stk.s} \
+@@ -2127,7 +2127,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 4" \
+-	"" \
++	"-m elf_x86_64" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-stk.s property-x86-1.s property-x86-2.s} \
+@@ -2136,7 +2136,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 4 (.o)" \
+-	"-r -nostdlib" \
++	"-m elf_x86_64 -r" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-x86-2.s property-x86-1.s property-stk.s} \
+@@ -2145,7 +2145,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 4 (.so)" \
+-	"-shared" \
++	"-m elf_x86_64 -shared" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-x86-2.s property-x86-1.s property-stk.s} \
+@@ -2154,7 +2154,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 4 (-z stack-size=0)" \
+-	"-z stack-size=0" \
++	"-m elf_x86_64 -z stack-size=0" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-stk.s property-x86-1.s property-x86-2.s} \
+@@ -2163,7 +2163,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 5" \
+-	"-z stack-size=0x900000" \
++	"-m elf_x86_64 -z stack-size=0x900000" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-stk.s property-x86-1.s property-x86-2.s} \
+@@ -2172,7 +2172,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 5 (.o)" \
+-	"-r -nostdlib -z stack-size=0x900000" \
++	"-m elf_x86_64 -r -z stack-size=0x900000" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-x86-2.s property-x86-1.s property-stk.s} \
+@@ -2181,7 +2181,7 @@ run_ld_link_tests [list \
+     ] \
+     [list \
+ 	"Build property 5 (.so)" \
+-	"-shared -z stack-size=0x900000" \
++	"-m elf_x86_64 -shared -z stack-size=0x900000" \
+ 	"" \
+ 	"--64 -defsym __64_bit__=1 -mx86-used-note=yes" \
+ 	{property-x86-2.s property-x86-1.s property-stk.s} \
+-- 
+2.43.0
+

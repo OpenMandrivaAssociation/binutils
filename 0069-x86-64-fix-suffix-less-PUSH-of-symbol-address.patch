@@ -1,0 +1,74 @@
+From 7fe76f02413fff61566ae52ec80d581da1e264a2 Mon Sep 17 00:00:00 2001
+From: Jan Beulich <jbeulich@suse.com>
+Date: Wed, 27 Sep 2023 10:53:38 +0200
+Subject: [PATCH 069/180] x86-64: fix suffix-less PUSH of symbol address
+
+PR gas/30856
+
+In 5cc007751cdb ("x86: further adjust extend-to-32bit-address
+conditions") I neglected the case of PUSH, which is the only insn
+allowing (proper) symbol addresses to be used as immediates (not
+displacements, like CALL/JMP) in the absence of any register operands.
+Since it defaults to 64-bit operand size, guessing an L suffix is wrong
+there.
+---
+ gas/config/tc-i386.c             | 7 ++++++-
+ gas/testsuite/gas/i386/immed64.d | 6 ++++++
+ gas/testsuite/gas/i386/immed64.s | 6 ++++++
+ 3 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/gas/config/tc-i386.c b/gas/config/tc-i386.c
+index 4d85f8bcf14..913e016a491 100644
+--- a/gas/config/tc-i386.c
++++ b/gas/config/tc-i386.c
+@@ -6039,7 +6039,12 @@ optimize_imm (void)
+     }
+   else if ((flag_code == CODE_16BIT) ^ (i.prefix[DATA_PREFIX] != 0))
+     guess_suffix = WORD_MNEM_SUFFIX;
+-  else if (flag_code != CODE_64BIT || !(i.prefix[REX_PREFIX] & REX_W))
++  else if (flag_code != CODE_64BIT
++	   || (!(i.prefix[REX_PREFIX] & REX_W)
++	       /* A more generic (but also more involved) way of dealing
++		  with the special case(s) would be to go look for
++		  DefaultSize attributes on any of the templates.  */
++	       && current_templates->start->mnem_off != MN_push))
+     guess_suffix = LONG_MNEM_SUFFIX;
+ 
+   for (op = i.operands; --op >= 0;)
+diff --git a/gas/testsuite/gas/i386/immed64.d b/gas/testsuite/gas/i386/immed64.d
+index 35492a5a458..a83ab2c6e1e 100644
+--- a/gas/testsuite/gas/i386/immed64.d
++++ b/gas/testsuite/gas/i386/immed64.d
+@@ -24,6 +24,12 @@ Disassembly of section \.text:
+ [ 	]*[0-9a-fA-F]+:[ 	]+48 b8 04 00 00 00 00 00 00 00[ 	]+movabsq? +\$0x4,%rax
+ [ 	]*[0-9a-fA-F]+:[ 	]+48 b8 08 00 00 00 00 00 00 00[ 	]+movabsq? +\$0x8,%rax
+ [ 	]*[0-9a-fA-F]+:[ 	]+48 b8 00 00 00 00 00 00 00 00[ 	]+movabsq? +\$0x0,%rax
++[ 	]*[0-9a-fA-F]+:[ 	]+6a 04[ 	]+pushq? +\$0x4
++[ 	]*[0-9a-fA-F]+:[ 	]+68 08 00 00 00[ 	]+pushq? +\$0x8
++[ 	]*[0-9a-fA-F]+:[ 	]+66 6a 04[ 	]+pushw +\$0x4
++[ 	]*[0-9a-fA-F]+:[ 	]+66 68 08 00[ 	]+pushw +\$0x8
++[ 	]*[0-9a-fA-F]+:[ 	]+6a 04[ 	]+pushq? +\$0x4
++[ 	]*[0-9a-fA-F]+:[ 	]+68 08 00 00 00[ 	]+pushq? +\$0x8
+ [ 	]*[0-9a-fA-F]+:[ 	]+04 04[ 	]+addb? +\$0x4,%al
+ [ 	]*[0-9a-fA-F]+:[ 	]+04 08[ 	]+addb? +\$0x8,%al
+ [ 	]*[0-9a-fA-F]+:[ 	]+04 00[ 	]+addb? +\$0x0,%al
+diff --git a/gas/testsuite/gas/i386/immed64.s b/gas/testsuite/gas/i386/immed64.s
+index 265b41924e8..21c30ec4860 100644
+--- a/gas/testsuite/gas/i386/immed64.s
++++ b/gas/testsuite/gas/i386/immed64.s
+@@ -19,6 +19,12 @@ _start:
+ 	movabsq	$early, %rax
+ 	movabsq	$late, %rax
+ 	movabsq	$xtrn, %rax
++	pushq	$early
++	pushq	$late
++	pushw	$early
++	pushw	$late
++	push	$early
++	push	$late
+ 	addb	$early, %al
+ 	addb	$late, %al
+ 	addb	$xtrn, %al
+-- 
+2.43.0
+

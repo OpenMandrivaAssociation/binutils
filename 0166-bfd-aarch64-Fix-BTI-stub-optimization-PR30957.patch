@@ -1,0 +1,57 @@
+From 8b9de994244a85f6d87564a798e00d5acefa75b7 Mon Sep 17 00:00:00 2001
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+Date: Fri, 13 Oct 2023 17:51:15 +0100
+Subject: [PATCH 166/180] bfd: aarch64: Fix BTI stub optimization PR30957
+
+The instruction was looked up in the wrong input file (file of branch
+source instead of branch target) when optimizing away BTI stubs in
+
+  commit 5834f36d93cabf1a8bcc7dd7654141aed3d296bc
+  bfd: aarch64: Optimize BTI stubs PR30076
+
+This can cause adding BTI stubs when they are not necessary or removing
+them when they are (the latter is a correctness issue but it is very
+unlikely in practice).
+
+Fixes bug 30957.
+
+(cherry picked from commit 98b94ebb3ffe715fddde762bb3ee7fd6d972f233)
+---
+ bfd/elfnn-aarch64.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/bfd/elfnn-aarch64.c b/bfd/elfnn-aarch64.c
+index 4592bd6da27..a0dd17faa7e 100644
+--- a/bfd/elfnn-aarch64.c
++++ b/bfd/elfnn-aarch64.c
+@@ -3675,8 +3675,7 @@ group_sections (struct elf_aarch64_link_hash_table *htab,
+ /* True if the inserted stub does not break BTI compatibility.  */
+ 
+ static bool
+-aarch64_bti_stub_p (bfd *input_bfd,
+-		    struct elf_aarch64_stub_hash_entry *stub_entry)
++aarch64_bti_stub_p (struct elf_aarch64_stub_hash_entry *stub_entry)
+ {
+   /* Stubs without indirect branch are BTI compatible.  */
+   if (stub_entry->stub_type != aarch64_stub_adrp_branch
+@@ -3690,7 +3689,7 @@ aarch64_bti_stub_p (bfd *input_bfd,
+   file_ptr off = stub_entry->target_value;
+   bfd_size_type count = sizeof (loc);
+ 
+-  if (!bfd_get_section_contents (input_bfd, section, loc, off, count))
++  if (!bfd_get_section_contents (section->owner, section, loc, off, count))
+     return false;
+ 
+   uint32_t insn = bfd_getl32 (loc);
+@@ -4637,7 +4636,7 @@ _bfd_aarch64_add_call_stub_entries (bool *stub_changed, bfd *output_bfd,
+ 
+ 	      /* A stub with indirect jump may break BTI compatibility, so
+ 		 insert another stub with direct jump near the target then.  */
+-	      if (need_bti && !aarch64_bti_stub_p (input_bfd, stub_entry))
++	      if (need_bti && !aarch64_bti_stub_p (stub_entry))
+ 		{
+ 		  stub_entry->double_stub = true;
+ 		  htab->has_double_stub = true;
+-- 
+2.43.0
+

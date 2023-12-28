@@ -1,0 +1,31 @@
+From 493b2c96a5634439266fa32d0f1b5b8e5d422373 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Tue, 8 Aug 2023 02:17:57 +0100
+Subject: [PATCH 159/180] ld: Fix relocatable.d XFAIL/notarget entry for hppa
+
+PR 30734
+* ld/testsuite/ld-elf/relocatable.d: Fix notarget entry for hppa to match
+  hppa{1.1,2.0}*, like hppa2.0-unknown-linux-gnu which Gentoo uses.
+
+Signed-off-by: Sam James <sam@gentoo.org>
+(cherry picked from commit 0e339f6b4f2df25ed351cb94dc7fe16868626f49)
+---
+ ld/testsuite/ld-elf/relocatable.d | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ld/testsuite/ld-elf/relocatable.d b/ld/testsuite/ld-elf/relocatable.d
+index d0fba97a104..cb39baa52bc 100644
+--- a/ld/testsuite/ld-elf/relocatable.d
++++ b/ld/testsuite/ld-elf/relocatable.d
+@@ -2,7 +2,7 @@
+ #source: simple.s
+ #ld: -r -T relocatable.t
+ #readelf: -S --wide
+-#xfail: hppa-*-*
++#xfail: hppa*-*-*
+ 
+ #...
+   \[[ 0-9]+\] \.text.*[ \t]+PROGBITS[ \t]+0+800000[ \t0-9a-f]+AX.*
+-- 
+2.43.0
+

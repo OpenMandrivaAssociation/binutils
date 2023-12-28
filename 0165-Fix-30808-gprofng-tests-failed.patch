@@ -1,0 +1,82 @@
+From ad9049e6da186e8317916dc2d0c89002d6a5e0f9 Mon Sep 17 00:00:00 2001
+From: Vladimir Mezentsev <vladimir.mezentsev@oracle.com>
+Date: Thu, 31 Aug 2023 16:26:59 -0700
+Subject: [PATCH 165/180] Fix 30808 gprofng tests failed
+
+In gprofng testing, we need a tempory gprofng installation to resolve run-time
+dependencies on libraries (libgprofng, libopcodes, libbfd, etc).
+We set LD_LIBRARY_PATH and GPROFNG_SYSCONFDIR to find our libraries and
+configuration file. These variables must be set for all gprofng tests.
+
+Tested on aarch64 and x86_64 with and without --enable-shared and --target=<>.
+
+gprofng/ChangeLog
+2023-08-31  Vladimir Mezentsev  <vladimir.mezentsev@oracle.com>
+
+	PR gprofng/30808
+	* testsuite/config/default.exp: Make a temporary install dir.
+	Set LD_LIBRARY_PATH, GPROFNG_SYSCONFDIR.
+	* testsuite/lib/Makefile.skel: Move LD_LIBRARY_PATH and
+	GPROFNG_SYSCONFDIR setting in testsuite/config/default.exp.
+
+(cherry picked from commit a13e4c5c10d1a13d9128d033c9525810e876ac14)
+---
+ gprofng/testsuite/config/default.exp | 20 ++++++++++++++------
+ gprofng/testsuite/lib/Makefile.skel  |  5 -----
+ 2 files changed, 14 insertions(+), 11 deletions(-)
+
+diff --git a/gprofng/testsuite/config/default.exp b/gprofng/testsuite/config/default.exp
+index 1c862d54592..c4a6588bb64 100644
+--- a/gprofng/testsuite/config/default.exp
++++ b/gprofng/testsuite/config/default.exp
+@@ -32,17 +32,25 @@ if {![info exists CFLAGS]} {
+     set CFLAGS "-g -O2"
+ }
+ 
++remote_exec host "sh -c \"rm -rf tmpdir; mkdir -p tmpdir\""
+ if { "$CHECK_TARGET" == "check-install" } {
+     set ::env(GPROFNG) "$PREFIX/bin/gprofng"
+ } else {
+-    set ::env(GPROFNG) "$BUILDDIR/src/gprofng"
++    # Make a temporary install dir to run gprofng from, and point at it
++    remote_exec host "sh -c \"$MAKE -C .. install-gprofng MAKEFLAGS=program_transform_name= DESTDIR=$BUILDDIR/tmpdir/root\""
++    set ::env(GPROFNG) [exec find $BUILDDIR/tmpdir -type f -name gprofng -perm -u+x | head -1]
++
++    set x [exec find $BUILDDIR/tmpdir -type d -name gprofng | head -1]
++    set ::env(LD_LIBRARY_PATH) "$x:$x/.."
++
++    set x [exec find $BUILDDIR/tmpdir -type f -name gprofng.rc | head -1]
++    set ::env(GPROFNG_SYSCONFDIR) [exec dirname $x]
++
++    puts "### LD_LIBRARY_PATH: $env(LD_LIBRARY_PATH)"
++    puts "### GPROFNG_SYSCONFDIR: $env(GPROFNG_SYSCONFDIR)"
+ }
++puts "### GPROFNG: $env(GPROFNG)"
+ 
+ set TEST_TIMEOUT 300
+ 
+-# Create directories where gprofng can find libraries and binaries:
+-remote_exec host "sh -c \"rm -rf tmpdir; mkdir -p tmpdir\""
+-remote_exec host "sh -c \"mkdir -p lib; rm -f lib/gprofng; ln -s ../libcollector/.libs lib/gprofng\""
+-remote_exec host "sh -c \"rm -f bin; ln -s src bin\""
+-
+ load_lib display-lib.exp
+diff --git a/gprofng/testsuite/lib/Makefile.skel b/gprofng/testsuite/lib/Makefile.skel
+index 5a30966c1cd..9ccc0340c10 100644
+--- a/gprofng/testsuite/lib/Makefile.skel
++++ b/gprofng/testsuite/lib/Makefile.skel
+@@ -39,11 +39,6 @@ DISPLAY	    = $(GPROFNG) display text
+ EXPERIMENT  = test.er
+ DISPLAY_LOG = display.log
+ 
+-export LD_LIBRARY_PATH := $(BUILDDIR)/src
+-
+-# Set GPROFNG_SYSCONFDIR to find out gprofng.rc:
+-export GPROFNG_SYSCONFDIR := $(srcdir)/../../../src
+-
+ .PHONY: all collect compare clobber clean
+ 
+ all: compare
+-- 
+2.43.0
+

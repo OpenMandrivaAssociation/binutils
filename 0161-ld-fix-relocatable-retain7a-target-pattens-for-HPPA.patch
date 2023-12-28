@@ -1,0 +1,56 @@
+From a23e3d64517f0763cad9ad522c234fcdd7c20117 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Mon, 14 Aug 2023 04:28:35 +0100
+Subject: [PATCH 161/180] ld: fix relocatable, retain7a target pattens for HPPA
+
+Fix issue reported by Dave and Alan.
+
+Put back the old pattern for hppa-*-linux* and add hppa[12]*-*-linux* to cover
+Gentoo's hppa1.1 and hppa2.0 without including hppa64 inadvertently like I did
+before.
+
+ld/
+	PR 30733
+	PR 30734
+	* ld/testsuite/ld-elf/relocatable.d: Use better pattern to exclude hppa64
+          but include hppa1.1, hppa2.0.
+	* ld/testsuite/ld-elf/retain7a.d: Ditto.
+
+Fixes: 0e339f6b4f2df25ed351cb94dc7fe16868626f49
+Fixes: e3b66187192ce6840df283c00f6395bb0ff15cf5
+Signed-off-by: Sam James <sam@gentoo.org>
+(cherry picked from commit 3b23a5ea693deee60648c9a9e9d666d83549298e)
+---
+ ld/testsuite/ld-elf/relocatable.d | 2 +-
+ ld/testsuite/ld-elf/retain7a.d    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ld/testsuite/ld-elf/relocatable.d b/ld/testsuite/ld-elf/relocatable.d
+index cb39baa52bc..33a04912fd0 100644
+--- a/ld/testsuite/ld-elf/relocatable.d
++++ b/ld/testsuite/ld-elf/relocatable.d
+@@ -2,7 +2,7 @@
+ #source: simple.s
+ #ld: -r -T relocatable.t
+ #readelf: -S --wide
+-#xfail: hppa*-*-*
++#xfail: hppa-*-* hppa[12]*-*-*
+ 
+ #...
+   \[[ 0-9]+\] \.text.*[ \t]+PROGBITS[ \t]+0+800000[ \t0-9a-f]+AX.*
+diff --git a/ld/testsuite/ld-elf/retain7a.d b/ld/testsuite/ld-elf/retain7a.d
+index 38d9a9ba255..406aaa40ad5 100644
+--- a/ld/testsuite/ld-elf/retain7a.d
++++ b/ld/testsuite/ld-elf/retain7a.d
+@@ -2,7 +2,7 @@
+ #source: retain7.s
+ #ld: -e _start --gc-sections
+ # hppa-linux chooses ELFOSABI_GNU regardless of GNU feature use
+-#notarget: ![supports_gnu_osabi] ![check_gc_sections_available] hppa*-*-linux*
++#notarget: ![supports_gnu_osabi] ![check_gc_sections_available] hppa-*-linux* hppa[12]*-*-linux*
+ #readelf: -h
+ 
+ #failif
+-- 
+2.43.0
+
