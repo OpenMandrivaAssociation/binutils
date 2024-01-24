@@ -64,11 +64,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.41
+Version:	2.41.90
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	2
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sourceware.org/binutils/
@@ -99,35 +99,6 @@ Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-gold
 
 # From upstream
 # [currently nothing]
-Patch100:	0003-Updated-Spanish-translation-for-the-gprof-directory.patch
-Patch101:	0005-gas-rework-timestamp-preservation-on-doc-asconfig.te.patch
-Patch102:	0009-PR30697-ppc32-mix-of-local-dynamic-and-global-dynami.patch
-Patch103:	0017-PR30724-cygwin-ld-performance-regression-since-014a6.patch
-Patch104:	0022-Updated-Russian-translation-for-the-bfd-directory.patch
-Patch105:	0033-PR30794-PowerPC-gold-internal-error-in-add_output_se.patch
-Patch106:	0048-x86-restrict-prefix-use-with-.insn-VEX-XOP-EVEX.patch
-Patch107:	0049-aarch64-Remove-unused-function.patch
-Patch108:	0069-x86-64-fix-suffix-less-PUSH-of-symbol-address.patch
-Patch109:	0125-Gold-MIPS-Use-EM_MIPS-instead-of-EM_MIPS_RS3_LE-for-.patch
-Patch110:	0126-Gold-MIPS-Add-targ_extra_size-64-for-mips32-triples.patch
-Patch111:	0156-gprofng-30700-tmpdir-gp-collect-app_F-test-fails.patch
-Patch112:	0157-Fix-only-keep-debug-for-ELF-relocatables-binutils-te.patch
-Patch113:	0158-ld-Build-libpr23169a.so-with-z-lazy.patch
-Patch114:	0159-ld-Fix-relocatable.d-XFAIL-notarget-entry-for-hppa.patch
-Patch115:	0160-ld-Fix-retain7a.d-XFAIL-notarget-entry-for-hppa.patch
-Patch116:	0161-ld-fix-relocatable-retain7a-target-pattens-for-HPPA.patch
-Patch117:	0162-ld-ld-lib.exp-log-failed-dump.out-contents-for-debug.patch
-Patch118:	0163-ld-x86-reduce-testsuite-dependency-on-system-object-.patch
-Patch119:	0164-Fix-ld-x86-reduce-testsuite-dependency-on-system-obj.patch
-Patch120:	0165-Fix-30808-gprofng-tests-failed.patch
-Patch121:	0166-bfd-aarch64-Fix-BTI-stub-optimization-PR30957.patch
-Patch122:	0167-bfd-aarch64-Fix-broken-BTI-stub-PR30930.patch
-Patch123:	0168-bfd-aarch64-Fix-leaks-in-case-of-BTI-stub-reuse.patch
-Patch124:	0169-bfd-aarch64-Avoid-BTI-stub-for-a-PLT-that-has-BTI.patch
-Patch125:	0170-ld-aarch64-Add-BTI-stub-insertion-test-PR30930.patch
-Patch126:	0171-ld-aarch64-Use-lp64-abi-in-recent-BTI-stub-tests.patch
-Patch127:	0172-aarch64-elf-FAIL-indirect-call-stub-to-BTI-stub-rela.patch
-
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto
@@ -165,8 +136,6 @@ Patch1028:	binutils-2.24.51.0.3.ld-default.settings.patch
 # --build-id=sha1
 # --icf=safe
 Patch1029:	binutils-2.24-2013-10-04.ld.gold-default-setttings.patch
-# musl's libintl is good enough, we don't need the internal copy
-Patch1032:	binutils-2015.01-accept-musl-libintl.patch
 
 #from Леонид Юрьев leo@yuriev.ru, posted to binutils list
 Patch1031:	binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
@@ -531,6 +500,10 @@ cd -
 rm -f %{buildroot}%{_bindir}/ld
 ln -s ld.lld %{buildroot}%{_bindir}/ld
 %endif
+
+# We get those from gdb-doc (the files are identical too, coming out of
+# the binutils-gdb shared repository)
+rm %{buildroot}%{_infodir}/ctf-spec.info* %{buildroot}%{_infodir}/sframe-spec.info*
 
 %files -f binutils.lang
 %{_bindir}/addr2line

@@ -1,7 +1,7 @@
-diff -up binutils-2.41/gas/config/tc-i386.c.10~ binutils-2.41/gas/config/tc-i386.c
---- binutils-2.41/gas/config/tc-i386.c.10~	2023-07-03 01:00:00.000000000 +0200
-+++ binutils-2.41/gas/config/tc-i386.c	2023-07-30 23:44:12.228490549 +0200
-@@ -37,6 +37,15 @@
+diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/tc-i386.c
+--- binutils-2.41.90/gas/config/tc-i386.c.10~	2024-01-24 15:07:59.000000000 +0100
++++ binutils-2.41.90/gas/config/tc-i386.c	2024-01-24 15:47:59.563081686 +0100
+@@ -38,6 +38,15 @@
  #include "opcodes/i386-mnem.h"
  #include <limits.h>
  
@@ -17,25 +17,24 @@ diff -up binutils-2.41/gas/config/tc-i386.c.10~ binutils-2.41/gas/config/tc-i386
  #ifndef INFER_ADDR_PREFIX
  #define INFER_ADDR_PREFIX 1
  #endif
-@@ -2570,7 +2579,7 @@ update_code_flag (int value, int check)
-       else
- 	as_error = as_bad;
-       (*as_error) (_("64bit mode not supported on `%s'."),
--		   cpu_arch_name ? cpu_arch_name : default_arch);
-+		   cpu_arch_name ? cpu_arch_name : (is_linux32 () ? "i386" : default_arch));
+@@ -2676,14 +2685,14 @@ update_code_flag (int value, int check)
+   if (value == CODE_64BIT && !cpu_arch_flags.bitfield.cpu64 )
+     {
+       as_error (_("64bit mode not supported on `%s'."),
+-		cpu_arch_name ? cpu_arch_name : default_arch);
++		cpu_arch_name ? cpu_arch_name : (is_linux32 () ? "i386" : default_arch));
+       return;
      }
+ 
    if (value == CODE_32BIT && !cpu_arch_flags.bitfield.cpui386)
      {
-@@ -2579,7 +2588,7 @@ update_code_flag (int value, int check)
-       else
- 	as_error = as_bad;
-       (*as_error) (_("32bit mode not supported on `%s'."),
--		   cpu_arch_name ? cpu_arch_name : default_arch);
-+		   cpu_arch_name ? cpu_arch_name : (is_linux32 () ? "i386" : default_arch));
+       as_error (_("32bit mode not supported on `%s'."),
+-		cpu_arch_name ? cpu_arch_name : default_arch);
++		cpu_arch_name ? cpu_arch_name : (is_linux32 () ? "i386" : default_arch));
+       return;
      }
-   stackop_size = '\0';
- }
-@@ -2705,7 +2714,7 @@ check_cpu_arch_compatible (const char *n
+ 
+@@ -2811,7 +2820,7 @@ check_cpu_arch_compatible (const char *n
  	 use default_arch.  */
        arch = cpu_arch_name;
        if (!arch)
@@ -44,16 +43,16 @@ diff -up binutils-2.41/gas/config/tc-i386.c.10~ binutils-2.41/gas/config/tc-i386
      }
  
    /* If we are targeting Intel MCU, we must enable it.  */
-@@ -5056,7 +5065,7 @@ md_assemble (char *line)
+@@ -6601,7 +6610,7 @@ md_assemble (char *line)
  	case unsupported_on_arch:
  	  as_bad (_("`%s' is not supported on `%s%s'"),
- 		  pass1_mnem ? pass1_mnem : insn_name (current_templates->start),
+ 		  pass1_mnem ? pass1_mnem : insn_name (current_templates.start),
 -		  cpu_arch_name ? cpu_arch_name : default_arch,
-+		  (is_linux32 () ? "i386" : default_arch),
++		  cpu_arch_name ? cpu_arch_name : (is_linux32 () ? "i386" : default_arch),
  		  cpu_sub_arch_name ? cpu_sub_arch_name : "");
  	  return;
  	case unsupported_64bit:
-@@ -14893,7 +14902,7 @@ md_show_usage (FILE *stream)
+@@ -16864,7 +16873,7 @@ md_show_usage (FILE *stream)
  const char *
  i386_target_format (void)
  {
@@ -61,10 +60,10 @@ diff -up binutils-2.41/gas/config/tc-i386.c.10~ binutils-2.41/gas/config/tc-i386
 +  if (startswith (default_arch, "x86_64") && !is_linux32())
      {
        update_code_flag (CODE_64BIT, 1);
-       if (default_arch[6] == '\0')
-@@ -14901,7 +14910,7 @@ i386_target_format (void)
-       else
+ #if defined (OBJ_ELF) || defined (OBJ_MAYBE_ELF)
+@@ -16874,7 +16883,7 @@ i386_target_format (void)
  	x86_elf_abi = X86_64_X32_ABI;
+ #endif
      }
 -  else if (!strcmp (default_arch, "i386"))
 +  else if (!strcmp (default_arch, "i386") || is_linux32())
