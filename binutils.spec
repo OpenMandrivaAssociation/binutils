@@ -166,6 +166,8 @@ BuildRequires:	pkgconfig(cloog-isl)
 BuildRequires:	gmp-devel
 BuildRequires:	pkgconfig(mpfr)
 BuildRequires:	libmpc-devel
+# For llvm-ar
+BuildRequires:	llvm
 %if %{with default_lld}
 Requires:	lld
 %endif
