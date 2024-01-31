@@ -64,7 +64,7 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.41.90
+Version:	2.42
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
