@@ -68,7 +68,7 @@ Version:	2.42
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	1
+Release:	2
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sourceware.org/binutils/
@@ -174,6 +174,9 @@ Requires:	lld
 %if %{with gprofng}
 BuildRequires:	jdk-current
 %endif
+# wrappers requires
+Requires:	which
+
 # Just to allow "lazy dependencies" on a %{_target_platform}
 # toolchain (without having to check whether or not it's native).
 # Obviously a native toolchain is also a "cross toolchain" to itself.
