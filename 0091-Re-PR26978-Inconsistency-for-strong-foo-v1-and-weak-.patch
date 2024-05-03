@@ -1,0 +1,51 @@
+From 6224493e457e72b11818c87cdc112bdb0fee5f81 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Mon, 8 Apr 2024 08:16:20 +0930
+Subject: [PATCH 091/115] Re: PR26978, Inconsistency for strong foo@v1 and weak
+ foo@@v1
+
+Commit 726d7d1ecf opened a hole that allowed a u.i.link loop to be
+created, resulting in _bfd_generic_link_add_one_symbol never
+returning.  Fix that.  Note that the MIND case handles two types of
+redefinition.  For a new indirect symbol we'll have string non-NULL.
+For a new def, string will be NULL.  So moving the string comparison
+earlier would work.  However, we've already looked up inh in the first
+case so can dispense with name comparisons.  Either way, for a new def
+we'll get to the defweak test and possibly cycle.  Which is what we
+want here.
+
+	PR 31615
+	PR 26978
+	* linker.c (_bfd_generic_link_add_one_symbol <MIND>): Test for
+	exactly matching indirect symbols before cycling on a defweak.
+
+(cherry picked from commit 248b6326a49ed49e2f627d3bddbac514a074bac0)
+---
+ bfd/linker.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/bfd/linker.c b/bfd/linker.c
+index 36cca9624c2..0821db558f4 100644
+--- a/bfd/linker.c
++++ b/bfd/linker.c
+@@ -1678,6 +1678,8 @@ _bfd_generic_link_add_one_symbol (struct bfd_link_info *info,
+ 	case MIND:
+ 	  /* Multiple indirect symbols.  This is OK if they both point
+ 	     to the same symbol.  */
++	  if (h->u.i.link == inh)
++	    break;
+ 	  if (h->u.i.link->type == bfd_link_hash_defweak)
+ 	    {
+ 	      /* It is also OK to redefine a symbol that indirects to
+@@ -1689,8 +1691,6 @@ _bfd_generic_link_add_one_symbol (struct bfd_link_info *info,
+ 	      cycle = true;
+ 	      break;
+ 	    }
+-	  if (string != NULL && strcmp (h->u.i.link->root.string, string) == 0)
+-	    break;
+ 	  /* Fall through.  */
+ 	case MDEF:
+ 	  /* Handle a multiple definition.  */
+-- 
+2.44.0
+

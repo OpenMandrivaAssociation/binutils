@@ -1,0 +1,128 @@
+From d816fda3cbd83ff5c2700bf5f001d59fcaf75985 Mon Sep 17 00:00:00 2001
+From: Andrew Carlotti <andrew.carlotti@arm.com>
+Date: Tue, 27 Feb 2024 19:41:29 +0000
+Subject: [PATCH 063/115] aarch64: Remove B16B16, SVE2p1 and SME2p1
+
+Support for these extensions is broken and incomplete in the 2.42
+branch, with a number of syntax and opcode bugs.  This patch removes the
+flags and documentation, to avoid any further suggestion that this
+extension is fully and correctly supported.
+---
+ gas/NEWS                               | 13 ++++++-------
+ gas/config/tc-aarch64.c                |  3 ---
+ gas/doc/c-aarch64.texi                 |  6 ------
+ gas/testsuite/gas/aarch64/bfloat16-1.d |  1 +
+ gas/testsuite/gas/aarch64/sme2p1-1.d   |  1 +
+ gas/testsuite/gas/aarch64/sve2p1-1.d   |  1 +
+ 6 files changed, 9 insertions(+), 16 deletions(-)
+
+diff --git a/gas/NEWS b/gas/NEWS
+index 67d806cbf89..dfccd9f1dc7 100644
+--- a/gas/NEWS
++++ b/gas/NEWS
+@@ -1,15 +1,14 @@
+ -*- text -*-
+ 
+-Changes in 2.42:
+-
+-* Added support for AMD znver5 processor (available from GNU Binutils 2.42 release).
++Changes in 2.42.1:
+ 
+-* Add support for the AArch64 Scalable Vector Extension version 2.1 (SVE2.1).
++* The options to enable the AArch64 SVE2.1, SME2.1 and B16B16 extensions have
++  been disabled, because of a number of known issues with their implementation
++  in the 2.42 release.
+ 
+-* Add support for the AArch64 Scalable Matrix Extension version 2.1 (SME2.1).
++Changes in 2.42:
+ 
+-* Add support for the AArch64 BFloat16 to BFloat16 arithmetic for SVE2 and SME2
+-  (B16B16).
++* Added support for AMD znver5 processor (available from GNU Binutils 2.42 release).
+ 
+ * Add support for the AArch64 Reliability, Availability and Serviceability
+   extension v2 (RASv2).
+diff --git a/gas/config/tc-aarch64.c b/gas/config/tc-aarch64.c
+index 0c6de289408..a7c29d2f03f 100644
+--- a/gas/config/tc-aarch64.c
++++ b/gas/config/tc-aarch64.c
+@@ -10425,9 +10425,6 @@ static const struct aarch64_option_cpu_value_table aarch64_features[] = {
+   {"ite",		AARCH64_FEATURE (ITE), AARCH64_NO_FEATURES},
+   {"d128",		AARCH64_FEATURE (D128),
+ 			AARCH64_FEATURE (LSE128)},
+-  {"b16b16",		AARCH64_FEATURE (B16B16), AARCH64_FEATURE (SVE2)},
+-  {"sme2p1",		AARCH64_FEATURE (SME2p1), AARCH64_FEATURE (SME2)},
+-  {"sve2p1",		AARCH64_FEATURE (SVE2p1), AARCH64_FEATURE (SVE2)},
+   {"rcpc3",		AARCH64_FEATURE (RCPC3), AARCH64_FEATURE (RCPC2)},
+   {NULL,		AARCH64_NO_FEATURES, AARCH64_NO_FEATURES},
+ };
+diff --git a/gas/doc/c-aarch64.texi b/gas/doc/c-aarch64.texi
+index 4f97768206c..77226a07973 100644
+--- a/gas/doc/c-aarch64.texi
++++ b/gas/doc/c-aarch64.texi
+@@ -161,8 +161,6 @@ automatically cause those extensions to be disabled.
+ @headitem Extension @tab Depends upon @tab Description
+ @item @code{aes} @tab @code{simd}
+  @tab Enable the AES and PMULL cryptographic extensions.
+-@item @code{b16b16} @tab @code{sve2}
+- @tab Enable BFloat16 to BFloat16 arithmetic for SVE2 and SME2.
+ @item @code{bf16} @tab @code{fp}
+  @tab Enable BFloat16 extension.
+ @item @code{chk} @tab
+@@ -263,8 +261,6 @@ automatically cause those extensions to be disabled.
+  @tab Enable SME I16I64 Extension.
+ @item @code{sme2} @tab @code{sme}
+  @tab Enable SME2.
+-@item @code{sme2p1} @tab @code{sme2}
+- @tab Enable SME2.1.
+ @item @code{ssbs} @tab
+  @tab Enable Speculative Store Bypassing Safe state read and write.
+ @item @code{sve} @tab @code{fcma}
+@@ -279,8 +275,6 @@ automatically cause those extensions to be disabled.
+  @tab Enable the SVE2 SHA3 Extension.
+ @item @code{sve2-sm4} @tab @code{sve2}, @code{sm4}
+  @tab Enable the SVE2 SM4 Extension.
+-@item @code{sve2p1} @tab @code{sve2}
+- @tab Enable SVE2.1.
+ @item @code{the} @tab
+  @tab Enable the Translation Hardening Extension.
+ @item @code{tme} @tab
+diff --git a/gas/testsuite/gas/aarch64/bfloat16-1.d b/gas/testsuite/gas/aarch64/bfloat16-1.d
+index f0d436bec58..0f4ab764d24 100644
+--- a/gas/testsuite/gas/aarch64/bfloat16-1.d
++++ b/gas/testsuite/gas/aarch64/bfloat16-1.d
+@@ -1,6 +1,7 @@
+ #name: Test of SVE2.1 and SME2.1 non-widening BFloat16 instructions.
+ #as: -march=armv9.4-a+b16b16
+ #objdump: -dr
++#xfail: *-*-*
+ 
+ [^:]+:     file format .*
+ 
+diff --git a/gas/testsuite/gas/aarch64/sme2p1-1.d b/gas/testsuite/gas/aarch64/sme2p1-1.d
+index a6e7b766402..4b94cc9e4a0 100644
+--- a/gas/testsuite/gas/aarch64/sme2p1-1.d
++++ b/gas/testsuite/gas/aarch64/sme2p1-1.d
+@@ -1,6 +1,7 @@
+ #name: Test of SME2.1 movaz instructions.
+ #as: -march=armv9.4-a+sme2p1
+ #objdump: -dr
++#xfail: *-*-*
+ 
+ [^:]+:     file format .*
+ 
+diff --git a/gas/testsuite/gas/aarch64/sve2p1-1.d b/gas/testsuite/gas/aarch64/sve2p1-1.d
+index daece899b38..72fac004141 100644
+--- a/gas/testsuite/gas/aarch64/sve2p1-1.d
++++ b/gas/testsuite/gas/aarch64/sve2p1-1.d
+@@ -1,6 +1,7 @@
+ #name: Test of SVE2.1 min max instructions.
+ #as: -march=armv9.4-a+sve2p1
+ #objdump: -dr
++#xfail: *-*-*
+ 
+ [^:]+:     file format .*
+ 
+-- 
+2.44.0
+

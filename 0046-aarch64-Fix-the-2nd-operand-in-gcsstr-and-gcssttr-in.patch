@@ -1,0 +1,159 @@
+From 831be495ef18c2df5964fbd5dc7c6c16fc275d13 Mon Sep 17 00:00:00 2001
+From: Srinath Parvathaneni <srinath.parvathaneni@arm.com>
+Date: Thu, 29 Feb 2024 21:06:25 +0000
+Subject: [PATCH 046/115] aarch64: Fix the 2nd operand in gcsstr and gcssttr
+ instructions.
+
+The assembler wrongly expects plain register name instead of
+memory-form 2nd operand for gcsstr and gcssttr instructions.
+This patch fixes the issue.
+---
+ gas/testsuite/gas/aarch64/gcs-1-bad.l | 48 +++++++++++++--------------
+ gas/testsuite/gas/aarch64/gcs-1.d     | 48 +++++++++++++--------------
+ gas/testsuite/gas/aarch64/gcs-1.s     |  2 +-
+ opcodes/aarch64-tbl.h                 |  4 +--
+ 4 files changed, 51 insertions(+), 51 deletions(-)
+
+diff --git a/gas/testsuite/gas/aarch64/gcs-1-bad.l b/gas/testsuite/gas/aarch64/gcs-1-bad.l
+index ca8d17ab8fc..4c69c6e1c57 100644
+--- a/gas/testsuite/gas/aarch64/gcs-1-bad.l
++++ b/gas/testsuite/gas/aarch64/gcs-1-bad.l
+@@ -19,27 +19,27 @@
+ [^ :]+:[0-9]+: Error: selected processor does not support `gcspopm x15'
+ [^ :]+:[0-9]+: Error: selected processor does not support `gcspopm x30'
+ [^ :]+:[0-9]+: Error: selected processor does not support `gcspopm xzr'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x0,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x0,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x0,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x15,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x15,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x15,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x30,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x30,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x30,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr xzr,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr xzr,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr xzr,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x0,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x0,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x0,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x15,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x15,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x15,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x30,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x30,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x30,sp'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr xzr,x1'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr xzr,x16'
+-[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr xzr,sp'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x0,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x0,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x0,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x15,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x15,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x15,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x30,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x30,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr x30,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr xzr,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr xzr,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcsstr xzr,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x0,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x0,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x0,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x15,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x15,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x15,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x30,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x30,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr x30,\[sp\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr xzr,\[x1\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr xzr,\[x16\]'
++[^ :]+:[0-9]+: Error: selected processor does not support `gcssttr xzr,\[sp\]'
+diff --git a/gas/testsuite/gas/aarch64/gcs-1.d b/gas/testsuite/gas/aarch64/gcs-1.d
+index 09fa418e5ea..ff059a36525 100644
+--- a/gas/testsuite/gas/aarch64/gcs-1.d
++++ b/gas/testsuite/gas/aarch64/gcs-1.d
+@@ -29,27 +29,27 @@
+ .*:	d52b772f 	gcspopm	x15
+ .*:	d52b773e 	gcspopm	x30
+ .*:	d52b773f 	gcspopm
+-.*:	d91f0c20 	gcsstr	x0, x1
+-.*:	d91f0e00 	gcsstr	x0, x16
+-.*:	d91f0fe0 	gcsstr	x0, sp
+-.*:	d91f0c2f 	gcsstr	x15, x1
+-.*:	d91f0e0f 	gcsstr	x15, x16
+-.*:	d91f0fef 	gcsstr	x15, sp
+-.*:	d91f0c3e 	gcsstr	x30, x1
+-.*:	d91f0e1e 	gcsstr	x30, x16
+-.*:	d91f0ffe 	gcsstr	x30, sp
+-.*:	d91f0c3f 	gcsstr	xzr, x1
+-.*:	d91f0e1f 	gcsstr	xzr, x16
+-.*:	d91f0fff 	gcsstr	xzr, sp
+-.*:	d91f1c20 	gcssttr	x0, x1
+-.*:	d91f1e00 	gcssttr	x0, x16
+-.*:	d91f1fe0 	gcssttr	x0, sp
+-.*:	d91f1c2f 	gcssttr	x15, x1
+-.*:	d91f1e0f 	gcssttr	x15, x16
+-.*:	d91f1fef 	gcssttr	x15, sp
+-.*:	d91f1c3e 	gcssttr	x30, x1
+-.*:	d91f1e1e 	gcssttr	x30, x16
+-.*:	d91f1ffe 	gcssttr	x30, sp
+-.*:	d91f1c3f 	gcssttr	xzr, x1
+-.*:	d91f1e1f 	gcssttr	xzr, x16
+-.*:	d91f1fff 	gcssttr	xzr, sp
++.*:	d91f0c20 	gcsstr	x0, \[x1\]
++.*:	d91f0e00 	gcsstr	x0, \[x16\]
++.*:	d91f0fe0 	gcsstr	x0, \[sp\]
++.*:	d91f0c2f 	gcsstr	x15, \[x1\]
++.*:	d91f0e0f 	gcsstr	x15, \[x16\]
++.*:	d91f0fef 	gcsstr	x15, \[sp\]
++.*:	d91f0c3e 	gcsstr	x30, \[x1\]
++.*:	d91f0e1e 	gcsstr	x30, \[x16\]
++.*:	d91f0ffe 	gcsstr	x30, \[sp\]
++.*:	d91f0c3f 	gcsstr	xzr, \[x1\]
++.*:	d91f0e1f 	gcsstr	xzr, \[x16\]
++.*:	d91f0fff 	gcsstr	xzr, \[sp\]
++.*:	d91f1c20 	gcssttr	x0, \[x1\]
++.*:	d91f1e00 	gcssttr	x0, \[x16\]
++.*:	d91f1fe0 	gcssttr	x0, \[sp\]
++.*:	d91f1c2f 	gcssttr	x15, \[x1\]
++.*:	d91f1e0f 	gcssttr	x15, \[x16\]
++.*:	d91f1fef 	gcssttr	x15, \[sp\]
++.*:	d91f1c3e 	gcssttr	x30, \[x1\]
++.*:	d91f1e1e 	gcssttr	x30, \[x16\]
++.*:	d91f1ffe 	gcssttr	x30, \[sp\]
++.*:	d91f1c3f 	gcssttr	xzr, \[x1\]
++.*:	d91f1e1f 	gcssttr	xzr, \[x16\]
++.*:	d91f1fff 	gcssttr	xzr, \[sp\]
+diff --git a/gas/testsuite/gas/aarch64/gcs-1.s b/gas/testsuite/gas/aarch64/gcs-1.s
+index 35584a8810e..17734f9f979 100644
+--- a/gas/testsuite/gas/aarch64/gcs-1.s
++++ b/gas/testsuite/gas/aarch64/gcs-1.s
+@@ -14,7 +14,7 @@
+ 	.irp op gcsstr, gcssttr
+         .irp reg1 x0, x15, x30, xzr
+ 	.irp reg2 x1, x16, sp
+-	\op \reg1, \reg2
++	\op \reg1, [\reg2]
+ 	.endr
+ 	.endr
+ 	.endr
+diff --git a/opcodes/aarch64-tbl.h b/opcodes/aarch64-tbl.h
+index 66d68c00725..093eb60f7d0 100644
+--- a/opcodes/aarch64-tbl.h
++++ b/opcodes/aarch64-tbl.h
+@@ -4283,8 +4283,8 @@ const struct aarch64_opcode aarch64_opcode_table[] =
+   GCS_INSN ("gcsss2", 0xd52b7760, 0xffffffe0, OP1 (Rt), QL_I1X, 0),
+   GCS_INSN ("gcspopm", 0xd52b773f, 0xffffffff, OP0 (), {}, 0),
+   GCS_INSN ("gcspopm", 0xd52b7720, 0xffffffe0, OP1 (Rt), QL_I1X, 0),
+-  GCS_INSN ("gcsstr", 0xd91f0c00, 0xfffffc00, OP2 (Rt, Rn_SP), QL_I2SAMEX, 0),
+-  GCS_INSN ("gcssttr", 0xd91f1c00, 0xfffffc00, OP2 (Rt, Rn_SP), QL_I2SAMEX, 0),
++  GCS_INSN ("gcsstr", 0xd91f0c00, 0xfffffc00, OP2 (Rt, ADDR_SIMPLE), QL_DST_X, 0),
++  GCS_INSN ("gcssttr", 0xd91f1c00, 0xfffffc00, OP2 (Rt, ADDR_SIMPLE), QL_DST_X, 0),
+   CORE_INSN ("gcsb", 0xd503227f, 0xffffffff, ic_system, 0, OP1 (BARRIER_GCSB), {}, F_ALIAS),
+   CORE_INSN ("sys", 0xd5080000, 0xfff80000, ic_system, 0, OP5 (UIMM3_OP1, CRn, CRm, UIMM3_OP2, Rt), QL_SYS, F_HAS_ALIAS | F_OPD4_OPT | F_DEFAULT (0x1F)),
+   D128_INSN ("sysp", 0xd5480000, 0xfff80000, OP6 (UIMM3_OP1, CRn, CRm, UIMM3_OP2, Rt, PAIRREG_OR_XZR), QL_SYSP, F_HAS_ALIAS | F_OPD_NARROW | F_OPD4_OPT | F_OPD_PAIR_OPT | F_DEFAULT (0x1f)),
+-- 
+2.44.0
+

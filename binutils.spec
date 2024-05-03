@@ -13,7 +13,7 @@
 %else
 # Listed targets are short form and will be expanded by rpm
 # gnueabihf variants etc. are inserted by rpm into long_targets
-%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-linuxuclibc armv7hnl-linuxuclibc i686-linuxuclibc x86_64-linuxuclibc x32-linuxuclibc riscv32-linuxuclibc riscv64-linuxuclibc aarch64-android armv7l-android armv8l-android x86_64-android i686-mingw32 x86_64-mingw32 ppc64le-linux ppc64le-linuxmusl ppc64le-linuxuclibc ppc64-linux ppc64-linuxmusl ppc64-linuxuclibc
+%global targets aarch64-linux armv7hnl-linux i686-linux x86_64-linux x32-linux riscv32-linux riscv64-linux aarch64-linuxmusl armv7hnl-linuxmusl i686-linuxmusl x86_64-linuxmusl x32-linuxmusl riscv32-linuxmusl riscv64-linuxmusl aarch64-linuxuclibc armv7hnl-linuxuclibc i686-linuxuclibc x86_64-linuxuclibc x32-linuxuclibc riscv32-linuxuclibc riscv64-linuxuclibc aarch64-android armv7l-android armv8l-android x86_64-android i686-mingw32 x86_64-mingw32 ppc64le-linux ppc64le-linuxmusl ppc64le-linuxuclibc ppc64-linux ppc64-linuxmusl ppc64-linuxuclibc loongarch64-linux loongarch64-linuxmusl loongarch64-linuxuclibc
 %endif
 %global long_targets %(
 	for i in %{targets}; do
@@ -68,7 +68,7 @@ Version:	2.42
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	2
+Release:	3
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sourceware.org/binutils/
@@ -98,7 +98,26 @@ Patch19:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-spec
 Patch20:	https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-gold-mismatched-section-flags.patch
 
 # From upstream
-# [currently nothing]
+Patch100:	0002-PR31314-chew-crashing-on-use-of-uninitialized-value.patch
+Patch101:	0004-gas-scfi-add-missing-ginsn-cofi-1-testcase-files.patch
+Patch102:	0006-PR31124-Addendum-Remove-PROVIDE-of-__flmap_init_labe.patch
+Patch103:	0007-Mention-support-for-AMD-znver5-in-GAS.patch
+Patch104:	0010-x86-Disallow-instructions-with-length-15-bytes.patch
+Patch105:	0013-LoongArch-gas-Fix-the-types-of-symbols-referred-with.patch
+Patch106:	0016-Link-x86-64-mark-plt-1.so-with-no-as-needed.patch
+Patch107:	0019-PR-31283-windmc-Parse-input-correctly-on-big-endian-.patch
+Patch108:	0020-PR31208-strip-can-break-ELF-alignment-requirements.patch
+Patch109:	0022-x86-APX-VROUND-P-S-S-D-encodings-require-AVX512-F-VL.patch
+Patch110:	0024-x86-64-Add-R_X86_64_CODE_6_GOTTPOFF.patch
+Patch111:	0028-PowerPC-Add-support-for-Power11-options.patch
+Patch112:	0032-x86-Display-msse-check-default-as-none.patch
+Patch113:	0046-aarch64-Fix-the-2nd-operand-in-gcsstr-and-gcssttr-in.patch
+Patch114:	0056-print-cached-error-messages-using-_bfd_error_handler.patch
+Patch115:	0057-Re-Move-bfd_init-to-bfd.c.patch
+Patch116:	0063-aarch64-Remove-B16B16-SVE2p1-and-SME2p1.patch
+Patch117:	0084-x86-APX-Remove-KEYLOCKER-and-SHA-promotions-from-EVE.patch
+Patch118:	0085-hppa-Implement-PA-2.0-symbolic-relocations-for-long-.patch
+Patch119:	0091-Re-PR26978-Inconsistency-for-strong-foo-v1-and-weak-.patch
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto

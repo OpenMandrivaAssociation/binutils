@@ -1,0 +1,33 @@
+From b76b89831165cb28751d57d14de5bb6210938d82 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Tue, 6 Feb 2024 12:59:06 +1030
+Subject: [PATCH 016/115] Link x86-64 mark-plt-1.so with --no-as-needed
+
+Fixes
+FAIL: Build mark-plt-1.so
+where gcc is built with default --as-needed.
+
+	* testsuite/ld-x86-64/x86-64.exp (Build mark-plt-1.so): Pass
+	--no-as-needed.
+
+(cherry picked from commit 60c95acdaca94eca79b81ec75bfab97826cc0271)
+---
+ ld/testsuite/ld-x86-64/x86-64.exp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ld/testsuite/ld-x86-64/x86-64.exp b/ld/testsuite/ld-x86-64/x86-64.exp
+index a1a0422cea2..e370f393a7a 100644
+--- a/ld/testsuite/ld-x86-64/x86-64.exp
++++ b/ld/testsuite/ld-x86-64/x86-64.exp
+@@ -2263,7 +2263,7 @@ if { [check_compiler_available] } {
+     run_cc_link_tests [list \
+ 	[list \
+ 	    "Build mark-plt-1.so" \
+-	    "-shared -Wl,-z,mark-plt,-z,pack-relative-relocs" \
++	    "-shared -Wl,--no-as-needed,-z,mark-plt,-z,pack-relative-relocs" \
+ 	    "-fPIC" \
+ 	    { mark-plt-1.s } \
+ 	    {{readelf {-W --version-info} mark-plt-1a.rd} \
+-- 
+2.44.0
+

@@ -1,0 +1,138 @@
+From d125f9675372b1ae01ceb1893c06ccb27bc7bf22 Mon Sep 17 00:00:00 2001
+From: John David Anglin <danglin@gcc.gnu.org>
+Date: Mon, 1 Apr 2024 23:00:52 +0000
+Subject: [PATCH 085/115] hppa: Implement PA 2.0 symbolic relocations for long
+ displacements
+
+The PA 2.0 architecture introduced several new load and store
+instructions with long displacements.  These include floating
+point loads and stores for word mode, and integer and floating
+point loads and stores for double words.  Currently, ld does
+not correctly support symbolic relocations for these instructions.
+
+If these are used, ld applies the standard R_PARISC_DPREL14R
+relocation and corrupts the instruction.  This change uses
+bfd_hppa_insn2fmt to determine the correct relocation format.
+
+We need to check the computed displacement as the immediate
+value used in these instruction must be a multiple of 4 or 8
+depending on whether the access is for a word or double word.
+
+A misaligned offset can potentially occur if the symbol is not
+properly aligned or if $global$ (the global pointer) is not
+double word aligned.  $global$ is provided as a .data section
+start symbol.  The patch adjusts elf.sc and hppalinux.sh to
+align .data to a 8-byte boundary in non-shared and non-pie
+links.
+
+2024-04-01  John David Anglin  <danglin@gcc.gnu.org>
+
+	PR ld/31503
+
+bfd/ChangeLog:
+
+	* elf32-hppa.c (final_link_relocate): Output
+
+ld/ChangeLog:
+
+	* emulparams/hppalinux.sh (DATA_SECTION_ALIGNMENT): Define.
+	* scripttempl/elf.sc: Align .data section to DATA_SECTION_ALIGNMENT
+	when relocating.
+---
+ bfd/elf32-hppa.c           | 46 +++++++++++++++++++++++++++++++++++++-
+ ld/emulparams/hppalinux.sh |  1 +
+ ld/scripttempl/elf.sc      |  2 +-
+ 3 files changed, 47 insertions(+), 2 deletions(-)
+
+diff --git a/bfd/elf32-hppa.c b/bfd/elf32-hppa.c
+index 28aadfb8f9c..99ec7890465 100644
+--- a/bfd/elf32-hppa.c
++++ b/bfd/elf32-hppa.c
+@@ -3110,7 +3110,7 @@ final_link_relocate (asection *input_section,
+   unsigned int r_type = ELF32_R_TYPE (rela->r_info);
+   unsigned int orig_r_type = r_type;
+   reloc_howto_type *howto = elf_hppa_howto_table + r_type;
+-  int r_format = howto->bitsize;
++  int r_format;
+   enum hppa_reloc_field_selector_type_alt r_field;
+   bfd *input_bfd = input_section->owner;
+   bfd_vma offset = rela->r_offset;
+@@ -3432,6 +3432,50 @@ final_link_relocate (asection *input_section,
+       break;
+     }
+ 
++  r_format = bfd_hppa_insn2fmt (input_bfd, insn);
++  switch (r_format)
++    {
++    case 10:
++    case -10:
++      if (val & 7)
++	{
++	  _bfd_error_handler
++	    /* xgettext:c-format */
++	    (_("%pB(%pA+%#" PRIx64 "): displacement %#x for insn %#x "
++	       "is not a multiple of 8 (gp %#x)"),
++	     input_bfd,
++	     input_section,
++	     (uint64_t) offset,
++	     val,
++	     insn,
++	     (unsigned int) elf_gp (input_section->output_section->owner));
++	  bfd_set_error (bfd_error_bad_value);
++	  return bfd_reloc_notsupported;
++	}
++      break;
++
++    case -11:
++    case -16:
++      if (val & 3)
++	{
++	  _bfd_error_handler
++	    /* xgettext:c-format */
++	    (_("%pB(%pA+%#" PRIx64 "): displacement %#x for insn %#x "
++	       "is not a multiple of 4 (gp %#x)"),
++	     input_bfd,
++	     input_section,
++	     (uint64_t) offset,
++	     val,
++	     insn,
++	     (unsigned int) elf_gp (input_section->output_section->owner));
++	  bfd_set_error (bfd_error_bad_value);
++	  return bfd_reloc_notsupported;
++	}
++      break;
++
++    default:
++      break;
++    }
+   insn = hppa_rebuild_insn (insn, val, r_format);
+ 
+   /* Update the instruction word.  */
+diff --git a/ld/emulparams/hppalinux.sh b/ld/emulparams/hppalinux.sh
+index 7892df9130d..5a462119742 100644
+--- a/ld/emulparams/hppalinux.sh
++++ b/ld/emulparams/hppalinux.sh
+@@ -19,6 +19,7 @@ else
+   DATA_SEGMENT_END=". = DATA_SEGMENT_END (.);"
+   DATA_SEGMENT_RELRO_END=". = DATA_SEGMENT_RELRO_END (${SEPARATE_GOTPLT-0}, .);"
+ fi
++DATA_SECTION_ALIGNMENT="${CREATE_SHLIB-${CREATE_PIE-ALIGN(8)}}"
+ ARCH=hppa
+ MACHINE=hppa1.1    # We use 1.1 specific features.
+ NOP=0x08000240
+diff --git a/ld/scripttempl/elf.sc b/ld/scripttempl/elf.sc
+index fae7c2ad71c..d5022fa502f 100644
+--- a/ld/scripttempl/elf.sc
++++ b/ld/scripttempl/elf.sc
+@@ -669,7 +669,7 @@ cat <<EOF
+ 
+   ${DATA_PLT+${PLT_BEFORE_GOT-${PLT}}}
+ 
+-  .data         ${RELOCATING-0} :
++  .data         ${RELOCATING-0}${RELOCATING+${DATA_SECTION_ALIGNMENT}} :
+   {
+     ${RELOCATING+${DATA_START_SYMBOLS}}
+     *(.data${RELOCATING+ .data.* .gnu.linkonce.d.*})
+-- 
+2.44.0
+

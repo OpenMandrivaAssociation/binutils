@@ -1,0 +1,31 @@
+From cb11047e34adf6d71689a828f3ee0b0d6a0f8938 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Sat, 9 Mar 2024 19:48:48 +1030
+Subject: [PATCH 057/115] Re: Move bfd_init to bfd.c
+
+Commit b1c95bc4dd73 cleared some bfd static variables, with bad
+results since bfd_set_error_program_name is often called before
+bfd_init.
+
+	* bfd.c (bfd_init): Don't clear _bfd_error_program_name.
+
+(cherry picked from commit 0c947d990a92fd48ac0aa887df7e1e055fa0d680)
+---
+ bfd/bfd.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/bfd/bfd.c b/bfd/bfd.c
+index 0776145af52..36f5321164c 100644
+--- a/bfd/bfd.c
++++ b/bfd/bfd.c
+@@ -1742,7 +1742,6 @@ bfd_init (void)
+   input_bfd = NULL;
+   _bfd_clear_error_data ();
+   input_error = bfd_error_no_error;
+-  _bfd_error_program_name = NULL;
+   _bfd_error_internal = error_handler_fprintf;
+   _bfd_assert_handler = _bfd_default_assert_handler;
+ 
+-- 
+2.44.0
+

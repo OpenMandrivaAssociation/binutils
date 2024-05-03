@@ -1,0 +1,37 @@
+From 78f9e9faaa41d628170f6047c3e032a67f9e829d Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Fri, 9 Feb 2024 07:04:22 +1030
+Subject: [PATCH 020/115] PR31208, strip can break ELF alignment requirements
+
+In https://sourceware.org/pipermail/binutils/2007-August/053261.html
+(git commit 3dea8fca8b86) I disabled a then new linker feature that
+removed empty PT_LOAD headers in cases where a user specified program
+headers, and for objcopy.  This can be a problem for objcopy/strip and
+since objcopy operates on sections, any part of a PT_LOAD loading file
+contents not covered by a section will be omitted anyway.
+
+	PR 31208
+	* elf.c (_bfd_elf_map_sections_to_segments): Pass remove_empty_load
+	as true to elf_modify_segment_map for objcopy/strip.
+
+(cherry picked from commit 7f26d260ef76a4cb2873a7815bef187005528c19)
+---
+ bfd/elf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bfd/elf.c b/bfd/elf.c
+index 88c75ae3ce0..8bffd3c5141 100644
+--- a/bfd/elf.c
++++ b/bfd/elf.c
+@@ -5789,7 +5789,7 @@ _bfd_elf_map_sections_to_segments (bfd *abfd,
+       elf_seg_map (abfd) = mfirst;
+     }
+ 
+-  if (!elf_modify_segment_map (abfd, info, no_user_phdrs))
++  if (!elf_modify_segment_map (abfd, info, no_user_phdrs || info == NULL))
+     return false;
+ 
+   for (count = 0, m = elf_seg_map (abfd); m != NULL; m = m->next)
+-- 
+2.44.0
+

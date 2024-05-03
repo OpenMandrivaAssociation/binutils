@@ -1,0 +1,97 @@
+From 48942a586ebc056bd059d3f63a5eed3a2fa46ab3 Mon Sep 17 00:00:00 2001
+From: Indu Bhagat <indu.bhagat@oracle.com>
+Date: Tue, 30 Jan 2024 00:35:04 -0800
+Subject: [PATCH 004/115] gas: scfi: add missing ginsn-cofi-1 testcase files
+
+Previous commit a58dc5427f0 intended to bring the following two commits
+from master branch:
+
+ 91cdbed4d7b gas: scfi: untraceable control flow should be a hard error
+ 16cbeae1b27 x86: testsuite: scfi: adjust COFI testcase
+
+But missed adding the testcase files. Fix the failure by adding the
+missing files.
+
+gas/testsuite/
+	* gas/scfi/x86_64/ginsn-cofi-1.l: New test.
+	* gas/scfi/x86_64/ginsn-cofi-1.s: Likewise.
+---
+ gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.l | 38 ++++++++++++++++++++
+ gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.s | 20 +++++++++++
+ 2 files changed, 58 insertions(+)
+ create mode 100644 gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.l
+ create mode 100644 gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.s
+
+diff --git a/gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.l b/gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.l
+new file mode 100644
+index 00000000000..ab6b50d47e8
+--- /dev/null
++++ b/gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.l
+@@ -0,0 +1,38 @@
++.*: Assembler messages:
++.*:20: Error: untraceable control flow for func 'foo'
++GAS LISTING .*
++
++
++   1              	# Testcase with a variety of "change of flow instructions"
++   2              	#
++   3              	# This test does not have much going on wrt synthesis of CFI;
++   4              	# it just aims to ensure x8_64 -> ginsn decoding behaves
++   5              	# gracefully for these "change of flow instructions"
++   6              		.text
++   7              		.globl  foo
++   8              		.type   foo, @function
++   8              	ginsn: SYM FUNC_BEGIN
++   9              	foo:
++   9              	ginsn: SYM foo
++  10 \?\?\?\? 4801D0   		addq    %rdx, %rax
++  10              	ginsn: ADD %r1, %r0, %r0
++  11 \?\?\?\? E200     		loop    foo
++  11              	ginsn: JCC 
++  12 \?\?\?\? 3EFFE0   		notrack jmp     \*%rax
++  12              	ginsn: JMP %r0, 
++  13 \?\?\?\? 41FFD0   		call    \*%r8
++  13              	ginsn: CALL
++  14 \?\?\?\? 67E305   		jecxz   .L179
++  14              	ginsn: JCC 
++  15 \?\?\?\? FF6730   		jmp     \*48\(%rdi\)
++  15              	ginsn: JMP %r5, 
++  16 \?\?\?\? 7000     		jo      .L179
++  16              	ginsn: JCC 
++  17              	.L179:
++  17              	ginsn: SYM .L179
++  18 \?\?\?\? C3       		ret
++  18              	ginsn: RET
++  19              	.LFE0:
++  19              	ginsn: SYM .LFE0
++  20              		.size   foo, .-foo
++  20              	ginsn: SYM FUNC_END
+diff --git a/gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.s b/gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.s
+new file mode 100644
+index 00000000000..0a63910e046
+--- /dev/null
++++ b/gas/testsuite/gas/scfi/x86_64/ginsn-cofi-1.s
+@@ -0,0 +1,20 @@
++# Testcase with a variety of "change of flow instructions"
++#
++# This test does not have much going on wrt synthesis of CFI;
++# it just aims to ensure x8_64 -> ginsn decoding behaves
++# gracefully for these "change of flow instructions"
++	.text
++	.globl  foo
++	.type   foo, @function
++foo:
++	addq    %rdx, %rax
++	loop    foo
++	notrack jmp     *%rax
++	call    *%r8
++	jecxz   .L179
++	jmp     *48(%rdi)
++	jo      .L179
++.L179:
++	ret
++.LFE0:
++	.size   foo, .-foo
+-- 
+2.44.0
+

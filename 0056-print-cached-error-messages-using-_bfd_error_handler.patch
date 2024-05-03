@@ -1,0 +1,37 @@
+From 818bcf40efbee8784511ee8951c4c78328462582 Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Sat, 9 Mar 2024 13:26:19 +1030
+Subject: [PATCH 056/115] print cached error messages using _bfd_error_handler
+
+	* format.c (print_warnmsg): Use _bfd_error_handler to print
+	cached messages.
+
+(cherry picked from commit bd8d76258f86f93b20e6bd94f58033a49eb0d3ec)
+---
+ bfd/format.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/bfd/format.c b/bfd/format.c
+index 47c3e9ba35a..8f3fc7e7b96 100644
+--- a/bfd/format.c
++++ b/bfd/format.c
+@@ -255,15 +255,8 @@ bfd_preserve_finish (bfd *abfd ATTRIBUTE_UNUSED, struct bfd_preserve *preserve)
+ static void
+ print_warnmsg (struct per_xvec_message **list)
+ {
+-  fflush (stdout);
+-  fprintf (stderr, "%s: ", _bfd_get_error_program_name ());
+-
+   for (struct per_xvec_message *warn = *list; warn; warn = warn->next)
+-    {
+-      fputs (warn->message, stderr);
+-      fputc ('\n', stderr);
+-    }
+-  fflush (stderr);
++    _bfd_error_handler ("%s", warn->message);
+ }
+ 
+ static void
+-- 
+2.44.0
+
