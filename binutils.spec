@@ -64,11 +64,11 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.42
+Version:	2.43
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
 Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	4
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		http://sourceware.org/binutils/
@@ -133,31 +133,7 @@ https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-no-config-h-c
 # This should be an option instead of a hardcode in the longer term!
 #https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.29-revert-PLT-elision.patch
 https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-2.27-aarch64-ifunc.patch
-https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-special-sections-in-groups.patch
 https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-gold-mismatched-section-flags.patch
-
-# From upstream
-0002-PR31314-chew-crashing-on-use-of-uninitialized-value.patch
-0004-gas-scfi-add-missing-ginsn-cofi-1-testcase-files.patch
-0006-PR31124-Addendum-Remove-PROVIDE-of-__flmap_init_labe.patch
-0007-Mention-support-for-AMD-znver5-in-GAS.patch
-0010-x86-Disallow-instructions-with-length-15-bytes.patch
-0013-LoongArch-gas-Fix-the-types-of-symbols-referred-with.patch
-0016-Link-x86-64-mark-plt-1.so-with-no-as-needed.patch
-0019-PR-31283-windmc-Parse-input-correctly-on-big-endian-.patch
-0020-PR31208-strip-can-break-ELF-alignment-requirements.patch
-0022-x86-APX-VROUND-P-S-S-D-encodings-require-AVX512-F-VL.patch
-0024-x86-64-Add-R_X86_64_CODE_6_GOTTPOFF.patch
-0028-PowerPC-Add-support-for-Power11-options.patch
-0032-x86-Display-msse-check-default-as-none.patch
-0046-aarch64-Fix-the-2nd-operand-in-gcsstr-and-gcssttr-in.patch
-0056-print-cached-error-messages-using-_bfd_error_handler.patch
-0057-Re-Move-bfd_init-to-bfd.c.patch
-0063-aarch64-Remove-B16B16-SVE2p1-and-SME2p1.patch
-0084-x86-APX-Remove-KEYLOCKER-and-SHA-promotions-from-EVE.patch
-0085-hppa-Implement-PA-2.0-symbolic-relocations-for-long-.patch
-0091-Re-PR26978-Inconsistency-for-strong-foo-v1-and-weak-.patch
-0130-aarch64-Remove-asserts-from-operand-qualifier-decode.patch
 
 # From Yocto (note: SOME Yocto patches are important
 # and good for OM as well - others are very much Yocto
