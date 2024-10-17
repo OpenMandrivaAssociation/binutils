@@ -71,7 +71,7 @@ Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.t
 Release:	1
 License:	GPLv3+
 Group:		Development/Other
-URL:		http://sourceware.org/binutils/
+URL:		https://sourceware.org/binutils/
 Source5:	https://src.fedoraproject.org/rpms/binutils/raw/master/f/binutils-2.19.50.0.1-output-format.sed
 Source10:	binutils.rpmlintrc
 # Wrapper scripts for ar, ranlib and nm that know how to deal with
