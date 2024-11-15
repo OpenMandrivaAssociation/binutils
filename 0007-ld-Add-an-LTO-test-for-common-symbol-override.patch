@@ -1,0 +1,88 @@
+From d16a1893c44f1b270c8298361dacbb768d3bfbfb Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Wed, 14 Aug 2024 08:29:15 -0700
+Subject: [PATCH 007/108] ld: Add an LTO test for common symbol override
+
+Linker checks if a symbol in an archive member is a real definition, not
+common, before including the archive member in the link output so that
+only a real definition in archive will override the common symbol in
+object file.  Add an LTO test to verify that a real definition in archive
+overrides the common symbol in object file.
+
+	* testsuite/ld-plugin/common-1.c: New file.
+	* testsuite/ld-plugin/definition-1.c: Likewise.
+	* testsuite/ld-plugin/lto.exp: Run common tests.
+
+Signed-off-by: H.J. Lu <hjl.tools@gmail.com>
+(cherry picked from commit 8be33827cdc57fd7c31e84966f3c445b986be4ff)
+---
+ ld/testsuite/ld-plugin/common-1.c     | 11 +++++++++++
+ ld/testsuite/ld-plugin/definition-1.c |  1 +
+ ld/testsuite/ld-plugin/lto.exp        | 18 ++++++++++++++++++
+ 3 files changed, 30 insertions(+)
+ create mode 100644 ld/testsuite/ld-plugin/common-1.c
+ create mode 100644 ld/testsuite/ld-plugin/definition-1.c
+
+diff --git a/ld/testsuite/ld-plugin/common-1.c b/ld/testsuite/ld-plugin/common-1.c
+new file mode 100644
+index 00000000000..b4f616aeea2
+--- /dev/null
++++ b/ld/testsuite/ld-plugin/common-1.c
+@@ -0,0 +1,11 @@
++#include <stdio.h>
++
++int foo;
++
++int main()
++{
++  if (foo == 1)
++    printf ("PASS\n");
++
++  return 0;
++}
+diff --git a/ld/testsuite/ld-plugin/definition-1.c b/ld/testsuite/ld-plugin/definition-1.c
+new file mode 100644
+index 00000000000..a244740a3a5
+--- /dev/null
++++ b/ld/testsuite/ld-plugin/definition-1.c
+@@ -0,0 +1 @@
++int foo = 1;
+diff --git a/ld/testsuite/ld-plugin/lto.exp b/ld/testsuite/ld-plugin/lto.exp
+index 604dc8c284d..0c3c9d94ec0 100644
+--- a/ld/testsuite/ld-plugin/lto.exp
++++ b/ld/testsuite/ld-plugin/lto.exp
+@@ -231,6 +231,13 @@ set lto_link_tests [list \
+    "$plug_opt" "-flto $lto_no_fat -fcommon" \
+    {pr26389.c} \
+    [list [list "nm" "$plug_opt" "pr26389.d"]]] \
++  [list "Build libdefinition-1.a" \
++   "$plug_opt" \
++   "-O2 -fcommon -flto $lto_no_fat" \
++   {definition-1.c} \
++   {} \
++   "libdefinition-1.a" \
++  ] \
+ ]
+ 
+ if { [at_least_gcc_version 10 0] && [check_lto_shared_available] } {
+@@ -763,6 +770,17 @@ set lto_run_tests [list \
+    {pr26262a.c} "pr26262b" "pass.out" \
+    "-flto -O2" "c" "" \
+    ""] \
++  [list "Run common-1" \
++   "-O2 -flto" \
++   "" \
++   {common-1.c} \
++   "common-1" \
++   "pass.out" \
++   "-O2 -fcommon -flto $lto_no_fat" \
++   "c" \
++   "" \
++   "tmpdir/libdefinition-1.a" \
++  ] \
+ ]
+ 
+ if { [at_least_gcc_version 4 7] } {
+-- 
+2.47.0
+

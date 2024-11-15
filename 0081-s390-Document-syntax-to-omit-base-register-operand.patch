@@ -1,0 +1,45 @@
+From d6ab1d2efdc8a31609fbebb76187157e4fe617aa Mon Sep 17 00:00:00 2001
+From: Jens Remus <jremus@linux.ibm.com>
+Date: Mon, 9 Sep 2024 17:05:27 +0200
+Subject: [PATCH 081/108] s390: Document syntax to omit base register operand
+
+Document the s390-specific assembler syntax introduced by commit
+aacf780bca29 ("s390: Allow to explicitly omit base register operand in
+assembly") to omit the base register operand B in D(X,B) and D(L,B) by
+coding D(X,) and D(L,).
+
+While at it document the alternative syntax to omit the index register
+operand X in D(X,B) by coding D(,B) instead of D(B).
+
+gas/
+	* doc/c-s390.texi (s390 Operands): Document syntax to omit base
+	register operand.
+
+Fixes: aacf780bca29 ("s390: Allow to explicitly omit base register operand in assembly")
+Signed-off-by: Jens Remus <jremus@linux.ibm.com>
+(cherry picked from commit e75cfa9f0f81f70389b6d81d22b664c37f2403db)
+---
+ gas/doc/c-s390.texi | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/gas/doc/c-s390.texi b/gas/doc/c-s390.texi
+index f73dfdeae60..cd0dc7be258 100644
+--- a/gas/doc/c-s390.texi
++++ b/gas/doc/c-s390.texi
+@@ -300,10 +300,11 @@ field. The notation changes as follows:
+ @display
+ @multitable @columnfractions 0.30 0.30
+ @headitem full notation @tab short notation
+-@item Dn(0,Bn) @tab Dn(Bn)
++@item Dn(Xn,0) @tab Dn(Xn,)
++@item Dn(0,Bn) @tab Dn(,Bn) or Dn(Bn)
+ @item Dn(0,0) @tab Dn
+ @item Dn(0) @tab Dn
+-@item Dn(Ln,0) @tab Dn(Ln)
++@item Dn(Ln,0) @tab Dn(Ln,) or Dn(Ln)
+ @end multitable
+ @end display
+ 
+-- 
+2.47.0
+
