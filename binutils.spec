@@ -64,10 +64,10 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.43.1
+Version:	2.44
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
-Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
+Source0:	https://ftp.gnu.org/gnu/binutils/binutils-with-gold-%{version}%{?DATE:-%{DATE}}.tar.bz2
 Release:	2
 License:	GPLv3+
 Group:		Development/Other
@@ -122,23 +122,14 @@ Provides:	cross-%{_target_platform}-binutils = %{EVRD}
 
 %patchlist
 # From upstream git:
-0007-ld-Add-an-LTO-test-for-common-symbol-override.patch
-0008-lto-Add-a-test-for-PR-ld-32083.patch
-0013-PR32109-aborting-at-bfd-bfd.c-1236-in-int-_bfd_doprn.patch
-0037-bfd-Pass-true-to-ld_plugin_object_p.patch
-0040-x86-APX-Don-t-promote-AVX-AVX2-instructions-out-of-A.patch
-0041-x86-64-Never-make-R_X86_64_GOT64-section-relative.patch
-0042-x86-64-Disable-PIE-on-PR-gas-32189-test.patch
-0048-x86-Turn-PLT32-to-PC32-only-for-PC-relative-relocati.patch
-0051-ld-Don-t-explicitly-add-.note.gnu.build-id-in-elf.sc.patch
-0055-segv-in-bfd_elf_get_str_section.patch
-0080-LoongArch-Add-elfNN_loongarch_mkobject-to-initialize.patch
-0081-s390-Document-syntax-to-omit-base-register-operand.patch
-0082-s390-Align-opcodes-to-lower-case.patch
-0083-s390-Simplify-dis-assembly-of-insn-operands-with-con.patch
-0084-s390-Relax-risbg-n-z-risb-h-l-gz-rns-ros-rxs-bgt-ope.patch
-0085-s390-Add-arch15-instructions.patch
-0094-PR32300-dependency-file-link-dependencies-are-not-al.patch
+0014-gas-fix-rs_fill_nop-listing.patch
+0017-score-elf-gas-SEGV.patch
+0025-PR-32731-ub-sanitizer-accessing-filenames_reversed.patch
+0030-Updated-translations-for-bfd-and-gold.patch
+0037-ld-Pass-Wl-z-lazy-to-compiler-for-i386-lazy-binding-.patch
+0050-elf-Clear-the-SEC_ALLOC-bit-for-NOLOAD-note-sections.patch
+0061-x86-Remove-AVX10.2-256-bit-rounding-support.patch
+0076-s390-Add-support-for-z17-as-CPU-name.patch
 # From Fedora:
 https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-libtool-lib64.patch
 # We don't want this one! Tends to break compatibility with scripts
@@ -227,7 +218,7 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%autosetup -p1 -n binutils-%{version}%{?DATE:-%{DATE}}
+%autosetup -p1 -n binutils-with-gold-%{version}%{?DATE:-%{DATE}}
 
 %if %{with gprofng}
 . %{_sysconfdir}/profile.d/90java.sh
@@ -328,6 +319,9 @@ for i in %{long_targets}; do
 		--without-static-standard-libraries \
 		--enable-64-bit-bfd \
 		--with-bugurl=%{bugurl} \
+%if ! %{with gprofng}
+		--disable-gprofng \
+%endif
 %if %{with gold}
 %if %{gold_default}
 		--enable-ld=yes \

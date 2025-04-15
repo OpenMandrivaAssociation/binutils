@@ -1,6 +1,6 @@
-diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/tc-i386.c
---- binutils-2.41.90/gas/config/tc-i386.c.10~	2024-01-24 15:07:59.000000000 +0100
-+++ binutils-2.41.90/gas/config/tc-i386.c	2024-01-24 15:47:59.563081686 +0100
+diff -up binutils-with-gold-2.44/gas/config/tc-i386.c.17~ binutils-with-gold-2.44/gas/config/tc-i386.c
+--- binutils-with-gold-2.44/gas/config/tc-i386.c.17~	2025-04-15 14:09:35.363684036 +0100
++++ binutils-with-gold-2.44/gas/config/tc-i386.c	2025-04-15 14:10:46.173836870 +0100
 @@ -38,6 +38,15 @@
  #include "opcodes/i386-mnem.h"
  #include <limits.h>
@@ -17,7 +17,7 @@ diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/t
  #ifndef INFER_ADDR_PREFIX
  #define INFER_ADDR_PREFIX 1
  #endif
-@@ -2676,14 +2685,14 @@ update_code_flag (int value, int check)
+@@ -2974,14 +2983,14 @@ update_code_flag (int value, int check)
    if (value == CODE_64BIT && !cpu_arch_flags.bitfield.cpu64 )
      {
        as_error (_("64bit mode not supported on `%s'."),
@@ -34,7 +34,7 @@ diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/t
        return;
      }
  
-@@ -2811,7 +2820,7 @@ check_cpu_arch_compatible (const char *n
+@@ -3112,7 +3121,7 @@ check_cpu_arch_compatible (const char *n
  	 use default_arch.  */
        arch = cpu_arch_name;
        if (!arch)
@@ -43,7 +43,7 @@ diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/t
      }
  
    /* If we are targeting Intel MCU, we must enable it.  */
-@@ -6601,7 +6610,7 @@ md_assemble (char *line)
+@@ -7112,7 +7121,7 @@ i386_assemble (char *line)
  	case unsupported_on_arch:
  	  as_bad (_("`%s' is not supported on `%s%s'"),
  		  pass1_mnem ? pass1_mnem : insn_name (current_templates.start),
@@ -52,7 +52,7 @@ diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/t
  		  cpu_sub_arch_name ? cpu_sub_arch_name : "");
  	  return;
  	case unsupported_64bit:
-@@ -16864,7 +16873,7 @@ md_show_usage (FILE *stream)
+@@ -17722,7 +17731,7 @@ md_show_usage (FILE *stream)
  const char *
  i386_target_format (void)
  {
@@ -60,8 +60,8 @@ diff -up binutils-2.41.90/gas/config/tc-i386.c.10~ binutils-2.41.90/gas/config/t
 +  if (startswith (default_arch, "x86_64") && !is_linux32())
      {
        update_code_flag (CODE_64BIT, 1);
- #if defined (OBJ_ELF) || defined (OBJ_MAYBE_ELF)
-@@ -16874,7 +16883,7 @@ i386_target_format (void)
+ #ifdef OBJ_ELF
+@@ -17732,7 +17741,7 @@ i386_target_format (void)
  	x86_elf_abi = X86_64_X32_ABI;
  #endif
      }

@@ -1,0 +1,99 @@
+From e1af7e590a5870164ed3bd2933d7131e919573fc Mon Sep 17 00:00:00 2001
+From: "H.J. Lu" <hjl.tools@gmail.com>
+Date: Thu, 13 Mar 2025 11:52:00 -0700
+Subject: [PATCH 50/81] elf: Clear the SEC_ALLOC bit for NOLOAD note sections
+
+When generating an ELF output file, if a note section is marked as
+NOLOAD, clear the SEC_ALLOC bit so that it won't be treated as an
+SHF_ALLOC section, like a .bss style section.
+
+	PR ld/32787
+	* ld.texi: Update NOLOAD for ELF output files.
+	* ldlang.c (lang_add_section): Clear the SEC_ALLOC bit for NOLOAD
+	note sections for ELF output files.
+	* testsuite/ld-elf/pr32787.d: New file.
+	* testsuite/ld-elf/pr32787.t: Likewise.
+
+Signed-off-by: H.J. Lu <hjl.tools@gmail.com>
+(cherry picked from commit d87be451ebbf831d44ac168ca9ea2b79ab5a79b3)
+---
+ ld/ld.texi                    |  8 +++++++-
+ ld/ldlang.c                   |  6 ++++--
+ ld/testsuite/ld-elf/pr32787.d |  9 +++++++++
+ ld/testsuite/ld-elf/pr32787.t | 12 ++++++++++++
+ 4 files changed, 32 insertions(+), 3 deletions(-)
+ create mode 100644 ld/testsuite/ld-elf/pr32787.d
+ create mode 100644 ld/testsuite/ld-elf/pr32787.t
+
+diff --git a/ld/ld.texi b/ld/ld.texi
+index f6384ad82dd..7678d1383e3 100644
+--- a/ld/ld.texi
++++ b/ld/ld.texi
+@@ -5965,7 +5965,13 @@ parentheses.  The following types are defined:
+ 
+ @item NOLOAD
+ The section should be marked as not loadable, so that it will not be
+-loaded into memory when the program is run.
++loaded into memory when the program is run.  When generating an ELF
++output file, the memory space is allocated for the section at run-time,
++except for SHT_NOTE sections.  For other output files, no memory space
++is allocated at run-time.
++
++Note - the ELF behaviour is a bug that may change to be consistent
++with non-ELF targets.
+ 
+ @item READONLY
+ The section should be marked as read-only.
+diff --git a/ld/ldlang.c b/ld/ldlang.c
+index 88d2c188fac..511d4bd2162 100644
+--- a/ld/ldlang.c
++++ b/ld/ldlang.c
+@@ -2783,8 +2783,10 @@ lang_add_section (lang_statement_list_type *ptr,
+       /* Unfortunately GNU ld has managed to evolve two different
+ 	 meanings to NOLOAD in scripts.  ELF gets a .bss style noload,
+ 	 alloc, no contents section.  All others get a noload, noalloc
+-	 section.  */
+-      if (bfd_get_flavour (link_info.output_bfd) == bfd_target_elf_flavour)
++	 section.  Unlike a .bss style section, if a note section is
++	 marked as NOLOAD, also clear SEC_ALLOC.  */
++      if (bfd_get_flavour (link_info.output_bfd) == bfd_target_elf_flavour
++	  && elf_section_type (section) != SHT_NOTE)
+ 	flags &= ~SEC_HAS_CONTENTS;
+       else
+ 	flags &= ~SEC_ALLOC;
+diff --git a/ld/testsuite/ld-elf/pr32787.d b/ld/testsuite/ld-elf/pr32787.d
+new file mode 100644
+index 00000000000..8d07b8d7914
+--- /dev/null
++++ b/ld/testsuite/ld-elf/pr32787.d
+@@ -0,0 +1,9 @@
++#source: start.s
++#ld: --build-id -T pr32787.t
++#nm: -n
++# The following targets don't support --build-id.
++#xfail: [uses_genelf]
++
++#...
++.* start
++#pass
+diff --git a/ld/testsuite/ld-elf/pr32787.t b/ld/testsuite/ld-elf/pr32787.t
+new file mode 100644
+index 00000000000..cf5aeb18ad1
+--- /dev/null
++++ b/ld/testsuite/ld-elf/pr32787.t
+@@ -0,0 +1,12 @@
++SECTIONS {
++	. = SIZEOF_HEADERS;
++	.text : {
++		*(.text)
++	}
++	.data : {
++		_data_start = .;
++		*(.data)
++	}
++	.note.gnu.build-id (NOLOAD) : { *(.note.gnu.build-id) }
++	/DISCARD/ : { *(*) }
++}
+-- 
+2.49.0
+

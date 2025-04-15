@@ -1,0 +1,77 @@
+From 78082591ec7032afeba8d041160d6c013a6d609a Mon Sep 17 00:00:00 2001
+From: Alan Modra <amodra@gmail.com>
+Date: Sun, 16 Feb 2025 08:29:27 +1030
+Subject: [PATCH 17/81] score-elf gas SEGV
+
+Commit 3fb6f5457e5b typoed an array subscript.
+
+	* config/tc-score7.c (s7_gen_reloc): Correct array subscript.
+	* testsuite/gas/score/pr32700.d,
+	* testsuite/gas/score/pr32700.s: New test.
+	* testsuite/gas/score/relax.exp: Run it.
+
+(cherry picked from commit ac8a1a52cf757b64373dfca8efc0e3041648a9f5)
+---
+ gas/config/tc-score7.c            |  2 +-
+ gas/testsuite/gas/score/pr32700.d | 14 ++++++++++++++
+ gas/testsuite/gas/score/pr32700.s |  2 ++
+ gas/testsuite/gas/score/relax.exp |  2 +-
+ 4 files changed, 18 insertions(+), 2 deletions(-)
+ create mode 100644 gas/testsuite/gas/score/pr32700.d
+ create mode 100644 gas/testsuite/gas/score/pr32700.s
+
+diff --git a/gas/config/tc-score7.c b/gas/config/tc-score7.c
+index 07177954e5b..1743df4eaeb 100644
+--- a/gas/config/tc-score7.c
++++ b/gas/config/tc-score7.c
+@@ -6845,7 +6845,7 @@ s7_gen_reloc (asection * section ATTRIBUTE_UNUSED, fixS * fixp)
+       s7_number_to_chars (buf, newval, s7_INSN_SIZE);
+ 
+       retval[1] = notes_alloc (sizeof (arelent));
+-      retval[2]->sym_ptr_ptr = notes_alloc (sizeof (asymbol *));
++      retval[1]->sym_ptr_ptr = notes_alloc (sizeof (asymbol *));
+       retval[2] = NULL;
+       *retval[1]->sym_ptr_ptr = symbol_get_bfdsym (fixp->fx_addsy);
+       retval[1]->address = (reloc->address + s7_RELAX_RELOC2 (fixp->fx_frag->fr_subtype));
+diff --git a/gas/testsuite/gas/score/pr32700.d b/gas/testsuite/gas/score/pr32700.d
+new file mode 100644
+index 00000000000..be814b86d11
+--- /dev/null
++++ b/gas/testsuite/gas/score/pr32700.d
+@@ -0,0 +1,14 @@
++#as:
++#objdump: -dr
++#source: pr32700.s
++
++.*: +file format .*
++
++Disassembly of section \.text:
++
++0+ <\.text>:
++   0:	94388000 	ldis		r1, 0x0\(0\)
++			0: R_SCORE_HI16	dwarf_reg_size_table
++   4:	84348000 	ori		r1, 0x0
++			4: R_SCORE_LO16	dwarf_reg_size_table
++   8:	d8e18000 	lbu		r7, \[r1, 0\]
+diff --git a/gas/testsuite/gas/score/pr32700.s b/gas/testsuite/gas/score/pr32700.s
+new file mode 100644
+index 00000000000..117b3c8ab4e
+--- /dev/null
++++ b/gas/testsuite/gas/score/pr32700.s
+@@ -0,0 +1,2 @@
++ .text
++ lbu r7,dwarf_reg_size_table
+diff --git a/gas/testsuite/gas/score/relax.exp b/gas/testsuite/gas/score/relax.exp
+index 184f9180e97..534a822f806 100644
+--- a/gas/testsuite/gas/score/relax.exp
++++ b/gas/testsuite/gas/score/relax.exp
+@@ -32,5 +32,5 @@ if [istarget score-*-*] then {
+     run_dump_test "move"
+     run_dump_test "rD_rA_BN"
+     run_dump_test "rD_rA"
++    run_dump_test pr32700
+ }
+-
+-- 
+2.49.0
+
