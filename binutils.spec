@@ -532,6 +532,7 @@ rm %{buildroot}%{_infodir}/ctf-spec.info* %{buildroot}%{_infodir}/sframe-spec.in
 %optional %{_bindir}/dwp
 %{_bindir}/elfedit
 %{_bindir}/gprof
+%if %{with gprofng}
 %ifarch %{x86_64} %{aarch64}
 %config(noreplace) %{_sysconfdir}/gprofng.rc
 %{_bindir}/gprofng
@@ -541,7 +542,14 @@ rm %{buildroot}%{_infodir}/ctf-spec.info* %{buildroot}%{_infodir}/sframe-spec.in
 %{_bindir}/gp-display-html
 %{_bindir}/gp-display-src
 %{_bindir}/gp-display-text
+%{_bindir}/gprofng-archive
+%{_bindir}/gprofng-collect-app
+%{_bindir}/gprofng-display-html
+%{_bindir}/gprofng-display-src
+%{_bindir}/gprofng-display-text
 %{_libdir}/gprofng
+%doc %{_docdir}/gprofng
+%endif
 %endif
 %{_bindir}/ld
 %{_bindir}/ld.bfd
