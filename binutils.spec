@@ -185,6 +185,7 @@ binutils-2.25.51-fix-overrides-for-gold-testsuite.patch
 #binutils-2.25.51-lto.patch
 binutils-2.27.90-fix-warnings.patch
 binutils-2.31-clang7.patch
+binutils-2.44-workaround-linkage-failure.patch
 
 %description
 Binutils is a collection of binary utilities, including:

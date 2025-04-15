@@ -1,0 +1,31 @@
+diff -up binutils-with-gold-2.44/gprofng/libcollector/heaptrace.c.omv~ binutils-with-gold-2.44/gprofng/libcollector/heaptrace.c
+--- binutils-with-gold-2.44/gprofng/libcollector/heaptrace.c.omv~	2025-04-15 17:02:07.482379718 +0200
++++ binutils-with-gold-2.44/gprofng/libcollector/heaptrace.c	2025-04-15 17:04:20.183811368 +0200
+@@ -25,6 +25,7 @@
+ #include "config.h"
+ #include <dlfcn.h>
+ #include <stddef.h>
++#include <stdlib.h> // strtoull
+ 
+ #include "gp-defs.h"
+ #include "collector.h"
+@@ -137,9 +138,17 @@ open_experiment (const char *exp)
+   if (*params != 'o') // Not -H on. Read a range.
+     {
+       char *s;
+-      start_range = (size_t) CALL_UTIL (strtoull) (params, &s, 0);
++      // FIXME using CALL_UTIL here results in
++      // ld.lld: error: undefined symbol: __collector_util_funcs
++      // even though __collector_util_funcs is defined. Probably an LTO bug
++      // of some kind.
++      // In the mean time, it's no big deal because the only OS we care about
++      // running on has strtoull and doesn't need a helper copy.
++      //start_range = (size_t) CALL_UTIL (strtoull) (params, &s, 0);
++      start_range = strtoull (params, &s, 0);
+       if (*s == '-')
+-	end_range = (size_t) CALL_UTIL (strtoull) (s + 1, &s, 0);
++	//end_range = (size_t) CALL_UTIL (strtoull) (s + 1, &s, 0);
++	end_range = strtoull (s + 1, &s, 0);
+       fprintf(stderr, "Range: %lld - %lld\n", (long long) start_range, (long long) end_range);
+     }
+   
