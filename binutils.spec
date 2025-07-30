@@ -64,11 +64,15 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.44
+Version:	2.45
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
-Source0:	https://ftp.gnu.org/gnu/binutils/binutils-with-gold-%{version}%{?DATE:-%{DATE}}.tar.bz2
-Release:	2
+Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
+# gold stopped being included at 2.44, so until further notice we'll put in what's in git
+# (and still getting at least occasional patches) -- just tar up the "gold" and "elfcpp" directories
+# from git
+Source1:	gold-20250730.tar.xz
+Release:	1
 License:	GPLv3+
 Group:		Development/Other
 URL:		https://sourceware.org/binutils/
@@ -122,14 +126,6 @@ Provides:	cross-%{_target_platform}-binutils = %{EVRD}
 
 %patchlist
 # From upstream git:
-0014-gas-fix-rs_fill_nop-listing.patch
-0017-score-elf-gas-SEGV.patch
-0025-PR-32731-ub-sanitizer-accessing-filenames_reversed.patch
-0030-Updated-translations-for-bfd-and-gold.patch
-0037-ld-Pass-Wl-z-lazy-to-compiler-for-i386-lazy-binding-.patch
-0050-elf-Clear-the-SEC_ALLOC-bit-for-NOLOAD-note-sections.patch
-0061-x86-Remove-AVX10.2-256-bit-rounding-support.patch
-0076-s390-Add-support-for-z17-as-CPU-name.patch
 # From Fedora:
 https://src.fedoraproject.org/rpms/binutils/raw/rawhide/f/binutils-libtool-lib64.patch
 # We don't want this one! Tends to break compatibility with scripts
@@ -219,7 +215,7 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%autosetup -p1 -n binutils-with-gold-%{version}%{?DATE:-%{DATE}}
+%autosetup -p1 -n binutils-%{version}%{?DATE:-%{DATE}} -a1
 
 %if %{with gprofng}
 . %{_sysconfdir}/profile.d/90java.sh
