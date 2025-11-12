@@ -1,3 +1,3 @@
 sources:
-  binutils-2.45.tar.bz2: 7117fc18f6008e83a6a3239cfaf9d7e2e22a57df
   gold-20250730.tar.xz: 268ff81b74ec54556f4e77aa28f1d4814bbc4ea2
+  binutils-2.45.1.tar.bz2: 86ec78eae9c5ff0c0d326e5e3f8e722aad9cacdf
