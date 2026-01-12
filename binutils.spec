@@ -51,7 +51,7 @@
 %define gold_default 0
 
 %bcond_with gold
-%ifarch %{riscv}
+%ifarch %{riscv} %{loongarch64}
 # FIXME Not yet ported -- enable when it is
 %bcond_with gprofng
 %else
