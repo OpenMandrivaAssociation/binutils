@@ -88,6 +88,7 @@ Source102:	nm
 %rename %{lib_name}
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	make
 BuildRequires:	bison
 BuildRequires:	flex
 BuildRequires:	gettext
