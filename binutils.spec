@@ -64,14 +64,15 @@
 
 Summary:	GNU Binary Utility Development Utilities
 Name:		binutils
-Version:	2.45.1
+Version:	2.46
 # To package a snapshot, use
 # "./src-release.sh -x binuitls" in binutils-gdb.git
-Source0:	https://ftp.gnu.org/gnu/binutils/binutils-%{version}%{?DATE:-%{DATE}}.tar.bz2
+Source0:	https://ftp.gnu.org/gnu/binutils/binutils-with-gold-%{version}%{?DATE:-%{DATE}}.tar.xz
 # gold stopped being included at 2.44, so until further notice we'll put in what's in git
 # (and still getting at least occasional patches) -- just tar up the "gold" and "elfcpp" directories
 # from git
-Source1:	gold-20250730.tar.xz
+# [bring this back if the binutils-with-gold tarball releases disappear again]
+#Source1:	gold-20250730.tar.xz
 Release:	1
 License:	GPLv3+
 Group:		Development/Other
@@ -215,13 +216,13 @@ have a stable ABI.  Developers starting new projects are strongly encouraged
 to consider using libelf instead of BFD.
 
 %prep
-%autosetup -p1 -n binutils-%{version}%{?DATE:-%{DATE}} -a1
+%autosetup -p1 -n binutils-with-gold-%{version}%{?DATE:-%{DATE}}
 
 %if %{with gprofng}
 . %{_sysconfdir}/profile.d/90java.sh
 %endif
 
-cp -f %{_datadir}/libtool/config/config.{guess,sub} .
+cp -f %{_bindir}/config.{guess,sub} .
 
 # Need to regenerate lex files
 rm -f binutils/syslex.c binutils/arlex.c binutils/deflex.c gas/config/bfin-lex.c gas/itbl-lex.c ld/ldlex.c
@@ -254,6 +255,7 @@ sed -i -e 's,tooldir)/lib,tooldir)/%{_lib},g' gold/Makefile.*
 
 export CC="%{__cc} -D_GNU_SOURCE=1 -DHAVE_DECL_ASPRINTF=1"
 export CXX="%{__cxx} -D_GNU_SOURCE=1 -std=gnu++14"
+export RANLIB=llvm-ranlib
 
 for i in %{long_targets}; do
 	mkdir -p BUILD-$i
@@ -543,6 +545,7 @@ rm %{buildroot}%{_infodir}/ctf-spec.info* %{buildroot}%{_infodir}/sframe-spec.in
 %{_bindir}/gprofng-display-html
 %{_bindir}/gprofng-display-src
 %{_bindir}/gprofng-display-text
+%{_bindir}/gprofng-gmon
 %{_libdir}/gprofng
 %doc %{_docdir}/gprofng
 %endif
